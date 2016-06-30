@@ -29,32 +29,8 @@ int Position::getY() {
 bool Position::operator ==(const Position& p) {
 	return (this->x == p.x && this->y == p.y);
 }
-
 bool Position::operator !=(const Position& p) {
 	return (this->x != p.x || this->y != p.y);
-}
-
-// test main
-int main() {
-
-	Position p1(2, 3);
-	Position p2(1, 2);
-	Position p3(2, 3);
-	Position p4;
-
-	if (p1 != p2) cout << "good\n";
-	else cout << "bad\n";
-
-	if (p1 == p3) cout << "good\n";
-	else cout << "bad\n";
-
-	cout << "Four: " << p4.getX() << ", " << p4.getY() << "\n";
-	cout << "Three: " << p3.getX() << ", " << p3.getY() << "\n";
-	cout << "Two: " << p2.getX() << ", " << p2.getY() << "\n";
-	cout << "One: " << p1.getX() << ", " << p1.getY() << "\n";
-
-	return 0;
-
 }
 
 
