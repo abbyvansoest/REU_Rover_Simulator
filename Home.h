@@ -16,7 +16,7 @@ private :
 public:
 	Home(double,double);
 	double getPosition();
-	double getCurrentamount();
+	double getCurrentAmount();
 	void recieveValues(int);
 
 };
