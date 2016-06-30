@@ -25,6 +25,9 @@ POI::POI()
 	this->weight = 1;
 }
 
+
+/* Non-default constructor calls on the 
+* position non-default constructor */
 POI::POI(int weight, int x, int y) : p(x, y)
 {
 	this->weight = weight;
@@ -35,7 +38,7 @@ int POI::get_weight()
 	return this->weight;
 }
 
-void POI::compleated()
+void POI::completed()
 {
 	this->complete = true;
 }
