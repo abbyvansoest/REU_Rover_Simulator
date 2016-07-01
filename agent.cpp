@@ -18,6 +18,7 @@
 
 #include "agent.h"
 
+Agent::Agent(){}
 //  non-default constructor for agent
 Agent::Agent(Position initialPos, State initialState) {
 	position = initialPos;
@@ -31,6 +32,7 @@ Agent::Agent(Position initialPos, State initialState) {
  * policy has chosen */
 float Agent::nextAction(State s, FANN::neural_net net) {
 	//stateTrajectory.push_back(s);
+	//TODO add exploratory steps
 	
 	fann_type* output = net.run( (fann_type*) s.array);
 

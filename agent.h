@@ -23,6 +23,7 @@ class Agent {
 		std::deque<State> stateTrajectory; // Do we want to keep this?
 
 	public:	
+		Agent();
 		Agent(Position, State);
 		float nextAction(State, FANN::neural_net);
 };
