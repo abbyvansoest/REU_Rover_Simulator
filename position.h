@@ -1,22 +1,25 @@
 #ifndef POSITION_INCLUDED
 #define POSITION_INCLUDED
 
+#include <string>
+using std::string;
+
 class Position 
 {
+	private:
+		int x;
+		int y;
+	public:
+		Position();
+		Position(int, int);
+		Position(string);
 
-private:
-	int x;
-	int y;
+		int getX();
+		int getY();
+		string toString();
 
-public:
-	Position();
-	Position(int, int);
-
-	int getX(void);
-	int getY(void);
-
-	bool operator ==(const Position& p);
-	bool operator !=(const Position& p);
+		bool operator ==(const Position& p);
+		bool operator !=(const Position& p);
 
 };
 
