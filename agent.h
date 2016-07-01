@@ -24,7 +24,7 @@ class Agent {
 	public:	
 		Agent();
 		Agent(Position, State);
-		float nextAction(State, FANN::neural_net);
+		int nextAction(State, FANN::neural_net);
 };
 
 #endif

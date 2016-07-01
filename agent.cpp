@@ -30,7 +30,7 @@ Agent::Agent(Position initialPos, State initialState) {
  * ouput array with the max value. The output is the 6-array of [0,1] continuous 
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
-float Agent::nextAction(State s, FANN::neural_net net) {
+int Agent::nextAction(State s, FANN::neural_net net) {
 	//stateTrajectory.push_back(s);
 	//TODO add exploratory steps
 	
