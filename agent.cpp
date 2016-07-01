@@ -22,18 +22,23 @@
 Agent::Agent(Position initialPos, State initialState) {
 	position = initialPos;
 	stateTrajectory.push_back(initialState);
-
 }
 
-//  get next action based on state and return to Gridworld
-int Agent::nextAction(State s) {
-	stateTrajectory.push_back(s);
-	return calculateAction(s);
+/* get next action based on state and return to Gridworld
+ * The action is represented as a single integer, found as the index in the
+ * ouput array with the max value. The output is the 6-array of [0,1] continuous 
+ * values. and the highest value represents the most favorable action the
+ * policy has chosen */
+float Agent::nextAction(State s, FANN::neural_net net) {
+	//stateTrajectory.push_back(s);
+	
+	fann_type* output = net.run( (fann_type*) s.array);
+
+	int max_i = 0;
+	for (int i = 0; i < 6; ++i)
+	{
+		if (output[i] > output[max_i]) { max_i = i; }
+	}
+	return max_i;
 }
 
-// based on current neural network and current agent state,
-// compute and return the next desired action
-int Agent::calculateAction(State state) {
-
-
-}
