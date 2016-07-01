@@ -1,23 +1,28 @@
-
 #ifndef AGENT_INCLUDED
 #define AGENT_INCLUDED
 
 #include <deque>
+#include <iostream>
+#include "position.h"
 
-typedef int[13] State;
+/* This struct is a nice wrapper around the state, allowing it to be treated as a singular object
+ * (with additional bracketing being overloaded, if it is desired)
+ * and encapsulates the int array away.
+ * The internal array can be directly accessed if needed */
+typedef struct State{
+	int& operator[](int i) {return array[i]; }
+	int array[13];
+} State;
 
 class Agent {
+	private:
+		Position position;
+		std::deque<State> stateTrajectory;
+		int calculateAction(State);
 
-private:
-	static XXX nn;
-	Position position;
-	std::deque<State> stateTrajectory;
-	int calculateAction(State);
-
-public:	
-	Agent();
-	int nextAction(State);
-	void updateNN(Deque<State>, double);
+	public:	
+		Agent(Position, State);
+		int nextAction(State);
 };
 
 #endif
