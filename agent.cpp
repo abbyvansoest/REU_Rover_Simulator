@@ -29,7 +29,6 @@ void Agent::setState(State state) {
 	stateTrajectory.push_back(state);
 }
 
-
 /* get next action based on state and return to Gridworld
  * The action is represented as a single integer, found as the index in the
  * ouput array with the max value. The output is the 6-array of [0,1] continuous 

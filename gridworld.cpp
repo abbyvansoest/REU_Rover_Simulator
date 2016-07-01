@@ -1,5 +1,3 @@
-/////            figure out how to initialize states 
-
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -25,6 +23,21 @@ int MOVE_DOWN = 2;
 int MOVE_RIGHT = 3;
 int PICKUP = 4;
 int BROADCAST = 5;
+
+// define the indices for the state array
+int AGENTS_1 = 0;
+int POI_1 = 1;
+int BROADCASTING_1 = 2;
+int AGENTS_2 = 3;
+int POI_2 = 4;
+int BROADCASTING_2 = 5;
+int AGENTS_3 = 6;
+int POI_3 = 7;
+int BROADCASTING_3 = 8;
+int AGENTS_4 = 9;
+int POI_4 = 10;
+int BROADCASTING_4 = 11;
+int CARRYING = 12;
 
 // constructor
 Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, FANN::neural_net net) {
@@ -125,7 +138,54 @@ private bool Gridworld::positionAvailable(Position p) {
 //  return the 13-dim state representation for ag
 private State Gridworld::getState(Agent ag) {
 
-	//  RETURN STATE OF THE AGENT SOMEHOW LOL
+	Position pos = agent.position;
+
+	// go through all agents and POI
+	// increment variables to account for counts
+	// based on relative quadrant location
+	int agentCountA;
+	int agentCountB;
+	int agentCountC;
+	int agentCountD;
+	int poiCountA; 
+	int poiCountB;
+	int poiCountC;
+	int poiCountD;
+	int broadcastCountA; 
+	int broadcastCountB;
+	int broadcastCountC;
+	int broadcastCountD;  
+
+	for (auto it = agents.begin(); it != agents.end(); ++it) {  
+
+
+	}
+
+	for (auto it = agents.begin(); it != agents.end(); ++it) {  
+
+		
+	}
+
+	State state;
+
+	//  information on quadrant 1 
+	state[AGENTS_A] = agentCountA;
+	state[POI_A] = poiCountA;
+	state[BROADCASTING_A] = broadcastCountA;
+	//  information on quadrant 2
+	state[AGENTS_B] = agentCountB;
+	state[POI_B] = poiCountB;
+	state[BROADCASTING_B] = broadcastCountB;
+	//  information on quadrant 3
+	state[AGENTS_C] = agentCountC;
+	state[POI_C] = poiCountC;
+	state[BROADCASTING_C] = broadcastCountC;
+	//  information on quadrant 4
+	state[AGENTS_D] = agentCountD;
+	state[POI_D] = poiCountD;
+	state[BROADCASTING_D] = broadcastCountD;
+	// carrying information
+	state[CARRYING] = ??
 
 }
 

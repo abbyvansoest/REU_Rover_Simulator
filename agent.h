@@ -11,6 +11,7 @@
  * (with additional bracketing being overloaded, if it is desired)
  * and encapsulates the int array away.
  * The internal array can be directly accessed if needed */
+
 typedef struct State{
 	float& operator[](int i) { return array[i]; }
 	float array[13];
@@ -25,7 +26,7 @@ class Agent {
 		Agent();
 		Agent(Position);
 		void Agent::setState(State);
-		int nextAction(State, FANN::neural_net);
+		int Agent::nextAction(State, FANN::neural_net);
 };
 
 #endif
