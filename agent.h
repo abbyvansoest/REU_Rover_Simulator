@@ -1,23 +1,30 @@
-
 #ifndef AGENT_INCLUDED
 #define AGENT_INCLUDED
 
 #include <deque>
+#include <iostream>
+#include <fann.h>
+#include <fann_cpp.h>
+#include "position.h"
 
-typedef int[13] State;
+/* This struct is a nice wrapper around the state, allowing it to be treated as a singular object
+ * (with additional bracketing being overloaded, if it is desired)
+ * and encapsulates the int array away.
+ * The internal array can be directly accessed if needed */
+typedef struct State{
+	float& operator[](int i) { return array[i]; }
+	float array[13];
+} State;
 
 class Agent {
+	private:
+		Position position; //Currently unused
+		std::deque<State> stateTrajectory; // Do we want to keep this?
 
-private:
-	static XXX nn;
-	Position position;
-	std::deque<State> stateTrajectory;
-	int calculateAction(State);
-
-public:	
-	Agent();
-	int nextAction(State);
-	void updateNN(Deque<State>, double);
+	public:	
+		Agent();
+		Agent(Position, State);
+		int nextAction(State, FANN::neural_net);
 };
 
 #endif

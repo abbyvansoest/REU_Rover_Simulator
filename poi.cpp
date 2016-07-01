@@ -1,6 +1,5 @@
 /*
- *  This file implements the simple poi class for the simulation.
- *  Classes were chosen for potential extensibility.
+ *  This simulator implements a rover domain gridworld for theoretical research purposes.
  *  Copyright (C) 2016  Connor Yates
  *
  *  This program is free software: you can redistribute it and/or modify
