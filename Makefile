@@ -12,8 +12,8 @@ debug-flags:
 
 debug: | debug-flags test
 
-all: agent.o poi.o gridworld.o simulator.o homebase.o
-	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulator.o homebase.o -o $(EXE)
+all: agent.o poi.o gridworld.o simulation.o homebase.o
+	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulation.o homebase.o -o $(EXE)
 
 agent.o: agent.cpp agent.h
 	$(CC) $(CFLAGS) -c agent.cpp -o agent.o
@@ -21,8 +21,8 @@ agent.o: agent.cpp agent.h
 gridworld.o: gridworld.cpp gridworld.h
 	$(CC) $(CFLAGS) -c gridworld.cpp -o gridworld.o
 
-simulator.o: simulator.cpp simulator.h
-	$(CC) $(CFLAGS) -c simulator.cpp -o simulator.o
+simulation.o: simulation.cpp simulation.h
+	$(CC) $(CFLAGS) -c simulation.cpp -o simulation.o
 
 homebase.o: homebase.cpp homebase.h
 	$(CC) $(CFLAGS) -c homebase.cpp -o homebase.o
