@@ -7,10 +7,10 @@ These models will then be translated to a physical platform, the Pioneer robots.
 There is the possibility for further work on more realistic simulator once the basic gridworld is complete.
 
 ## Authors
-[Connor Yates](github.com/Sir-Batman), [yatesco@oregonstate.edu](mailto:yatesco@oregonstate.edu)
-Abby Van Soest, [asoest@princeton.edu](mailto:asoest@princeton.edu)
-Tobi Ogunyale, [tobiogunyale@gmail.com](mailto:tobiogunyale@gmail.com)
+* [Connor Yates](github.com/Sir-Batman), [yatesco@oregonstate.edu](mailto:yatesco@oregonstate.edu)
+* Abby Van Soest, [asoest@princeton.edu](mailto:asoest@princeton.edu)
+* Tobi Ogunyale, [tobiogunyale@gmail.com](mailto:tobiogunyale@gmail.com)
 
 ## Dependencies
-This project requires [OpenANN](https://openann.github.io/OpenANN-apidoc/index.html) to be installed on the system to implement the neural network to control the agent policy.
+This project requires [FANN](http://leenissen.dk/fann/wp/) to be installed on the system to implement the neural network to control the agent policy.
 
