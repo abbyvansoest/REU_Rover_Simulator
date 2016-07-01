@@ -1,6 +1,4 @@
-/////   NEED TO: make position to string / from string operations
 /////            figure out how to initialize states 
-//////     cahnge constructor for agent and aff setState();
 
 #include <iostream>
 #include <cstdlib>
@@ -79,7 +77,7 @@ private void Gridworld::initAgents() {
 	Agent* ag;
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
 		ag = &it->second;
-		ag.setState(getState(agent));
+		(*ag).setState(getState(*ag));
 	}
 
 }

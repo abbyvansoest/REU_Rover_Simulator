@@ -20,10 +20,15 @@
 
 Agent::Agent(){}
 //  non-default constructor for agent
-Agent::Agent(Position initialPos, State initialState) {
+Agent::Agent(Position initialPos) {
 	position = initialPos;
-	stateTrajectory.push_back(initialState);
 }
+
+// push most recent agent state to trajectory stack 
+void Agent::setState(State state) {
+	stateTrajectory.push_back(state);
+}
+
 
 /* get next action based on state and return to Gridworld
  * The action is represented as a single integer, found as the index in the

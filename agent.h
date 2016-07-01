@@ -23,7 +23,8 @@ class Agent {
 
 	public:	
 		Agent();
-		Agent(Position, State);
+		Agent(Position);
+		void Agent::setState(State);
 		int nextAction(State, FANN::neural_net);
 };
 
