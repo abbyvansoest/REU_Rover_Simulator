@@ -6,7 +6,6 @@
 #include <fann.h>
 #include <fann_cpp.h>
 #include "position.h"
-#include <array>
 
 /* This struct is a nice wrapper around the state, allowing it to be treated as a singular object
  * (with additional bracketing being overloaded, if it is desired)
