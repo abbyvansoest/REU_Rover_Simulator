@@ -181,17 +181,22 @@ private State Gridworld::getState(Position pos, Agent ag) {
 		compAgent = it->second;
 		Position p = new Position(it->first);
 
-		if (p.getX < pos.getX && p.getY >= pos.getY) agentCountA++;
-		if (p.getX >= pos.getX && p.getY > pos.getY) agentCountB++;
-		if (p.getX <= pos.getX && p.getY < pos.getY) agentCountC++;
-		if (p.getX > pos.getX && p.getY <= pos.getY) agentCountD++;
-
-		//  determine the number of broadcasting agents
-		if ((*compAgent).isBroadcasting()) broadcastCountA++;
-		if ((*compAgent).isBroadcasting()) broadcastCountB++;
-		if ((*compAgent).isBroadcasting()) broadcastCountC++;
-		if ((*compAgent).isBroadcasting()) broadcastCountD++;
-
+		if (p.getX < pos.getX && p.getY >= pos.getY) {
+			agentCountA++;
+			if ((*compAgent).isBroadcasting()) broadcastCountA++;
+		}
+		if (p.getX >= pos.getX && p.getY > pos.getY) {
+			agentCountB++;
+			if ((*compAgent).isBroadcasting()) broadcastCountB++;
+		}
+		if (p.getX <= pos.getX && p.getY < pos.getY) {
+			agentCountC++;
+			if ((*compAgent).isBroadcasting()) broadcastCountC++;
+		}
+		if (p.getX > pos.getX && p.getY <= pos.getY) {
+			agentCountD++;
+			if ((*compAgent).isBroadcasting()) broadcastCountD++;
+		}
 		delete p;
 	}
 
@@ -255,11 +260,13 @@ void Gridworld::stepAgents() {
 
 		if (action == BROADCAST) {
 			(*agent).setBroadcast(true);
+			delete oldPos;
 			return;
 		}
 
 		if (action == PICKUP) {
 			(*agent).setCarrying(true);
+			delete oldPos;
 			return;
 		}
 
