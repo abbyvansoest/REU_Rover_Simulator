@@ -30,7 +30,7 @@ Agent::Agent(std::deque<State> trajectory, bool broadcasting, bool carrying) {
 }
 
 Agent Agent::copy() {
-	return new Agent(this->stateTrajectory, this.isBroadcasting(), this.isCarrying());
+	return Agent(this->stateTrajectory, this->isBroadcasting(), this->isCarrying());
 }
 
 // push most recent agent state to trajectory stack 
@@ -49,7 +49,7 @@ void Agent::setBroadcast(bool set) {
 }
 
 //  is the agent carrying anything?
-int Agent::isCarrying() {
+bool Agent::isCarrying() {
 	return this->carrying;
 }
 
@@ -64,11 +64,36 @@ void Agent::setCarrying(bool set) {
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, FANN::neural_net net) {
+int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position home_pos, double eps) {
 
 	//stateTrajectory.push_back(s);
-	//TODO add exploratory steps
 	
+	//TODO if adding threading, change to drand48_r() and rand_r()
+	if (drand48() < eps)
+	{
+		return rand() % 6;
+	}
+	
+	if (this->carrying)
+	{
+		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))
+		{
+			if (self_pos.getX() > home_pos.getX())
+			{
+				return MOVE_RIGHT;
+			}
+			else { return MOVE_LEFT; }
+		}
+		else{
+			if (self_pos.getY() > home_pos.getY())
+			{
+				return MOVE_DOWN;
+			}
+			else { return MOVE_UP; }
+		}
+	}
+
+	/* Picks the output from the neural net */
 	fann_type* output = net.run( (fann_type*) s.array);
 
 	int max_i = 0;
@@ -76,6 +101,6 @@ int Agent::nextAction(State s, FANN::neural_net net) {
 	{
 		if (output[i] > output[max_i]) { max_i = i; }
 	}
+
 	return max_i;
 }
-
