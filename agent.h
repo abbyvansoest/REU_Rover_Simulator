@@ -6,19 +6,18 @@
 #include <fann.h>
 #include <fann_cpp.h>
 #include "position.h"
+#include "state.h"
 
-/* This struct is a nice wrapper around the state, allowing it to be treated as a singular object
- * (with additional bracketing being overloaded, if it is desired)
- * and encapsulates the int array away.
- * The internal array can be directly accessed if needed */
-
-typedef struct State {
-
-	float& operator[](int i) { return array[i]; }
-	float array[13];
-
-} State;
-
+/* Definition of action behaviors relative numbers */
+enum
+{
+	MOVE_UP,
+	MOVE_LEFT,
+	MOVE_DOWN,
+	MOVE_RIGHT,
+	PICKUP,
+	BROADCAST
+}
 
 class Agent {
 
@@ -32,28 +31,28 @@ class Agent {
 
 		//  constructors
 		Agent();
-		Agent::Agent(std::deque<State>, bool);
-		Agent Agent::copy();
+		Agent(std::deque<State>, bool);
+		Agent copy();
 
 		//  push the newest state information onto the 
 		//  trajectory deque
-		void Agent::setState(State);
+		void setState(State);
 
 		//  get the next action for hte agent based on the
 		//  current state and the neural net
-		int Agent::nextAction(State, FANN::neural_net);
+		int nextAction(State, FANN::neural_net);
 
 		//  is the broadcasting signal positive or negative?
-		bool Agent::isBroadcasting();
+		bool isBroadcasting();
 
 		//  set broadcasting signal
-		void Agent::setBroadcast(bool);
+		void setBroadcast(bool);
 
 		//  is the agent carrying anything?
-		bool Agent::isCarrying();
+		bool isCarrying();
 
 		//  set the carrying signal appropriately
-		void Agent::setCarrying(bool);
+		void setCarrying(bool);
 };
 
 #endif
