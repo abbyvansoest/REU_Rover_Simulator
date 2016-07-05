@@ -235,12 +235,12 @@ void Gridworld::stepAgents() {
 		//  agent remains in original location
 		if ((POI point = this->newPoi.find(posString)) != newPoi.end() && action == PICKUP) {
 			int success = point.addAvailableAgent(agent);
-			if (ret == -1) point.completed();
+			if (success == -1) point.completed();
 			nextPos = oldPos;
 		}
 
 		// add agent to new map of the gridworld with updated location
-		newAgents[posString] = newAgents;
+		newAgents[posString] = agent;
 
 	}
 
