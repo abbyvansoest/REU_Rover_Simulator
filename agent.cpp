@@ -76,7 +76,6 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 	
 	if (this->carrying)
 	{
-		/* TODO verify that the math works on actually orienting them toward the homebase */
 		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))
 		{
 			if (self_pos.getX() > home_pos.getX())
@@ -88,9 +87,9 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 		else{
 			if (self_pos.getY() > home_pos.getY())
 			{
-				return MOVE_UP;
+				return MOVE_DOWN;
 			}
-			else { return MOVE_DOWN; }
+			else { return MOVE_UP; }
 		}
 	}
 
