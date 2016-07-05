@@ -39,6 +39,7 @@ private:
 	void initHome(bool);
 	bool positionAvailable(Position);
 	State getState(Position, Agent);
+	bool inDomain(Position);
 
 public:
 

@@ -183,34 +183,25 @@ State Gridworld::getState(Position pos, Agent ag) {
 	return state;
 }
 
-// step all agents in the world
-//  potential for threading
+//  step all agents in the world
 void Gridworld::stepAgents() {
+
 	Agent* agent;
 	State state;
-	Position oldPos;
-	Position nextPos;
+	Position oldPos, nextPos;
 
-	//  iterate through and step all agents
-	//  CHECK POSITION OF INCREMENT
+	unordered_map<string, Agent*> newAgents;
+	unordered_map<string, POI*> newPoi = this->poi;
+
+	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
+
 		oldPos = Position(it->first);
 		agent = it->second;
 		state = getState(oldPos, *agent);
 		int action = agent->nextAction(state, this->nn);
 
-		// execute action described by the action value
-
-		if (action == BROADCAST) {
-			(*agent).setBroadcast(true);
-			return;
-		}
-
-		if (action == PICKUP) {
-			(*agent).setCarrying(true);
-			return;
-		}
-
+		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
 			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
 		}
@@ -223,14 +214,62 @@ void Gridworld::stepAgents() {
 		if (action == MOVE_UP) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
 		}
+		if (action == BROADCAST) {
+			(*agent).setBroadcast(true);
+			nextPos = oldPos;
+		}
+		else (*agent).setBroadcast(false);    
+		if (action == PICKUP) {
+			nextPos = oldPos;
+		}
+		
+		//  check what the next position holds
+		string posString = nextPos.toString();
 
-		//  remove agent, construct new agent and insert to new position
-		string str = nextPos.toString();
-		Agent *newAgent = new Agent();
-		*newAgent = agent->copy();
-		agents.erase(it);
-		agents[str] = newAgent;
+		//  if it has an agent / if it is at the boundary, do not move
+		if (this->newAgents.find(posString) != newAgents.end() || !inDomain(nextPos)) {
+			nextPos = oldPos;
+		}
+
+		//  if it has a POI, mark the POI as having another potential carrier
+		//  agent remains in original location
+		if ((POI point = this->newPoi.find(posString)) != newPoi.end() && action == PICKUP) {
+			int success = point.addAvailableAgent(agent);
+			if (ret == -1) point.completed();
+			nextPos = oldPos;
+		}
+
+		// add agent to new map of the gridworld with updated location
+		newAgents[posString] = newAgents;
+
 	}
+
+	//  iterate through POI to see if any have been fully picked up
+	//  remove from the table if this is the case
+	for (auto it = newPoi.begin(); it != newPoi.end(); ++it) {
+		POI point = *it->second;
+		if (point.isComplete()) {
+			//  set carrying information for all agents in vector list
+			std::vector<Agent*> carriers = point.getCarriers();
+			for (int i = 0; i < carriers.size(); i++) {
+				(*carriers[i]).setCarrying(true);
+			}
+			newPoi.erase(it);
+		}
+	}
+
+	//  set new agent and POI states
+	this->agents = newAgents;
+	this->poi = newPoi;
+}
+
+//  check if a position is outside the bounds of the gridworld
+bool Gridworld::inDomain(Position p) {
+
+	if (p.getX() < 0 || p.getX() >= this->width || p.getY() < 0 || p.getY() >= this->height) {
+		return false;
+	}
+	return true;
 }
 
 // at the end of a simulation, get reward for this grid

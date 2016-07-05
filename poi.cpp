@@ -17,6 +17,7 @@
  */
 
 #include "poi.h"
+#include <vector>
 
 POI::POI()
 {
@@ -32,9 +33,23 @@ POI::POI(int weight, int x, int y) : p(x, y)
 	this->weight = weight;
 }
 
-int POI::get_weight()
+int POI::getWeight()
 {
 	return this->weight;
+}
+
+int POI::addAvailableAgent(Agent* agent) {
+	
+	if (this->agentsReady.size() >= this->weight) {
+		return -1;
+	}
+
+	agentsReady.insert(agent);
+	return 0;
+}
+
+std::vector<Agent*> POI::getCarriers() {
+	return this->agentsReady;
 }
 
 void POI::completed()
@@ -42,7 +57,7 @@ void POI::completed()
 	this->complete = true;
 }
 
-bool POI::is_complete()
+bool POI::isComplete()
 {
 	return this->complete;
 }

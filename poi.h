@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include "position.h"
+#include <vector>
+#include "agent.h"
 
 /* Implements a simple POI object with a position, a weight,
  * and the ability to track completed status. */
@@ -12,6 +14,7 @@ class POI {
 
 		bool complete;
 		int weight;
+		std::vector<Agent*> agentsReady;
 
 	public:
 
@@ -31,6 +34,9 @@ class POI {
 
 		/* Returns the bool to check if the POI is completed */
 		bool is_complete();
+
+		/* returns the array of carriers for the POI */
+		std::vector<Agent*> getCarriers();
 };
 
 #endif
