@@ -26,8 +26,7 @@ int Position::getY() {
 }
 
 Position Position::copy() {
-	Position p = new Position(this->x, this->y);
-	return p;
+	return Position(this->x, this->y);
 }
 
 // overload relational operators
@@ -37,9 +36,3 @@ bool Position::operator ==(const Position& p) {
 bool Position::operator !=(const Position& p) {
 	return (this->x != p.x || this->y != p.y);
 }
-
-
-
-
-
-
