@@ -14,6 +14,7 @@ class Gridworld
 {
 
 private:
+	
 	int numAgent;
 	int numPOI;
 	int width;
@@ -25,21 +26,37 @@ private:
 
 	void initPOI();
 	void initAgents();
+	void initHome(bool);
 	bool positionAvailable(Position);
+	State getState(Position, Agent);
 
 public:
 
 	// constructor
-	Gridworld(int, int, int, int, FANN::neural_net);
+	Gridworld(int, int, int, int, bool, FANN::neural_net);
 
 	// step all agents in the world
-	//  potential for threading
+	//  potential for threading?
 	void stepAgents(); 
 
 	// at the end of a simulation, get reward for this grid
 	double getGridReward();
 
+	// clear the gridworld of all agents and POI
+	void clear();
+
+	//  reset the world with the given neural net, 
+	//  or keep using the same neural net if NULL
+	void reset(bool, FANN::neural_net);
+
 };
 
 #endif
+
+
+
+
+
+
+
 

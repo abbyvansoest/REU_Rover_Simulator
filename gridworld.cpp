@@ -40,7 +40,8 @@ int BROADCASTING_4 = 11;
 int CARRYING = 12;
 
 // constructor
-Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, FANN::neural_net net) {
+Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, 
+	bool randHome, FANN::neural_net net) {
 		
 	this.numAgents = numAgents;
 	this.numPOI = numPOI;
@@ -49,15 +50,13 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, FANN::neu
 
 	initAgents();
 	initPOI();
-
-	Position p = new Position(HOME_X, HOME_Y);
-	this.home = new Home(p);
+	initHome(randHome);
 
 	this.nn = net;
 
 }
 
-//  randomly initalize agent positions in the grid
+//  randomly initalize agents in the grid
 private void Gridworld::initAgents() {
 
 	int x, y;
@@ -76,21 +75,24 @@ private void Gridworld::initAgents() {
 			y = rand() % height;
 			pos = new Position(x, y);
 			open = positionAvailable(pos);
+			if (!open) delete pos;
 		}
 		
 		// add an agent to the open position
 		str = pos.toString();
-		Agent addAgent = new Agent(p);
+		Agent addAgent = new Agent();
 		this.agents.insert(str, addAgent);
+
 		delete pos;
-		//  DELETING AGENTS????
 	}
 
 	//  set state of all agents
+	Position* pos;
 	Agent* ag;
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
+		pos = &it->first;
 		ag = &it->second;
-		(*ag).setState(getState(*ag));
+		(*ag).setState(getState(*pos, *ag));
 	}
 
 }
@@ -113,11 +115,12 @@ private void Gridworld::initPOI() {
 			y = rand() % height;
 			pos = new Position(x, y);
 			open = positionAvailable(pos);
+			if (!open) delete pos;
 		}
 
 		// add a POI to the open position
 		str = pos.toString();
-		POI addPOI = new POI(p);
+		POI addPOI = new POI();
 		this.poi.insert(str, addPOI);
 
 		delete pos;
@@ -125,44 +128,84 @@ private void Gridworld::initPOI() {
 
 }
 
-//  check if the position is occupied by an agent or a POI
+//  initialize home base to random location
+//  or pre-set global value
+private void initHome(bool rand) {
+
+	if (!rand) {
+		Position p = new Position(HOME_X, HOME_Y);
+		this.home = new Home(p);
+		delete p;
+	}
+
+	else {
+		// random seed
+		srand(time(NULL));
+		x = rand() % width;
+		y = rand() % height;
+		Position p = new Position(x, y);
+		this.home = new Home(p);
+		delete p;
+	}
+}
+
+//  check if the position is occupied by an agent, a POI, or the homebase
 private bool Gridworld::positionAvailable(Position p) {
+
+	bool available;
 
 	string posString = p.toString();
 	if (this.agents.find(posString) != agents.end() 
 		|| this.poi.find(posString) != poi.end()) return false;
+	if (this.home.getPosition() == p) return false;
 	return true;
 
 }
 
 //  return the 13-dim state representation for ag
-private State Gridworld::getState(Agent ag) {
-
-	Position pos = agent.position;
+private State Gridworld::getState(Position pos, Agent ag) {
 
 	// go through all agents and POI
 	// increment variables to account for counts
 	// based on relative quadrant location
-	int agentCountA;
-	int agentCountB;
-	int agentCountC;
-	int agentCountD;
-	int poiCountA; 
-	int poiCountB;
-	int poiCountC;
-	int poiCountD;
-	int broadcastCountA; 
-	int broadcastCountB;
-	int broadcastCountC;
-	int broadcastCountD;  
+	int agentCountA, agentCountB, agentCountC, agentCountD;
+	int poiCountA, poiCountB, poiCountC, poiCountD;
+	int broadcastCountA, broadcastCountB, broadcastCountC, broadcastCountD;
 
+	Agent* compAgent;
+
+	// get count of agents and count of broadcasting agents in each quadrant
 	for (auto it = agents.begin(); it != agents.end(); ++it) {  
 
+		//  values for the comparing agent
+		compAgent = it->second;
+		Position p = new Position(it->first);
 
+		if (p.getX < pos.getX && p.getY >= pos.getY) agentCountA++;
+		if (p.getX >= pos.getX && p.getY > pos.getY) agentCountB++;
+		if (p.getX <= pos.getX && p.getY < pos.getY) agentCountC++;
+		if (p.getX > pos.getX && p.getY <= pos.getY) agentCountD++;
+
+		//  determine the number of broadcasting agents
+		if ((*compAgent).isBroadcasting()) broadcastCountA++;
+		if ((*compAgent).isBroadcasting()) broadcastCountB++;
+		if ((*compAgent).isBroadcasting()) broadcastCountC++;
+		if ((*compAgent).isBroadcasting()) broadcastCountD++;
+
+		delete p;
 	}
 
-	for (auto it = agents.begin(); it != agents.end(); ++it) {  
+	//  get count of POI in each quadrant
+	for (auto it = poi.begin(); it != poi.end(); ++it) {  			
 
+		Position p = new Position(it->first);
+
+		if (p.getX < pos.getX && p.getY >= pos.getY) poiCountA++;
+		if (p.getX >= pos.getX && p.getY > pos.getY) poiCountB++;
+		if (p.getX <= pos.getX && p.getY < pos.getY) poiCountC++;
+		if (p.getX > pos.getX && p.getY <= pos.getY) poiCountD++;
+
+		delete p;
 		
 	}
 
@@ -184,36 +227,65 @@ private State Gridworld::getState(Agent ag) {
 	state[AGENTS_D] = agentCountD;
 	state[POI_D] = poiCountD;
 	state[BROADCASTING_D] = broadcastCountD;
-	// carrying information
-	state[CARRYING] = ??
+	// agent carrying information
+	state[CARRYING] = (int)ag.isCarrying();
 
+	return state;
 }
 
 // step all agents in the world
 //  potential for threading
 void Gridworld::stepAgents() {
 
-	Position pos;
-	Agent agent;
+	Agent* agent;
 	State state;
+	Position oldPos;
+	Position nextPos;
 
 	//  iterate through and step all agents
 	//  CHECK POSITION OF INCREMENT
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
-		pos = it->first;
-		agent = it->second;
-		state = getState(agent);
-		int action = agent.nextAction(state, this.nn);
-		// CHOOSE WHAT TO DO BASED ON ACTION VALUE
 
-		// //  if action is to move
-		// if (action == MOVE_RIGHT || action == MOVE_DOWN 
-		// 	|| action == MOVE_LEFT || action == MOVE_UP) {
+		oldPos = new Position(it->first);
+		agent = &it->second;
+		state = getState(oldPos, *agent);
+		int action = (*agent).nextAction(state, this.nn);
 
-		// }
+		// execute action described by the action value
 
+		if (action == BROADCAST) {
+			(*agent).setBroadcast(true);
+			return;
+		}
+
+		if (action == PICKUP) {
+			(*agent).setCarrying(true);
+			return;
+		}
+
+		if (action == MOVE_RIGHT) {
+			nextPos = new Position(oldPos.getX() - 1, oldPos.getY());
+		}
+		if (action == MOVE_DOWN) {
+			nextPos = new Position(oldPos.getX(), oldPos.getY() - 1);
+		}
+		if (action == MOVE_LEFT) {
+			nextPos = new Position(oldPos.getX() + 1, oldPos.getY());
+		}
+		if (action == MOVE_UP) {
+			nextPos = new Position(oldPos.getX(), oldPos.getY() + 1);
+		}
+
+		//  remove agent, construct new agent and insert to new position
+		string str = nextPos.toString();
+		Agent newAgent = (*agent).copy();
+		agents.erase(it);
+		agents.insert(str, newAgent);
+
+		delete oldPos;
+
+		return;
 	}
-
 }
 
 // at the end of a simulation, get reward for this grid
@@ -222,15 +294,35 @@ double Gridworld::getGridReward() {
 
 }
 
+//  entirely clear the gridworld of agents and POIs
+void Gridworld::clear() {
 
+	//  while agents and POI lists are not empty, scan through and 
+	//  delete their members
+	for (auto it = agents.begin(); it != agents.end(); ++it) {
+		delete it->second;
+	}
+	for (auto it = poi.begin(); it != poi.end(); ++it) {
+		delete it->second;
+	}
+	delete this.home;
+}
 
+//  reset the world with the given neural net, 
+//  or keep using the same neural net if NULL
+void Gridworld::reset(bool random, FANN::neural_net net) {
 
+	//  clear gridworld
+	Gridworld::clear();
 
+	//  reset POI and agents
+	initAgents();
+	initPOI();
+	initHome(random);
 
-
-
-
-
+	//  use a new neural net
+	if (net != NULL) this.nn = net;
+}
 
 
 

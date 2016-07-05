@@ -18,10 +18,19 @@
 
 #include "agent.h"
 
-Agent::Agent(){}
-//  non-default constructor for agent
-Agent::Agent(Position initialPos) {
-	position = initialPos;
+Agent::Agent() {
+	this->broadcasting = false;
+	this->carrying = false;
+}
+
+Agent::Agent(std::deque<State> trajectory, bool broadcasting, bool carrying) {
+	this->stateTrajectory = trajectory;
+	this->broadcasting = broadcasting;
+	this->carrying = carrying;
+}
+
+Agent Agent::copy() {
+	return new Agent(this->stateTrajectory, this.isBroadcasting(), this.isCarrying());
 }
 
 // push most recent agent state to trajectory stack 
@@ -29,12 +38,34 @@ void Agent::setState(State state) {
 	stateTrajectory.push_back(state);
 }
 
+//  is the agent in the middle of broadcasting?
+bool Agent::isBroadcasting() {
+	return this->broadcasting;
+}
+
+//  set the broadcast value appropriately
+void Agent::setBroadcast(bool set) {
+	this->broadcasting = set;
+}
+
+//  is the agent carrying anything?
+int Agent::isCarrying() {
+	return this->carrying;
+}
+
+//  set the carrying signal appropriately
+void Agent::setCarrying(bool set) {
+	this->carrying = set;
+}
+
 /* get next action based on state and return to Gridworld
  * The action is represented as a single integer, found as the index in the
  * ouput array with the max value. The output is the 6-array of [0,1] continuous 
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
+
 int Agent::nextAction(State s, FANN::neural_net net) {
+
 	//stateTrajectory.push_back(s);
 	//TODO add exploratory steps
 	

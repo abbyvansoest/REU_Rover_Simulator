@@ -14,6 +14,7 @@ public:
 
 	int getX(void);
 	int getY(void);
+	Position copy();
 
 	bool operator ==(const Position& p);
 	bool operator !=(const Position& p);

@@ -25,6 +25,11 @@ int Position::getY() {
 	return this->y;
 }
 
+Position Position::copy() {
+	Position p = new Position(this->x, this->y);
+	return p;
+}
+
 // overload relational operators
 bool Position::operator ==(const Position& p) {
 	return (this->x == p.x && this->y == p.y);

@@ -7,8 +7,9 @@
 /* Implements a simple POI object with a position, a weight,
  * and the ability to track completed status. */
 class POI {
+
 	private:
-		Position p;
+
 		bool complete;
 		int weight;
 

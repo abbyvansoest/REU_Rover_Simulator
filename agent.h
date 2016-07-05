@@ -12,21 +12,48 @@
  * and encapsulates the int array away.
  * The internal array can be directly accessed if needed */
 
-typedef struct State{
+typedef struct State {
+
 	float& operator[](int i) { return array[i]; }
 	float array[13];
+
 } State;
 
+
 class Agent {
+
 	private:
-		Position position; //Currently unused
-		std::deque<State> stateTrajectory; // Do we want to keep this?
+	
+		bool broadcasting;
+		bool carrying;
+		std::deque<State> stateTrajectory;
 
 	public:	
+
+		//  constructors
 		Agent();
-		Agent(Position);
+		Agent::Agent(std::deque<State>, bool);
+		Agent Agent::copy();
+
+		//  push the newest state information onto the 
+		//  trajectory deque
 		void Agent::setState(State);
+
+		//  get the next action for hte agent based on the
+		//  current state and the neural net
 		int Agent::nextAction(State, FANN::neural_net);
+
+		//  is the broadcasting signal positive or negative?
+		bool Agent::isBroadcasting();
+
+		//  set broadcasting signal
+		void Agent::setBroadcast(bool);
+
+		//  is the agent carrying anything?
+		bool Agent::isCarrying();
+
+		//  set the carrying signal appropriately
+		void Agent::setCarrying(bool);
 };
 
 #endif
