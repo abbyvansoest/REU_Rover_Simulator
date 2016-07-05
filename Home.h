@@ -19,10 +19,9 @@ private:
 public:
 
 	// constructor
+	Home();
 	Home(Position);
 
-	// destructor
-	Home::~Home();
 
 	// Returns the value of the position of the base
 	Position getPosition();

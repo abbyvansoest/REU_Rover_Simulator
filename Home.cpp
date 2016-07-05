@@ -13,10 +13,6 @@ Home::Home(Position p) {
 	this->capacity_value = 0;
 }
 
-Home::~Home() {
-	delete this->position;
-}
-
 // Returns the value of the Position in the form of X_cord and Y_cords
 Position Home::getPosition() {
 	return this->position;
