@@ -7,8 +7,10 @@ int HOME_Y = 0;
 
 
 // constructor
+Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
+
 Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, 
-	bool randHome, FANN::neural_net net) {
+	bool randHome) {
 		
 	this->numAgents = numAgents;
 	this->numPOI = numPOI;
@@ -18,8 +20,6 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initAgents();
 	initPOI();
 	initHome(randHome);
-
-	this->nn = net;
 	this->numSteps = 0;
 }
 
@@ -180,8 +180,9 @@ State Gridworld::getState(Position pos, Agent ag) {
 	return state;
 }
 
-//  step all agents in the world
-void Gridworld::stepAgents() {
+/*  step all agents in the world.
+ *  Does not calculate or provide a reward. */
+void Gridworld::stepAgents(FANN::neural_net net) {
 
 	Agent* agent;
 	State state;
@@ -196,7 +197,7 @@ void Gridworld::stepAgents() {
 		oldPos = Position(it->first);
 		agent = it->second;
 		state = getState(oldPos, *agent);
-		int action = agent->nextAction(state, this->nn, oldPos, this->home.getPosition(), .1); // a default epsilon value is a placeholder for now
+		int action = agent->nextAction(state, net, oldPos, this->home.getPosition(), .1); // a default epsilon value is a placeholder for now
 
 		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
@@ -303,11 +304,17 @@ void Gridworld::reset(bool random, FANN::neural_net net) {
 	initAgents();
 	initPOI();
 	initHome(random);
-
-	//  use a new neural net
-	//if (net != NULL) this->nn = net;
 }
 
+int Gridworld::currentAmount()
+{
+	return this->home.currentAmount();
+}
 
-
+bool Gridworld::worldComplete()
+{
+	if (this->home.currentAmount() == this->numPOI)
+		return true;
+	return false;
+}
 
