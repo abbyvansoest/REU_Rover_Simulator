@@ -25,4 +25,4 @@ This can be fixed temporarily in a terminal with
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
 ```
 or my adding the FANN library path to the ld config directory.
-This is traditionally in `/etc/ld.so.conf.d/`, and requires a root user invocation of ldconfig after adding the config file. 
+This is traditionally in `/etc/ld.so.conf.d/`, and requires a root user invocation of `ldconfig` after adding the config file. 
