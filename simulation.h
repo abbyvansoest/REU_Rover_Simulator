@@ -18,5 +18,43 @@
 #include <iostream>
 #include <fstream>
 
+struct gridConf
+{
+	int numAgents;
+	int numPOI;
+	int width;
+	int height;
+	bool randHome;
+};
+
+struct netConf
+{
+	FANN::network_type_enum net_type;
+	unsigned int num_layers;
+	const unsigned int *layers;
+	bool randWeights;
+	float randMin;
+	float randMax;
+};
+
+
+
+class Simulation
+{
+	private:
+		Gridworld world;
+		FANN::neural_net net;
+		double stats[];
+
+
+	public:
+		Simulation();
+		Simulation(struct gridConf, struct netConf);
+		void logResults();
+		void generateStats();
+		void saveModel();
+
+
+};
 
 #endif

@@ -32,7 +32,6 @@ private:
 	unordered_map<string, Agent*> agents;
 	unordered_map<string, POI*> poi;
 	Home home;
-	FANN::neural_net nn;
 
 	void initPOI();
 	void initAgents();
@@ -44,11 +43,12 @@ private:
 public:
 
 	// constructor
-	Gridworld(int, int, int, int, bool, FANN::neural_net);
+	Gridworld();
+	Gridworld(int, int, int, int, bool);
 
 	// step all agents in the world
 	//  potential for threading?
-	void stepAgents(); 
+	void stepAgents(FANN::neural_net); 
 
 	// at the end of a simulation, get reward for this grid
 	double getGridReward();

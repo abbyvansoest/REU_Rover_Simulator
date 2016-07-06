@@ -7,8 +7,10 @@ int HOME_Y = 0;
 
 
 // constructor
+Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
+
 Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, 
-	bool randHome, FANN::neural_net net) {
+	bool randHome) {
 		
 	this->numAgents = numAgents;
 	this->numPOI = numPOI;
@@ -18,8 +20,6 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initAgents();
 	initPOI();
 	initHome(randHome);
-
-	this->nn = net;
 }
 
 //  randomly initalize agents in the grid
@@ -180,7 +180,7 @@ State Gridworld::getState(Position pos, Agent ag) {
 }
 
 //  step all agents in the world
-void Gridworld::stepAgents() {
+void Gridworld::stepAgents(FANN::neural_net net) {
 
 	Agent* agent;
 	State state;
@@ -195,7 +195,7 @@ void Gridworld::stepAgents() {
 		oldPos = Position(it->first);
 		agent = it->second;
 		state = getState(oldPos, *agent);
-		int action = agent->nextAction(state, this->nn, oldPos, this->home.getPosition(), .1); // a default epsilon value is a placeholder for now
+		int action = agent->nextAction(state, net, oldPos, this->home.getPosition(), .1); // a default epsilon value is a placeholder for now
 
 		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
