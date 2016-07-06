@@ -20,6 +20,7 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initHome(randHome);
 
 	this->nn = net;
+	this->numSteps = 0;
 }
 
 //  randomly initalize agents in the grid
@@ -259,6 +260,7 @@ void Gridworld::stepAgents() {
 	//  set new agent and POI states
 	this->agents = newAgents;
 	this->poi = newPoi;
+	this->numSteps++;
 }
 
 //  check if a position is outside the bounds of the gridworld
@@ -272,7 +274,7 @@ bool Gridworld::inDomain(Position p) {
 
 // at the end of a simulation, get reward for this grid
 double Gridworld::getGridReward() {
-	return 0;
+	return (-.05*this->numSteps + this->home.currentAmount());
 }
 
 //  entirely clear the gridworld of agents and POIs

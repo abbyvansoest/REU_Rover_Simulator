@@ -13,7 +13,7 @@
 class Home {
 
 private:
-	int capacity_value;
+	int quantityReturned;
 	Position position;
 
 public:

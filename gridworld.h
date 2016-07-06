@@ -33,6 +33,7 @@ private:
 	unordered_map<string, POI*> poi;
 	Home home;
 	FANN::neural_net nn;
+	int numSteps;
 
 	void initPOI();
 	void initAgents();
