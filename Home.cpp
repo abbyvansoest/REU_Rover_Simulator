@@ -7,6 +7,11 @@
 
 #include "Home.h"
 
+Home::Home()
+{
+	this->capacity_value = 0;
+}
+
 Home::Home(Position p) {
 	// TODOd Auto-generated constructor stub
 	this->position = p.copy();
