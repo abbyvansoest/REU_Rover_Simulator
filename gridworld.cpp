@@ -96,9 +96,6 @@ void Gridworld::initHome(bool rand_flag) {
 
 //  check if the position is occupied by an agent, a POI, or the homebase
 bool Gridworld::positionAvailable(Position p) {
-
-	bool available;
-
 	string posString = p.toString();
 	if ((this->agents.find(posString) != agents.end()) ||
 		(this->poi.find(posString) != poi.end()))
@@ -110,7 +107,6 @@ bool Gridworld::positionAvailable(Position p) {
 		return false;
 	}
 	return true;
-
 }
 
 //  return the 13-dim state representation for ag
@@ -276,8 +272,7 @@ bool Gridworld::inDomain(Position p) {
 
 // at the end of a simulation, get reward for this grid
 double Gridworld::getGridReward() {
-
-
+	return 0;
 }
 
 //  entirely clear the gridworld of agents and POIs
