@@ -179,7 +179,8 @@ State Gridworld::getState(Position pos, Agent ag) {
 	return state;
 }
 
-//  step all agents in the world
+/*  step all agents in the world.
+ *  Does not calculate or provide a reward. */
 void Gridworld::stepAgents(FANN::neural_net net) {
 
 	Agent* agent;
@@ -301,11 +302,17 @@ void Gridworld::reset(bool random, FANN::neural_net net) {
 	initAgents();
 	initPOI();
 	initHome(random);
-
-	//  use a new neural net
-	//if (net != NULL) this->nn = net;
 }
 
+int Gridworld::currentAmount()
+{
+	return this->home.currentAmount();
+}
 
-
+bool Gridworld::worldComplete()
+{
+	if (this->home.currentAmount() == this->numPOI)
+		return true;
+	return false;
+}
 

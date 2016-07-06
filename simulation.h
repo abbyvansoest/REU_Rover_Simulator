@@ -45,14 +45,16 @@ class Simulation
 		Gridworld world;
 		FANN::neural_net net;
 		double stats[];
+		int timesteps;
 
 
 	public:
 		Simulation();
-		Simulation(struct gridConf, struct netConf);
+		Simulation(struct gridConf, struct netConf, int timesteps);
 		void logResults();
 		void generateStats();
 		void saveModel();
+		int runEpoch();
 
 
 };

@@ -59,6 +59,12 @@ public:
 	//  reset the world with the given neural net, 
 	//  or keep using the same neural net if NULL
 	void reset(bool, FANN::neural_net);
+	
+	/* Checks if all the POI's have been returned to the homebase */
+	bool worldComplete();
+
+	/* A passthrough accessor to return the home current amount */
+	int currentAmount();
 
 };
 
