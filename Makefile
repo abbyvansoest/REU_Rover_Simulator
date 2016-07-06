@@ -11,8 +11,8 @@ debug-flags:
 
 debug: | debug-flags all
 
-all: agent.o poi.o gridworld.o simulation.o Home.o position.o 
-	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulation.o Home.o position.o -o $(EXE)
+all: agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o
+	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o -o $(EXE)
 
 agent.o: agent.cpp agent.h state.h
 	$(CC) $(CFLAGS) -c agent.cpp -o agent.o
@@ -31,6 +31,9 @@ Home.o: Home.cpp Home.h
 
 position.o: position.cpp position.h
 	$(CC) $(CFLAGS) -c position.cpp -o position.o
+
+controller.o: controller.cpp controller.h
+	$(CC) $(CFLAGS)	-c controller.cpp -o controller.o
 
 clean:
 	rm -f *.o $(EXE)
