@@ -7,10 +7,9 @@ EXE=grid_sim.out
 default: all
 
 debug-flags: 
-	echo $(CFLAGS)
-	CFLAGS+="-D DEBUG -Wall"
+	$(eval CFLAGS += -D DEBUG -Wall)
 
-debug: | debug-flags test
+debug: | debug-flags all
 
 all: agent.o poi.o gridworld.o simulation.o Home.o position.o 
 	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulation.o Home.o position.o -o $(EXE)
@@ -18,14 +17,14 @@ all: agent.o poi.o gridworld.o simulation.o Home.o position.o
 agent.o: agent.cpp agent.h state.h
 	$(CC) $(CFLAGS) -c agent.cpp -o agent.o
 
-poi.o: poi.cpp poi.o
+poi.o: poi.cpp poi.h
 	$(CC) $(CFLAGS) -c poi.cpp -o poi.o
 
 gridworld.o: gridworld.cpp gridworld.h state.h
 	$(CC) $(CFLAGS) -c gridworld.cpp -o gridworld.o
 
-#simulation.o: simulation.cpp simulation.h
-	#$(CC) $(CFLAGS) -c simulation.cpp -o simulation.o
+simulation.o: simulation.cpp simulation.h
+	$(CC) $(CFLAGS) -c simulation.cpp -o simulation.o
 
 Home.o: Home.cpp Home.h
 	$(CC) $(CFLAGS) -c Home.cpp -o Home.o
