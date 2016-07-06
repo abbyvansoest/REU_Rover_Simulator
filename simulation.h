@@ -44,8 +44,8 @@ class Simulation
 	private:
 		Gridworld world;
 		FANN::neural_net net;
-		double stats[];
 		int timesteps;
+		//double stats[];
 
 
 	public:
