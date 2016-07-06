@@ -18,7 +18,7 @@ enum
 	MOVE_RIGHT,
 	PICKUP,
 	BROADCAST
-}
+};
 
 class Agent {
 

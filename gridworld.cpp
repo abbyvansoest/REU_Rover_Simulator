@@ -199,7 +199,7 @@ void Gridworld::stepAgents() {
 		oldPos = Position(it->first);
 		agent = it->second;
 		state = getState(oldPos, *agent);
-		int action = agent->nextAction(state, this->nn);
+		int action = agent->nextAction(state, this->nn, oldPos, this->home.getPosition(), .1); // a default epsilon value is a placeholder for now
 
 		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
@@ -227,15 +227,17 @@ void Gridworld::stepAgents() {
 		string posString = nextPos.toString();
 
 		//  if it has an agent / if it is at the boundary, do not move
-		if (this->newAgents.find(posString) != newAgents.end() || !inDomain(nextPos)) {
+		if (newAgents.find(posString) != newAgents.end() || !inDomain(nextPos)) {
 			nextPos = oldPos;
 		}
 
-		//  if it has a POI, mark the POI as having another potential carrier
-		//  agent remains in original location
-		if ((POI point = this->newPoi.find(posString)) != newPoi.end() && action == PICKUP) {
-			int success = point.addAvailableAgent(agent);
-			if (success == -1) point.completed();
+		//  If it has a POI, mark the POI as having another potential carrier.
+		//  Agent remains in original location.
+		auto foundPOI = newPoi.find(posString);
+		if (foundPOI != newPoi.end() && action == PICKUP) {
+			POI *point = foundPOI->second;
+			int success = point->addAvailableAgent(agent);
+			if (success == -1) point->completed();
 			nextPos = oldPos;
 		}
 

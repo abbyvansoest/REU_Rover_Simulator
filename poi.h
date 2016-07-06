@@ -27,16 +27,19 @@ class POI {
 		POI(int weight, int x, int y);
 
 		/* Returns the weight of the POI */
-		int get_weight();
+		int getWeight();
 
 		/* Triggers the POI to become completed */
 		void completed();
 
 		/* Returns the bool to check if the POI is completed */
-		bool is_complete();
+		bool isComplete();
 
 		/* returns the array of carriers for the POI */
 		std::vector<Agent*> getCarriers();
+
+		/* Adds an agent to the list of available agents to pick up the poi if it is not full */
+		int addAvailableAgent(Agent*);
 };
 
 #endif

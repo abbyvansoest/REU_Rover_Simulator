@@ -17,7 +17,6 @@
  */
 
 #include "poi.h"
-#include <vector>
 
 POI::POI()
 {
@@ -28,7 +27,7 @@ POI::POI()
 
 /* Non-default constructor calls on the 
 * position non-default constructor */
-POI::POI(int weight, int x, int y) : p(x, y)
+POI::POI(int weight, int x, int y)
 {
 	this->weight = weight;
 }
@@ -40,11 +39,14 @@ int POI::getWeight()
 
 int POI::addAvailableAgent(Agent* agent) {
 	
+	/* if we have enough agents lifting the poi, return -1 */
+	// TODO Do we want this to return -1? or should agents be made available
+	// for more than is necessary, and then allow only a subset to lift if?
 	if (this->agentsReady.size() >= this->weight) {
 		return -1;
 	}
 
-	agentsReady.insert(agent);
+	this->agentsReady.push_back(agent);
 	return 0;
 }
 
@@ -61,5 +63,4 @@ bool POI::isComplete()
 {
 	return this->complete;
 }
-
 
