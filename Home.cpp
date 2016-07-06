@@ -9,13 +9,13 @@
 
 Home::Home()
 {
-	this->quantityReturned = 0;
+	this->capacity_value = 0;
 }
 
 Home::Home(Position p) {
 	// TODOd Auto-generated constructor stub
 	this->position = p.copy();
-	this->quantityReturned = 0;
+	this->capacity_value = 0;
 }
 
 // Returns the value of the Position in the form of X_cord and Y_cords
@@ -23,9 +23,9 @@ Position Home::getPosition() {
 	return this->position;
 }
 
-// Returns the current value of the quantity at the home base
+// Returns the current value of the capacity_value
 double Home::currentAmount(){
-	return this->quantityReturned;
+	return this->capacity_value;
 }
 
 
@@ -36,9 +36,8 @@ void Home::setPosition(Position pos){
 }
 
 // Receives an amount of size newLoad from an agent and 
-//  adds it to the quantity at the home base
+//  adds it to the current value of the capacity
 void Home::recieveValues(int newLoad){
-	this->quantityReturned += newLoad;
+	this->capacity_value += newLoad;
 }
-
 
