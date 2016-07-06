@@ -128,11 +128,11 @@ State Gridworld::getState(Position pos, Agent ag) {
 
 		if (p.getX() < pos.getX() && p.getY() >= pos.getY()) {
 			agentCountA++;
-			if ((*compAgent).isBroadcasting()) { broadcastCountA++; }
+			if (compAgent->isBroadcasting()) { broadcastCountA++; }
 		}
 		if (p.getX() >= pos.getX() && p.getY() > pos.getY()) {
 			agentCountB++;
-			if ((*compAgent).isBroadcasting()) { broadcastCountB++; }
+			if (compAgent->isBroadcasting()) { broadcastCountB++; }
 		}
 		if (p.getX() <= pos.getX() && p.getY() < pos.getY()) {
 			agentCountC++;
@@ -211,10 +211,10 @@ void Gridworld::stepAgents() {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
 		}
 		if (action == BROADCAST) {
-			(*agent).setBroadcast(true);
+			agent->setBroadcast(true);
 			nextPos = oldPos;
 		}
-		else (*agent).setBroadcast(false);    
+		else agent->setBroadcast(false);    
 		if (action == PICKUP) {
 			nextPos = oldPos;
 		}
@@ -250,7 +250,7 @@ void Gridworld::stepAgents() {
 			//  set carrying information for all agents in vector list
 			std::vector<Agent*> carriers = point.getCarriers();
 			for (int i = 0; i < carriers.size(); i++) {
-				(*carriers[i]).setCarrying(true);
+				carriers[i]->setCarrying(true);
 			}
 			newPoi.erase(it);
 		}
