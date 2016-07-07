@@ -39,8 +39,8 @@ int main(void) {
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 3;
 	bool RANDOM_WEIGHTS = true;
-	int RANDOM_NET_MIN = -0.5;
-	int RANDOM_NET_MAX =  0.5;
+	double RANDOM_NET_MIN = -0.5;
+	double RANDOM_NET_MAX =  0.5;
 
 	//  set up gridworld configuration
 	struct gridConfig GC;
