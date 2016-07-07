@@ -6,7 +6,7 @@
 MAX_STEPS = 250;
 NUM_SIMULATIONS = 100;
 NUM_EPOCHS = 1000;
-TOP_PERFORMERS = 10;
+X_TOP_PERFORMERS = 10;
 
 //  control gridworld
 NUMBER_OF_AGENTS = 10;
@@ -22,6 +22,33 @@ NUMBER_OF_LAYERS = 3;
 RANDOM_WEIGHTS = true;
 RANDOM_NET_MIN = ??;
 RANDOM_NET_MAX = ??;
+
+
+//  return the top performers in the epoch iteration
+std::priority_queue<Simulation> getXMax(sim, rewards, X) {
+
+	//  top element is the smallest of the current top X
+	// priority queue of simulations sorted by reward! 
+		// need to implement that...comparators :)
+	std::priority_queue<Simulation> topXRewards; 
+	
+	// iterate through the simulations
+	for (auto it = sim.begin(); it != sim.end(); ++it) {
+		//  add simulation immediately if space in PQ
+		if (topXRewards.size() < X) {
+			topXRewards.push(it->first);
+		}
+		// otherwise, replace the lowest performer with the new simulation
+			//  if appropriate
+		else {
+			Simulation comp = topXRewards.pop();
+			if (rewards(comp) > rewards(it->first)) topXRewards.push(comp);
+			else topXRewards.push(it->first);
+		}
+	}
+	return topXRewards;
+}
+
 
 
 int main(int argc, char *argv[]) {
@@ -46,7 +73,7 @@ int main(int argc, char *argv[]) {
 	std::map<int, Simulation> simulations;
 
 	double reward;
-	int X = TOP_PERFORMERS;
+	int X = X_TOP_PERFORMERS;
 
 	// initiaize simulations
 	for (int i = 0; i < NUM_SIMULATIONS; i++) {
@@ -67,9 +94,9 @@ int main(int argc, char *argv[]) {
 		}
 
 		//  find the top X performers in the epoch
-		std::vector<Simulation> maxSet = getXMax(simulation, rewardTable, X);
+		std::priority_queue<Simulation> maxSet = getXMax(simulation, rewardTable, X);
 
-		//  based on the results, perform neuro-evolutionary techniques
+		//  NEUROEVOLUTION!
 		//  keep the nets of the best-performing simulations intact 
 		//  mutate the other simulations' nets
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
@@ -81,17 +108,6 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-//  return the top performers in the epoch iteration
-std::vector<Simulation> getXMax(sim, rewards, X) {
-
-	// iterate through the simulations
-	//  add immediately if space
-	//  otherwise check lowest dude and throw out if new guy is higher
-		//  then add new dude to maxSet
-
-//	if (rewards[sim[x]] <)
-
-}
 
 
 
