@@ -1,19 +1,18 @@
 #include "controller.h"
 
+//remove comparator
 
-/* comparator to sort simNodes in reverse order of their weights */
-struct minComparator {
-	bool operator()(const Simulation& sim1, const Simulation& sim2) {  
-		return sim1.getReward() > sim2.getReward();
-	}
-}; 
-
-void evolve_population(std::vector<Simulation> &simulations, int X)
+void evolve_reset_population(std::vector<Simulation> &simulations, int X)
 {
 	std::sort(simulations.begin(), simulations.end());
 	for (auto it = simulations.begin(); it != (simulations.end()-X); ++it)
 	{
 		it->mutate();
+		it->reset(RANDOM_HOME_LOCATION);
+	}
+	while (it != simulations.end()) {
+		it->reset(RANDOM_HOME_LOCATION);
+		++it;
 	}
 }
 
@@ -79,15 +78,11 @@ int main(void) {
 			simulations[j].runEpoch();
 		}
 
-		evolve_population(simulations, X_TOP_PERFORMERS);
-		for (auto it = simulations.begin(); it != simulations.end(); ++it)
-			it->reset(RANDOM_HOME_LOCATION);
+		evolve_reset_population(simulations, X_TOP_PERFORMERS);
 
 	}
 
 	return 0;
 }
 
-
-//  simulations.mutate()
 
