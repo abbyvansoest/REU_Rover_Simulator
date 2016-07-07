@@ -2,10 +2,11 @@
 
 //remove comparator
 
-void evolve_reset_population(std::vector<Simulation> &simulations, int X)
+void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool RANDOM_HOME_LOCATION)
 {
 	std::sort(simulations.begin(), simulations.end());
-	for (auto it = simulations.begin(); it != (simulations.end()-X); ++it)
+	auto it = simulations.begin();
+	for (it = simulations.begin(); it != (simulations.end()-X); ++it)
 	{
 		it->mutate();
 		it->reset(RANDOM_HOME_LOCATION);
@@ -78,7 +79,7 @@ int main(void) {
 			simulations[j].runEpoch();
 		}
 
-		evolve_reset_population(simulations, X_TOP_PERFORMERS);
+		evolve_reset_population(simulations, X_TOP_PERFORMERS, RANDOM_HOME_LOCATION);
 
 	}
 

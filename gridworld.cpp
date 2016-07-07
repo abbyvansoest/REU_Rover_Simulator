@@ -261,7 +261,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 //  return the string of the first neighboring POI for the given position,
 	//  or null if no neighboring POI exists
-string findNearbyPOI(Position pos, unordered_map<string, POI*> newPoi) {
+string Gridworld::findNearbyPOI(Position pos, unordered_map<string, POI*> newPoi) {
 
 	string checkUp = Position(pos.getX(), pos.getY() + 1).toString();
 	string checkDown = Position(pos.getX(), pos.getY() - 1).toString();
