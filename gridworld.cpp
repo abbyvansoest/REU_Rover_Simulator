@@ -23,6 +23,15 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	this->numSteps = 0;
 }
 
+Gridworld::~Gridworld()
+{
+	for (auto it = this->poi.begin(); it != this->poi.end(); ++it)
+		delete it->second;
+
+	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
+		delete it->second;
+}
+
 //  randomly initalize agents in the grid
 void Gridworld::initAgents() {
 	int x, y;

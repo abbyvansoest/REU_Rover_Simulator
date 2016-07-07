@@ -76,8 +76,10 @@ int main(void) {
 		}
 
 		evolve_reset_population(simulations, X_TOP_PERFORMERS, RANDOM_HOME_LOCATION);
-
 	}
+
+	/* Cleanup configuration memory */
+	delete [] NC.layers;
 
 	return 0;
 }

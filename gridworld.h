@@ -48,6 +48,7 @@ public:
 	// constructor
 	Gridworld();
 	Gridworld(int, int, int, int, bool);
+	~Gridworld();
 
 	// step all agents in the world
 	//  potential for threading?
