@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=--std=c++11 -lfann
+CFLAGS=--std=c++11
 EXE=grid_sim.out
 
 .PHONY: debug debug-flags default all
@@ -12,7 +12,7 @@ debug-flags:
 debug: | debug-flags all
 
 all: agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o
-	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o -o $(EXE)
+	$(CC) $(CFLAGS) -lfann agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o -o $(EXE)
 
 agent.o: agent.cpp agent.h state.h
 	$(CC) $(CFLAGS) -c agent.cpp -o agent.o
