@@ -1,5 +1,6 @@
 #include "controller.h"
 #include <map>
+#include <queue>
 #include <functional>
 
 //  control experiment data collection
@@ -20,38 +21,45 @@ RANDOM_HOME_LOCATION = true;
 //  control neural nets
 NUMBER_OF_LAYERS = 3;
 RANDOM_WEIGHTS = true;
-RANDOM_NET_MIN = ??;
-RANDOM_NET_MAX = ??;
+RANDOM_NET_MIN = -0.5;
+RANDOM_NET_MAX = 0.5;
 
 
-//  return the top performers in the epoch iteration
-std::priority_queue<Simulation> getXMax(sim, rewards, X) {
+/* comparator to sort simNodes in reverse order of their weights */
+struct minComparator {
+	bool operator()(const Simulation& sim1, const Simulation& sim2) {  
+    	return sim1.getReward() > sim2.getReward();
+    }
+}; 
 
-	//  top element is the smallest of the current top X
-	// priority queue of simulations sorted by reward! 
-		// need to implement that...comparators :)
-	std::priority_queue<Simulation> topXRewards; 
+//  return the top X performers in the epoch 
+std::priority_queue<Simulation> getXMax(sim, X) {
+
+	//  top element is the smallest of the current top X simulations
+	std::priority_queue<Simulation, vector<Simulation>, minComparator> topXRewards; 
 	
 	// iterate through the simulations
-	for (auto it = sim.begin(); it != sim.end(); ++it) {
-		//  add simulation immediately if space in PQ
+	auto end = sim.end();
+	for (auto it = sim.begin(); it != end; ++it) {
+		//  add simNode immediately if there is space in PQ
 		if (topXRewards.size() < X) {
-			topXRewards.push(it->first);
+			topXRewards.push(it->second);
 		}
 		// otherwise, replace the lowest performer with the new simulation
 			//  if appropriate
 		else {
 			Simulation comp = topXRewards.pop();
-			if (rewards(comp) > rewards(it->first)) topXRewards.push(comp);
-			else topXRewards.push(it->first);
+			if (comp.getReward() > it->second.getReward()) topXRewards.push(comp);
+			else topXRewards.push(it->second);
 		}
 	}
+
 	return topXRewards;
 }
 
-
-
-int main(int argc, char *argv[]) {
+/* run simulations for the full number of epochs, performing neuro-evolutionary
+   techniques between each epoch */ 
+int main(void) {
 
 	//  set up gridworld configuration
 	struct gridConfig GC;
@@ -63,17 +71,14 @@ int main(int argc, char *argv[]) {
 
 	//  set up initial net configuration
 	struct netConfig NC;
-	NC.net_type = //  what type of net do we want?
+	NC.net_type = FANN::layer;
 	NC.num_layers = NUMBER_OF_LAYERS;
-	NC.layers = //  what does this refer to?
+	NC.layers = {13, 8, 6};
 	NC.randWeights = RANDOM_WEIGHTS;
 	NC.randMin = RANDOM_NET_MIN; 
 	NC.randMax = RANDOM_NET_MAX;
 
 	std::map<int, Simulation> simulations;
-
-	double reward;
-	int X = X_TOP_PERFORMERS;
 
 	// initiaize simulations
 	for (int i = 0; i < NUM_SIMULATIONS; i++) {
@@ -82,19 +87,14 @@ int main(int argc, char *argv[]) {
 
 	//  for each learning epoch
 	for (int i = 0; i < NUM_EPOCHS; i++) {
-
-		std::map<Simulation, double> rewardTable;
 		
-		//  run each simulation and save reward
+		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
-
-			reward = simulations[j].runEpoch();
-			rewardTable[simulations[j]] = reward;
-
+			simulations[j].runEpoch();
 		}
 
 		//  find the top X performers in the epoch
-		std::priority_queue<Simulation> maxSet = getXMax(simulation, rewardTable, X);
+		std::priority_queue<Simulation> maxSet = getXMax(simulation, X_TOP_PERFORMERS);
 
 		//  NEUROEVOLUTION!
 		//  keep the nets of the best-performing simulations intact 
@@ -109,14 +109,7 @@ int main(int argc, char *argv[]) {
 }
 
 
-
-
-//  need to find top X simulations 
-//  mutate all mutations not in the top X
-
-
 //  simulations.mutate()
 //  simulations.reset()
-//  override comparison operators in Simulation class
-//  simulation.getReward() 
+//  simulation.getReward()
 
