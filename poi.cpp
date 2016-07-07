@@ -1,6 +1,5 @@
 /*
- *  This file implements the simple poi class for the simulation.
- *  Classes were chosen for potential extensibility.
+ *  This simulator implements a rover domain gridworld for theoretical research purposes.
  *  Copyright (C) 2016  Connor Yates
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -28,14 +27,31 @@ POI::POI()
 
 /* Non-default constructor calls on the 
 * position non-default constructor */
-POI::POI(int weight, int x, int y) : p(x, y)
+POI::POI(int weight, int x, int y)
 {
 	this->weight = weight;
 }
 
-int POI::get_weight()
+int POI::getWeight()
 {
 	return this->weight;
+}
+
+int POI::addAvailableAgent(Agent* agent) {
+	
+	/* if we have enough agents lifting the poi, return -1 */
+	// TODO Do we want this to return -1? or should agents be made available
+	// for more than is necessary, and then allow only a subset to lift if?
+	if (this->agentsReady.size() >= this->weight) {
+		return -1;
+	}
+
+	this->agentsReady.push_back(agent);
+	return 0;
+}
+
+std::vector<Agent*> POI::getCarriers() {
+	return this->agentsReady;
 }
 
 void POI::completed()
@@ -43,9 +59,8 @@ void POI::completed()
 	this->complete = true;
 }
 
-bool POI::is_complete()
+bool POI::isComplete()
 {
 	return this->complete;
 }
-
 
