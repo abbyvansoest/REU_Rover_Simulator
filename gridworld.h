@@ -69,6 +69,8 @@ public:
 	/* A passthrough accessor to return the home current amount */
 	int currentAmount();
 
+	double getDistance(Position, Position);
+
 };
 
 #endif
