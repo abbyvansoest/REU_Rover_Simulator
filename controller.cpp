@@ -62,12 +62,8 @@ int main(void) {
 	NC.randMin = RANDOM_NET_MIN; 
 	NC.randMax = RANDOM_NET_MAX;
 
-	std::vector<Simulation> simulations;
+	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
 
-	// initiaize simulations
-	for (int i = 0; i < NUM_SIMULATIONS; i++) {
-		simulations[i] = Simulation(GC, NC, MAX_STEPS);
-	}
 
 	//  for each learning epoch, we run the set of simulations and 
 	//  then evolve the population based on basic neuroevolutionary 
