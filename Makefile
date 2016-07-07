@@ -7,7 +7,7 @@ EXE=grid_sim.out
 default: all
 
 debug-flags: 
-	$(eval CFLAGS += -D DEBUG -Wall)
+	$(eval CFLAGS += -D DEBUG -Wall -g)
 
 debug: | debug-flags all
 
