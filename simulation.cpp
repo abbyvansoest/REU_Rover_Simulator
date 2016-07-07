@@ -64,3 +64,13 @@ void Simulation::reset(bool randHome)
 	this->world.reset(randHome);
 	// Reset any statistics variables here
 }
+
+void Simulation::mutate()
+{
+
+}
+
+bool Simulation::operator<(const Simulation &rhs) const
+{
+	return this->reward < rhs.reward;
+}

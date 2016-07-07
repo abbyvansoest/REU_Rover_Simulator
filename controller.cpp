@@ -1,65 +1,46 @@
 #include "controller.h"
-#include <map>
-#include <queue>
-#include <functional>
-
-//  control experiment data collection
-MAX_STEPS = 250;
-NUM_SIMULATIONS = 100;
-NUM_EPOCHS = 1000;
-X_TOP_PERFORMERS = 10;
-
-//  control gridworld
-NUMBER_OF_AGENTS = 10;
-NUMBER_OF_POI = 10;
-
-WORLD_WIDTH = 10;
-WORLD_HEIGHT = 10;
-
-RANDOM_HOME_LOCATION = true;
-
-//  control neural nets
-NUMBER_OF_LAYERS = 3;
-RANDOM_WEIGHTS = true;
-RANDOM_NET_MIN = -0.5;
-RANDOM_NET_MAX = 0.5;
 
 
 /* comparator to sort simNodes in reverse order of their weights */
 struct minComparator {
 	bool operator()(const Simulation& sim1, const Simulation& sim2) {  
-    	return sim1.getReward() > sim2.getReward();
-    }
+		return sim1.getReward() > sim2.getReward();
+	}
 }; 
 
-//  return the top X performers in the epoch 
-std::priority_queue<Simulation> getXMax(sim, X) {
-
-	//  top element is the smallest of the current top X simulations
-	std::priority_queue<Simulation, vector<Simulation>, minComparator> topXRewards; 
-	
-	// iterate through the simulations
-	auto end = sim.end();
-	for (auto it = sim.begin(); it != end; ++it) {
-		//  add simNode immediately if there is space in PQ
-		if (topXRewards.size() < X) {
-			topXRewards.push(it->second);
-		}
-		// otherwise, replace the lowest performer with the new simulation
-			//  if appropriate
-		else {
-			Simulation comp = topXRewards.pop();
-			if (comp.getReward() > it->second.getReward()) topXRewards.push(comp);
-			else topXRewards.push(it->second);
-		}
+void evolve_population(std::vector<Simulation> &simulations, int X)
+{
+	std::sort(simulations.begin(), simulations.end());
+	for (auto it = simulations.begin(); it != (simulations.end()-X); ++it)
+	{
+		it->mutate();
 	}
-
-	return topXRewards;
 }
+
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
 int main(void) {
+	//  control experiment data collection
+	int MAX_STEPS = 250;
+	int NUM_SIMULATIONS = 100;
+	int NUM_EPOCHS = 1000;
+	int X_TOP_PERFORMERS = 10;
+
+	//  control gridworld
+	int NUMBER_OF_AGENTS = 10;
+	int NUMBER_OF_POI = 10;
+
+	int WORLD_WIDTH = 10;
+	int WORLD_HEIGHT = 10;
+
+	bool RANDOM_HOME_LOCATION = true;
+
+	//  control neural nets
+	int NUMBER_OF_LAYERS = 3;
+	bool RANDOM_WEIGHTS = true;
+	int RANDOM_NET_MIN = -0.5;
+	int RANDOM_NET_MAX =  0.5;
 
 	//  set up gridworld configuration
 	struct gridConfig GC;
@@ -71,38 +52,37 @@ int main(void) {
 
 	//  set up initial net configuration
 	struct netConfig NC;
-	NC.net_type = FANN::layer;
+	NC.net_type = FANN::LAYER;
 	NC.num_layers = NUMBER_OF_LAYERS;
-	NC.layers = {13, 8, 6};
+	NC.layers = new unsigned int[3];
+	NC.layers[0] = 13;
+	NC.layers[1] = 8;
+	NC.layers[2] = 6;
 	NC.randWeights = RANDOM_WEIGHTS;
 	NC.randMin = RANDOM_NET_MIN; 
 	NC.randMax = RANDOM_NET_MAX;
 
-	std::map<int, Simulation> simulations;
+	std::vector<Simulation> simulations;
 
 	// initiaize simulations
 	for (int i = 0; i < NUM_SIMULATIONS; i++) {
 		simulations[i] = Simulation(GC, NC, MAX_STEPS);
 	}
 
-	//  for each learning epoch
+	//  for each learning epoch, we run the set of simulations and 
+	//  then evolve the population based on basic neuroevolutionary 
+	//  algorithms.
 	for (int i = 0; i < NUM_EPOCHS; i++) {
-		
+
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
 			simulations[j].runEpoch();
 		}
 
-		//  find the top X performers in the epoch
-		std::priority_queue<Simulation> maxSet = getXMax(simulation, X_TOP_PERFORMERS);
+		evolve_population(simulations, X_TOP_PERFORMERS);
+		for (auto it = simulations.begin(); it != simulations.end(); ++it)
+			it->reset(RANDOM_HOME_LOCATION);
 
-		//  NEUROEVOLUTION!
-		//  keep the nets of the best-performing simulations intact 
-		//  mutate the other simulations' nets
-		for (int j = 0; j < NUM_SIMULATIONS; j++) {
-			if (!maxSet.contains(simulations[j])) simulations[j].mutate();
-			simulations[j].reset();
-		}
 	}
 
 	return 0;
@@ -110,6 +90,4 @@ int main(void) {
 
 
 //  simulations.mutate()
-//  simulations.reset()
-//  simulation.getReward()
 

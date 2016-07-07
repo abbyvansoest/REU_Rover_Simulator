@@ -58,6 +58,8 @@ class Simulation
 		int runEpoch();
 		double getReward() const;
 		void reset(bool);
+		void mutate();
+		bool operator<(const Simulation &) const;
 };
 
 #endif
