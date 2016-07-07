@@ -40,6 +40,7 @@ private:
 	bool positionAvailable(Position);
 	State getState(Position, Agent);
 	bool inDomain(Position);
+	string findNearbyPOI(Position, unordered_map<string, POI*>);
 
 public:
 
