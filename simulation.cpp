@@ -13,7 +13,7 @@ Simulation::Simulation()
 
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
-Simulation::Simulation(struct gridConf GC, struct netConf NC, int timesteps)
+Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.randHome)
 	, net(NC.net_type, NC.num_layers, NC.layers)
 	

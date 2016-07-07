@@ -18,7 +18,7 @@
 #include <iostream>
 #include <fstream>
 
-struct gridConf
+struct gridConfig
 {
 	int numAgents;
 	int numPOI;
@@ -27,7 +27,7 @@ struct gridConf
 	bool randHome;
 };
 
-struct netConf
+struct netConfig
 {
 	FANN::network_type_enum net_type;
 	unsigned int num_layers;
@@ -50,7 +50,7 @@ class Simulation
 
 	public:
 		Simulation();
-		Simulation(struct gridConf, struct netConf, int timesteps);
+		Simulation(struct gridConfig, struct netConfig, int timesteps);
 		void logResults();
 		void generateStats();
 		void saveModel();
