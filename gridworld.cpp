@@ -227,8 +227,8 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				//  mark the POI as having another potential carrier.
 			//  Agent remains in original location.
 			string foundPOI = findNearbyPOI(nextPos, newPoi);
-			if (foundPOI != NULL) {
-				POI *point = newPoi.find(foundPOI);
+			if (!foundPOI.empty()) {
+				POI *point = newPoi.find(foundPOI)->second;
 				int success = point->addAvailableAgent(agent);
 				if (success == -1) point->completed();
 			}
@@ -275,7 +275,7 @@ string findNearbyPOI(Position pos, unordered_map<string, POI*> newPoi) {
 	if (newPoi.find(checkRight) != end) return checkRight;
 	if (newPoi.find(checkLeft) != end) return checkLeft;
 
-	return NULL;
+	return "";
 
 }
 
