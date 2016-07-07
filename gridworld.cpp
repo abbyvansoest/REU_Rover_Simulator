@@ -253,18 +253,6 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		}
 	}
 
-	//  need to: resolve conflicts. if two agents are aiming for the same place,
-	//  both must be returned to their oldPos (neither move)
-	for (int i = 0; i < attemptedPositions.bucket_count(); ++i) {
-		if (bucket_size(i) > 1) {
-			//  revert both positions back to the original
-			string ogPosition = originalPositions.find();
-			//  remove attempted position from map
-			//  add original positions to map
-			//  
-		}
-	}
-
 	//  set new agent and POI states
 	this->agents = newAgents;
 	this->poi = newPoi;
