@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 /* Other classes */
+#include <cmath>
 #include "Home.h"
 #include "position.h"
 #include "agent.h"
@@ -67,6 +68,8 @@ public:
 
 	/* A passthrough accessor to return the home current amount */
 	int currentAmount();
+
+	double getDistance(Position, Position);
 
 };
 
