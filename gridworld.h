@@ -59,7 +59,7 @@ public:
 
 	//  reset the world with the given neural net, 
 	//  or keep using the same neural net if NULL
-	void reset(bool, FANN::neural_net);
+	void reset(bool);
 	
 	/* Checks if all the POI's have been returned to the homebase */
 	bool worldComplete();

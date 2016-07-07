@@ -7,8 +7,8 @@ Simulation::Simulation()
 	: world(2, 1, 5, 5, false)
 	, net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6})
 {
+	this->reward = 0;
 	this->timesteps = 250;
-
 }
 
 /* This non default constructor uses the information provided by the configuration structs 
@@ -46,10 +46,21 @@ int Simulation::runEpoch()
 	}
 
 	// Calculate the reward
-	double reward = 0;
-	reward -= steps * 0.05;
-	reward += this->world.currentAmount();
+	this->reward -= steps * 0.05;
+	this->reward += this->world.currentAmount();
 
 
 	return 0;
+}
+
+double Simulation::getReward() const 
+{
+	return this->reward;
+}
+
+/* Resets the gridworld and the statistics variables internal to the class */
+void Simulation::reset(bool randHome)
+{
+	this->world.reset(randHome);
+	// Reset any statistics variables here
 }

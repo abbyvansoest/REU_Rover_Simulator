@@ -31,7 +31,7 @@ struct netConfig
 {
 	FANN::network_type_enum net_type;
 	unsigned int num_layers;
-	const unsigned int *layers;
+	unsigned int *layers;
 	bool randWeights;
 	float randMin;
 	float randMax;
@@ -46,6 +46,7 @@ class Simulation
 		FANN::neural_net net;
 		int timesteps;
 		//double stats[];
+		double reward;
 
 
 	public:
@@ -55,8 +56,8 @@ class Simulation
 		void generateStats();
 		void saveModel();
 		int runEpoch();
-
-
+		double getReward() const;
+		void reset(bool);
 };
 
 #endif
