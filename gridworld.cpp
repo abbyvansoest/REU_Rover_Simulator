@@ -188,8 +188,8 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 	State state;
 	Position oldPos, nextPos;
 
-	unordered_map<string, Agent*> newAgents;
-	unordered_map<string, POI*> newPoi = this->poi;
+	std::unordered_map<string, Agent*> newAgents;
+	std::unordered_map<string, POI*> newPoi = this->poi;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -212,36 +212,31 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		if (action == MOVE_UP) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
 		}
+
 		if (action == BROADCAST) {
 			agent->setBroadcast(true);
 			nextPos = oldPos;
 		}
-		else agent->setBroadcast(false);    
+		else agent->setBroadcast(false);  
+
 		if (action == PICKUP) {
+
 			nextPos = oldPos;
+
+			//  if it has a POI within one block of it and it's action is to pickup,
+				//  mark the POI as having another potential carrier.
+			//  Agent remains in original location.
+			string foundPOI = findNearbyPOI(nextPos, newPoi);
+			if (foundPOI != NULL) {
+				POI *point = newPoi.find(foundPOI);
+				int success = point->addAvailableAgent(agent);
+				if (success == -1) point->completed();
+			}
 		}
-		
-		//  check what the next position holds
+
 		string posString = nextPos.toString();
-
-		//  if it has an agent / if it is at the boundary, do not move
-		if (newAgents.find(posString) != newAgents.end() || !inDomain(nextPos)) {
-			nextPos = oldPos;
-		}
-
-		//  If it has a POI, mark the POI as having another potential carrier.
-		//  Agent remains in original location.
-		auto foundPOI = newPoi.find(posString);
-		if (foundPOI != newPoi.end() && action == PICKUP) {
-			POI *point = foundPOI->second;
-			int success = point->addAvailableAgent(agent);
-			if (success == -1) point->completed();
-			nextPos = oldPos;
-		}
-
-		// add agent to new map of the gridworld with updated location
 		newAgents[posString] = agent;
-
+		
 	}
 
 	//  iterate through POI to see if any have been fully picked up
@@ -258,10 +253,42 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		}
 	}
 
+	//  need to: resolve conflicts. if two agents are aiming for the same place,
+	//  both must be returned to their oldPos (neither move)
+	for (int i = 0; i < attemptedPositions.bucket_count(); ++i) {
+		if (bucket_size(i) > 1) {
+			//  revert both positions back to the original
+			string ogPosition = originalPositions.find();
+			//  remove attempted position from map
+			//  add original positions to map
+			//  
+		}
+	}
+
 	//  set new agent and POI states
 	this->agents = newAgents;
 	this->poi = newPoi;
 	this->numSteps++;
+}
+
+//  return the string of the first neighboring POI for the given position,
+	//  or null if no neighboring POI exists
+string findNearbyPOI(Position pos, unordered_map<string, POI*> newPoi) {
+
+	string checkUp = Position(pos.getX(), pos.getY() + 1).toString();
+	string checkDown = Position(pos.getX(), pos.getY() - 1).toString();
+	string checkRight = Position(pos.getX() - 1, pos.getY()).toString();
+	string checkLeft = Position(pos.getX() + 1, pos.getY()).toString();
+
+	auto end = newPoi.end();
+
+	if (newPoi.find(checkUp) != end) return checkUp;
+	if (newPoi.find(checkDown) != end) return checkDown;
+	if (newPoi.find(checkRight) != end) return checkRight;
+	if (newPoi.find(checkLeft) != end) return checkLeft;
+
+	return NULL;
+
 }
 
 //  check if a position is outside the bounds of the gridworld
