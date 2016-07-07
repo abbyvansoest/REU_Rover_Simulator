@@ -113,11 +113,10 @@ bool Gridworld::positionAvailable(Position p) {
 //  return the 13-dim state representation for ag
 State Gridworld::getState(Position pos, Agent ag) {
 	// go through all agents and POI
-	// increment variables to account for counts
-	// based on relative quadrant location
-	int agentCountA, agentCountB, agentCountC, agentCountD;
-	int poiCountA, poiCountB, poiCountC, poiCountD;
-	int broadcastCountA, broadcastCountB, broadcastCountC, broadcastCountD;
+	// increment variables to account for counts based on relative quadrant location
+	double agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
+	double poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
+	double broadcastCountA, broadcastCountB, broadcastCountC, broadcastCountD;
 
 	Agent* compAgent;
 
@@ -128,19 +127,19 @@ State Gridworld::getState(Position pos, Agent ag) {
 		Position p = Position(it->first);
 
 		if (p.getX() < pos.getX() && p.getY() >= pos.getY()) {
-			agentCountA++;
+			agentsA += 1/getDistance(p, pos);
 			if (compAgent->isBroadcasting()) { broadcastCountA++; }
 		}
 		if (p.getX() >= pos.getX() && p.getY() > pos.getY()) {
-			agentCountB++;
+			agentsB += 1/getDistance(p, pos);
 			if (compAgent->isBroadcasting()) { broadcastCountB++; }
 		}
 		if (p.getX() <= pos.getX() && p.getY() < pos.getY()) {
-			agentCountC++;
+			agentsC += 1/getDistance(p, pos);
 			if (compAgent->isBroadcasting()) { broadcastCountC++; }
 		}
 		if (p.getX() > pos.getX() && p.getY() <= pos.getY()) {
-			agentCountD++;
+			agentsD += 1/getDistance(p, pos);
 			if (compAgent->isBroadcasting()) { broadcastCountD++; }
 		}
 	}
@@ -150,34 +149,49 @@ State Gridworld::getState(Position pos, Agent ag) {
 
 		Position p = Position(it->first);
 
-		if (p.getX() <  pos.getX() && p.getY() >= pos.getY()) { poiCountA++; }
-		if (p.getX() >= pos.getX() && p.getY() >  pos.getY()) { poiCountB++; }
-		if (p.getX() <= pos.getX() && p.getY() <  pos.getY()) { poiCountC++; }
-		if (p.getX() >  pos.getX() && p.getY() <= pos.getY()) { poiCountD++; }
+		if (p.getX() <  pos.getX() && p.getY() >= pos.getY()) { 
+			poiA += 1/getDistance(p, pos);
+		}
+		if (p.getX() >= pos.getX() && p.getY() >  pos.getY()) { 
+			poiB += 1/getDistance(p, pos);
+		}
+		if (p.getX() <= pos.getX() && p.getY() <  pos.getY()) { 
+			poiC += 1/getDistance(p, pos);
+		}
+		if (p.getX() >  pos.getX() && p.getY() <= pos.getY()) {
+			poiD += 1/getDistance(p, pos);
+		}
 	}
 
 	State state;
 
 	//  information on quadrant 1 
-	state[AGENTS_A] = agentCountA;
-	state[POI_A] = poiCountA;
+	state[AGENTS_A] = agentsA;
+	state[POI_A] = poiA;
 	state[BROADCASTING_A] = broadcastCountA;
 	//  information on quadrant 2
-	state[AGENTS_B] = agentCountB;
-	state[POI_B] = poiCountB;
+	state[AGENTS_B] = agentsB;
+	state[POI_B] = poiB;
 	state[BROADCASTING_B] = broadcastCountB;
 	//  information on quadrant 3
-	state[AGENTS_C] = agentCountC;
-	state[POI_C] = poiCountC;
+	state[AGENTS_C] = agentsC;
+	state[POI_C] = poiC;
 	state[BROADCASTING_C] = broadcastCountC;
 	//  information on quadrant 4
-	state[AGENTS_D] = agentCountD;
-	state[POI_D] = poiCountD;
+	state[AGENTS_D] = agentsD;
+	state[POI_D] = poiD;
 	state[BROADCASTING_D] = broadcastCountD;
 	// agent carrying information
 	state[CARRYING] = (int)ag.isCarrying();
 
 	return state;
+}
+
+//  return the distance between points p1 and p2
+double Gridworld::getDistance(Position p1, Position p2) {
+	double deltaX = p1.getX() - p2.getX();
+	double deltaY = p1.getY() - p2.getY();
+	return sqrt(deltaX*deltaX + deltaY*deltaY);
 }
 
 /*  step all agents in the world.

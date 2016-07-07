@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 /* Other classes */
+#include <cmath>
 #include "Home.h"
 #include "position.h"
 #include "agent.h"

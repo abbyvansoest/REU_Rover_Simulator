@@ -26,8 +26,8 @@ enum
 
 typedef struct State {
 
-	float& operator[](int i) { return array[i]; }
-	float array[13];
+	double& operator[](int i) { return array[i]; }
+	double array[13];
 
 } State;
 
