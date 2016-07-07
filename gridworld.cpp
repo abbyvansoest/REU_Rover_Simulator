@@ -310,7 +310,7 @@ void Gridworld::clear() {
 
 //  reset the world with the given neural net, 
 //  or keep using the same neural net if NULL
-void Gridworld::reset(bool random, FANN::neural_net net) {
+void Gridworld::reset(bool randomHome) {
 
 	//  clear gridworld
 	clear();
@@ -318,7 +318,7 @@ void Gridworld::reset(bool random, FANN::neural_net net) {
 	//  reset POI and agents
 	initAgents();
 	initPOI();
-	initHome(random);
+	initHome(randomHome);
 }
 
 int Gridworld::currentAmount()

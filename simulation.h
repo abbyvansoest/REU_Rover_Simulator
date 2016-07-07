@@ -18,7 +18,7 @@
 #include <iostream>
 #include <fstream>
 
-struct gridConf
+struct gridConfig
 {
 	int numAgents;
 	int numPOI;
@@ -27,11 +27,11 @@ struct gridConf
 	bool randHome;
 };
 
-struct netConf
+struct netConfig
 {
 	FANN::network_type_enum net_type;
 	unsigned int num_layers;
-	const unsigned int *layers;
+	unsigned int *layers;
 	bool randWeights;
 	float randMin;
 	float randMax;
@@ -46,17 +46,20 @@ class Simulation
 		FANN::neural_net net;
 		int timesteps;
 		//double stats[];
+		double reward;
 
 
 	public:
 		Simulation();
-		Simulation(struct gridConf, struct netConf, int timesteps);
+		Simulation(struct gridConfig, struct netConfig, int timesteps);
 		void logResults();
 		void generateStats();
 		void saveModel();
 		int runEpoch();
-
-
+		double getReward() const;
+		void reset(bool);
+		void mutate();
+		bool operator<(const Simulation &) const;
 };
 
 #endif

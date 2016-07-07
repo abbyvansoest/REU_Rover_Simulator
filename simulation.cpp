@@ -7,13 +7,13 @@ Simulation::Simulation()
 	: world(2, 1, 5, 5, false)
 	, net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6})
 {
+	this->reward = 0;
 	this->timesteps = 250;
-
 }
 
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
-Simulation::Simulation(struct gridConf GC, struct netConf NC, int timesteps)
+Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.randHome)
 	, net(NC.net_type, NC.num_layers, NC.layers)
 	
@@ -46,10 +46,31 @@ int Simulation::runEpoch()
 	}
 
 	// Calculate the reward
-	double reward = 0;
-	reward -= steps * 0.05;
-	reward += this->world.currentAmount();
+	this->reward -= steps * 0.05;
+	this->reward += this->world.currentAmount();
 
 
 	return 0;
+}
+
+double Simulation::getReward() const 
+{
+	return this->reward;
+}
+
+/* Resets the gridworld and the statistics variables internal to the class */
+void Simulation::reset(bool randHome)
+{
+	this->world.reset(randHome);
+	// Reset any statistics variables here
+}
+
+void Simulation::mutate()
+{
+
+}
+
+bool Simulation::operator<(const Simulation &rhs) const
+{
+	return this->reward < rhs.reward;
 }
