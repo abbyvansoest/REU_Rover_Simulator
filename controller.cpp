@@ -17,6 +17,17 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool R
 	}
 }
 
+void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch) {
+
+	double avg = 0.0;
+
+	for (int i = 0; i < num_sims; i++) {
+		avg += simulations[i].getReward();
+	}
+
+	avg = avg / num_sims;
+	std::cout << "EPOCH: " << epoch << "  " << "AVG REWARD: " << avg << "\n";
+}
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
@@ -24,7 +35,7 @@ int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 250;
 	int NUM_SIMULATIONS = 10;
-	int NUM_EPOCHS = 10;
+	int NUM_EPOCHS = 1000;
 	int X_TOP_PERFORMERS = 5;
 
 	//  control gridworld
@@ -59,7 +70,7 @@ int main(void) {
 	NC.layers[1] = 8;
 	NC.layers[2] = 6;
 	NC.randWeights = RANDOM_WEIGHTS;
-	NC.randMin = RANDOM_NET_MIN; 
+	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
 
 	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
@@ -70,11 +81,19 @@ int main(void) {
 	//  algorithms.
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
+		std::cout << "EPOCH " << i << "\n";
+		std::cout << "**********************************" << "\n";
+
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
 			simulations[j].runEpoch();
+			std::cout << "simulation " << i << "   ";
+			simulations[j].logResults();
 		}
 
+		std::cout << "\n";
+
+		//printAvgReward(simulations, NUM_SIMULATIONS, i);
 		evolve_reset_population(simulations, X_TOP_PERFORMERS, RANDOM_HOME_LOCATION);
 	}
 
@@ -83,5 +102,7 @@ int main(void) {
 
 	return 0;
 }
+
+
 
 

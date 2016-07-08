@@ -1,5 +1,5 @@
 #include "simulation.h"
-
+#include <iostream>
 
 /* Calls the non-default constructors on the members with predetermined, 
  * almost arbitrary values */
@@ -25,7 +25,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 void Simulation::logResults()
 {
-
+	std::cout << "Reward: " << this->getReward() << "\n";
 }
 
 void Simulation::generateStats()
@@ -63,6 +63,7 @@ void Simulation::reset(bool randHome)
 {
 	this->world.reset(randHome);
 	// Reset any statistics variables here
+	this->reward = 0;
 }
 
 void Simulation::mutate()
