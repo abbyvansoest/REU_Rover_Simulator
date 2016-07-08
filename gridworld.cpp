@@ -5,6 +5,8 @@
 int HOME_X = 0;
 int HOME_Y = 0;
 
+POI POI_FOUND;
+
 
 // constructor
 Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
@@ -202,7 +204,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
-		int action = it->nextAction(state, net, oldPos, this->home.getPosition(), .1); // a default epsilon value is a placeholder for now
+		int action = it->nextAction(state, net, oldPos, this->home, .1); // a default epsilon value is a placeholder for now
 
 		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
@@ -230,18 +232,11 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 			//  if it has a POI within one block of it and it's action is to pickup,
 			//  mark the POI as having another potential carrier.
-			//  Agent remains in original location.
-			string foundPOI = findNearbyPOI(nextPos);
-			if (!foundPOI.empty()) {
-				for (auto it_poi = this->poi.begin(); it_poi != this->poi.end(); ++it)
-				{
-					if (foundPOI == it_poi->getP().toString())
-					{
-						int success = it_poi->addAvailableAgent(*it);
-						if (success == -1) {
-							it_poi->completed();
-						}
-					}
+			if (findNearbyPOI(nextPos)) {
+				//POI foundPOI = *foundPOI;
+				int success = POI_FOUND.addAvailableAgent(*it);
+				if (success == -1) {
+					POI_FOUND.completed();
 				}
 			}
 		}
@@ -280,7 +275,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 //  check if any POI border the given position 
 //  return the string of their position if so or null if not
-string Gridworld::findNearbyPOI(Position pos) {
+bool Gridworld::findNearbyPOI(Position pos) {
 
 	Position checkUp    = Position(pos.getX(), pos.getY() + 1);
 	Position checkDown  = Position(pos.getX(), pos.getY() - 1);
@@ -291,11 +286,12 @@ string Gridworld::findNearbyPOI(Position pos) {
 		Position p = it->getP();
 		if (p == checkUp || p == checkDown 
 			|| p == checkRight || p == checkLeft) {
-			return p.toString();
+			POI_FOUND = *it;
+			return true;
 		}
 	}
 
-	return "";
+	return false;
 }
 
 

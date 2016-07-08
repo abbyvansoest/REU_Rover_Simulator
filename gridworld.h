@@ -42,7 +42,7 @@ private:
 	void initHome(bool);
 	bool positionAvailable(Position);
 	State getState(Position, Agent);
-	string findNearbyPOI(Position);
+	bool findNearbyPOI(Position);
 
 public:
 

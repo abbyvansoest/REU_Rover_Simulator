@@ -25,7 +25,8 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 void Simulation::logResults()
 {
-	std::cout << "Reward: " << this->getReward() << "\n";
+	std::cout << "Reward: " << this->getReward() << 
+	"    Returned: " << this->world.currentAmount() << "\n";
 }
 
 void Simulation::generateStats()

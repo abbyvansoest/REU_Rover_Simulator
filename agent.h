@@ -8,6 +8,7 @@
 #include <fann_cpp.h>
 #include "position.h"
 #include "state.h"
+#include "Home.h"
 
 /* Definition of action behaviors relative numbers */
 enum
@@ -34,7 +35,7 @@ class Agent {
 
 		//  get the next action for hte agent based on the
 		//  current state and the neural net
-		int nextAction(State, FANN::neural_net, Position, Position, double);
+		int nextAction(State, FANN::neural_net, Position, Home, double);
 
 		//  is the broadcasting signal positive or negative?
 		bool isBroadcasting();

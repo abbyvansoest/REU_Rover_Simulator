@@ -42,8 +42,8 @@ int main(void) {
 	int NUMBER_OF_AGENTS = 2;
 	int NUMBER_OF_POI = 1;
 
-	int WORLD_WIDTH = 10;
-	int WORLD_HEIGHT = 10;
+	int WORLD_WIDTH = 4;
+	int WORLD_HEIGHT = 4;
 
 	bool RANDOM_HOME_LOCATION = true;
 

@@ -58,7 +58,7 @@ void Agent::setCarrying(bool set) {
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position home_pos, double eps) {
+int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home home, double eps) {
 
 	//stateTrajectory.push_back(s);
 	
@@ -70,6 +70,12 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 	
 	if (this->carrying)
 	{
+		if (this->getP() == home.getPosition()) {
+			this->carrying = false;
+			int load = 1;
+			home.recieveValues(load);
+		}
+		Position home_pos = home.getPosition();
 		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))
 		{
 			if (self_pos.getX() > home_pos.getX())
