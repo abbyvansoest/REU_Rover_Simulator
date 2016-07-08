@@ -126,7 +126,7 @@ State Gridworld::getState(Position &pos, Agent &ag) {
 	// increment variables to account for counts based on relative quadrant location
 	double agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
 	double poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
-	double broadcastCountA, broadcastCountB, broadcastCountC, broadcastCountD;
+	double broadcastCountA = 0.0, broadcastCountB = 0.0, broadcastCountC = 0.0, broadcastCountD = 0.0;
 
 	// get count of agents and count of broadcasting agents in each quadrant
 	for (auto it = agents.begin(); it != agents.end(); ++it) {  

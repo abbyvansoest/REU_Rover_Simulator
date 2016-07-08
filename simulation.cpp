@@ -37,8 +37,8 @@ void Simulation::generateStats()
 int Simulation::runEpoch()
 {
 	// Run the simulation until the time runs out or the simulation ends prematurely
-	int steps;
-	for (int steps = 0; steps < this->timesteps; ++steps)
+	int steps = 0;
+	for (; steps < this->timesteps; ++steps)
 	{
 		this->world.stepAgents(this->net);
 		if (this->world.worldComplete())
