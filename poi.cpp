@@ -37,7 +37,7 @@ int POI::getWeight()
 	return this->weight;
 }
 
-int POI::addAvailableAgent(Agent* agent) {
+int POI::addAvailableAgent() {
 	
 	/* if we have enough agents lifting the poi, return -1 */
 	// TODO Do we want this to return -1? or should agents be made available
@@ -46,7 +46,9 @@ int POI::addAvailableAgent(Agent* agent) {
 		return -1;
 	}
 
-	this->agentsReady.push_back(agent);
+	//this->agentsReady.push_back(agent);
+	this->pending++;
+	
 	return 0;
 }
 
@@ -64,3 +66,4 @@ bool POI::isComplete()
 	return this->complete;
 }
 
+Position POI::getP() { return this->p; }

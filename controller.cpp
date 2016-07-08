@@ -23,13 +23,13 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool R
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 250;
-	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 1000;
-	int X_TOP_PERFORMERS = 10;
+	int NUM_SIMULATIONS = 10;
+	int NUM_EPOCHS = 10;
+	int X_TOP_PERFORMERS = 5;
 
 	//  control gridworld
-	int NUMBER_OF_AGENTS = 10;
-	int NUMBER_OF_POI = 10;
+	int NUMBER_OF_AGENTS = 2;
+	int NUMBER_OF_POI = 1;
 
 	int WORLD_WIDTH = 10;
 	int WORLD_HEIGHT = 10;

@@ -26,6 +26,7 @@ class Agent {
 		bool broadcasting;
 		bool carrying;
 		std::deque<State> stateTrajectory; // currently unused
+		Position p;
 
 	public:	
 		//  constructors
@@ -52,6 +53,8 @@ class Agent {
 		//  set the carrying signal appropriately
 		void setCarrying(bool);
 		Agent copy();
+
+		Position getP();
 };
 
 #endif

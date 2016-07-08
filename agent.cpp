@@ -104,3 +104,5 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 
 	return max_i;
 }
+
+Position Agent::getP() { return this->p; }
