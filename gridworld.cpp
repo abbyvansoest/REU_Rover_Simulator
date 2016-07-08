@@ -271,6 +271,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			carriers[i]->setCarrying(true);
 			}
 			*/
+			bool picked_up = false;
 			for (auto it_a = this->agents.begin(); it_a != this->agents.end(); ++it_a)
 			{
 				Position pos(it_a->getP());
@@ -280,11 +281,14 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 						|| it->getP() == Position(pos.getX() + 1, pos.getY())
 				   )
 				{
-					
+					picked_up = true;
 					it_a->setCarrying(true);
 				}
-				else { newpoi.push_back(*it); }
 				
+			}
+			if (!picked_up)
+			{
+				newpoi.push_back(*it);
 			}
 
 			//  set new agent and POI states
