@@ -34,7 +34,7 @@ void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 250;
-	int NUM_SIMULATIONS = 10;
+	int NUM_SIMULATIONS = 20;
 	int NUM_EPOCHS = 1000;
 	int X_TOP_PERFORMERS = 5;
 
@@ -87,7 +87,7 @@ int main(void) {
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
 			simulations[j].runEpoch();
-			std::cout << "simulation " << i << "   ";
+			std::cout << "simulation " << j << "   ";
 			simulations[j].logResults();
 		}
 

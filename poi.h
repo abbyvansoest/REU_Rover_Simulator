@@ -14,8 +14,7 @@ class POI {
 
 		bool complete;
 		int weight;
-		std::vector<Agent*> agentsReady;
-		int pending;
+		std::vector<Agent> agentsReady;
 		Position p;
 
 	public:
@@ -38,10 +37,10 @@ class POI {
 		bool isComplete();
 
 		/* returns the array of carriers for the POI */
-		std::vector<Agent*> getCarriers();
+		std::vector<Agent> getCarriers();
 
 		/* Adds an agent to the list of available agents to pick up the poi if it is not full */
-		int addAvailableAgent();
+		int addAvailableAgent(Agent);
 
 		Position getP();
 };

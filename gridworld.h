@@ -41,8 +41,7 @@ private:
 	void initAgents();
 	void initHome(bool);
 	bool positionAvailable(Position);
-	State getState(Position&, Agent&);
-	bool inDomain(Position);
+	State getState(Position, Agent);
 	string findNearbyPOI(Position);
 
 public:
@@ -50,7 +49,6 @@ public:
 	// constructor
 	Gridworld();
 	Gridworld(int, int, int, int, bool);
-	~Gridworld();
 
 	// step all agents in the world
 	//  potential for threading?

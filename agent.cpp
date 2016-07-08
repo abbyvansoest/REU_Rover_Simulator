@@ -23,19 +23,13 @@ Agent::Agent() {
 	this->carrying = false;
 }
 
-Agent::Agent(std::deque<State> trajectory, bool broadcasting, bool carrying) {
-	this->stateTrajectory = trajectory;
+Agent::Agent(bool broadcasting, bool carrying) {
 	this->broadcasting = broadcasting;
 	this->carrying = carrying;
 }
 
 Agent Agent::copy() {
-	return Agent(this->stateTrajectory, this->isBroadcasting(), this->isCarrying());
-}
-
-// push most recent agent state to trajectory stack 
-void Agent::setState(State state) {
-	stateTrajectory.push_back(state);
+	return Agent(this->isBroadcasting(), this->isCarrying());
 }
 
 //  is the agent in the middle of broadcasting?
@@ -106,3 +100,7 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 }
 
 Position Agent::getP() { return this->p; }
+
+void Agent::setP(Position pos) {
+	this->p = pos;
+}

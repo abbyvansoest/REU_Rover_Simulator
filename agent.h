@@ -25,17 +25,12 @@ class Agent {
 	private:
 		bool broadcasting;
 		bool carrying;
-		std::deque<State> stateTrajectory; // currently unused
 		Position p;
 
 	public:	
 		//  constructors
 		Agent();
-		Agent(std::deque<State>, bool, bool);
-
-		//  push the newest state information onto the 
-		//  trajectory deque
-		void setState(State);
+		Agent(bool, bool);
 
 		//  get the next action for hte agent based on the
 		//  current state and the neural net
@@ -55,6 +50,7 @@ class Agent {
 		Agent copy();
 
 		Position getP();
+		void setP(Position);
 };
 
 #endif

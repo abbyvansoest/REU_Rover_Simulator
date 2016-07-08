@@ -23,17 +23,6 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	this->numSteps = 0;
 }
 
-Gridworld::~Gridworld()
-{
-	/*
-	for (auto it = this->poi.begin(); it != this->poi.end(); ++it)
-		delete it->second;
-
-	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
-		delete it->second;
-		*/
-}
-
 //  randomly initalize agents in the grid
 void Gridworld::initAgents() {
 	int x, y;
@@ -55,13 +44,6 @@ void Gridworld::initAgents() {
 		//Agent* addAgent = new Agent();
 		//this->agents[str] = addAgent;
 		this->agents.push_back(Agent());
-	}
-
-	//  set state of all agents
-	Position pos;
-	for (auto it = agents.begin(); it != agents.end(); ++it) {
-		pos = Position(it->getP());
-		it->setState(getState(pos, *it));
 	}
 }
 
@@ -105,23 +87,28 @@ void Gridworld::initHome(bool rand_flag) {
 
 //  check if the position is occupied by an agent, a POI, or the homebase
 bool Gridworld::positionAvailable(Position p) {
-	/*
-	string posString = p.toString();
-	if ((this->agents.find(posString) != agents.end()) ||
-		(this->poi.find(posString) != poi.end()))
-	{
+	
+	if (p.getX() < 0 || p.getX() >= this->width || p.getY() < 0 || p.getY() >= this->height) {
 		return false;
 	}
-	if (this->home.getPosition() == p)
-	{
-		return false;
+
+	if (this->home.getPosition() == p) return false;
+
+	for (auto it = agents.begin(); it != agents.end(); ++it) {  
+		Position pos = Position(it->getP());
+		if (pos == p) return false;
 	}
-	*/
+
+	for (auto it = poi.begin(); it != poi.end(); ++it) {  
+		Position pos = Position(it->getP());
+		if (pos == p) return false;
+	}
+
 	return true;
 }
 
 //  return the 13-dim state representation for ag
-State Gridworld::getState(Position &pos, Agent &ag) {
+State Gridworld::getState(Position pos, Agent ag) {
 	// go through all agents and POI
 	// increment variables to account for counts based on relative quadrant location
 	double agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
@@ -207,6 +194,8 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 	State state;
 	Position oldPos, nextPos;
+	std::vector<Agent> newAgents;
+	std::vector<POI> newpoi;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -248,7 +237,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				{
 					if (foundPOI == it_poi->getP().toString())
 					{
-						int success = it_poi->addAvailableAgent();
+						int success = it_poi->addAvailableAgent(*it);
 						if (success == -1) {
 							it_poi->completed();
 						}
@@ -256,80 +245,59 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				}
 			}
 		}
+
+		//  check for collisions in new map -- change agent's position if unoccupied
+		//  insert agent to newAgents vector 
+		if (!positionAvailable(nextPos)) {
+			nextPos = oldPos;
+		}
+		it->setP(nextPos);
+		newAgents.push_back(*it);
 	}
 
 	//  iterate through POI to see if any have been fully picked up
 	//  remove from the table if this is the case
-	std::vector<POI> newpoi;
 	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
 		if (it->isComplete())
 		{
-			/*
 			//  set carrying information for all agents in vector list
-			std::vector<Agent*> carriers = point.getCarriers();
-			for (int i = 0; i < carriers.size(); i++) {
-			carriers[i]->setCarrying(true);
+			std::vector<Agent> carriers = it->getCarriers();
+			for (auto it = carriers.begin(); it != carriers.end(); ++it) {
+				it->setCarrying(true);
 			}
-			*/
-			bool picked_up = false;
-			for (auto it_a = this->agents.begin(); it_a != this->agents.end(); ++it_a)
-			{
-				Position pos(it_a->getP());
-				if (   it->getP() == Position(pos.getX(), pos.getY() + 1)
-						|| it->getP() == Position(pos.getX(), pos.getY() - 1)
-						|| it->getP() == Position(pos.getX() - 1, pos.getY())
-						|| it->getP() == Position(pos.getX() + 1, pos.getY())
-				   )
-				{
-					picked_up = true;
-					it_a->setCarrying(true);
-				}
-				
-			}
-			if (!picked_up)
-			{
-				newpoi.push_back(*it);
-			}
+		}
 
-			//  set new agent and POI states
-			//this->agents = newAgents;
-			//this->poi = newPoi;
-			this->numSteps++;
+		else
+		{
+			newpoi.push_back(*it);
 		}
 	}
+
+	this->numSteps++;
 	this->poi = newpoi;
+	this->agents = newAgents;
 }
 
-//  return the string of the first neighboring POI for the given position,
-	//  or null if no neighboring POI exists
+//  check if any POI border the given position 
+//  return the string of their position if so or null if not
 string Gridworld::findNearbyPOI(Position pos) {
 
-	/*
-	string checkUp    = Position(pos.getX(), pos.getY() + 1).toString();
-	string checkDown  = Position(pos.getX(), pos.getY() - 1).toString();
-	string checkRight = Position(pos.getX() - 1, pos.getY()).toString();
-	string checkLeft  = Position(pos.getX() + 1, pos.getY()).toString();
+	Position checkUp    = Position(pos.getX(), pos.getY() + 1);
+	Position checkDown  = Position(pos.getX(), pos.getY() - 1);
+	Position checkRight = Position(pos.getX() - 1, pos.getY());
+	Position checkLeft  = Position(pos.getX() + 1, pos.getY());
 
-	auto end = newPoi.end();
-
-	if (newPoi.find(checkUp) != end)    return checkUp;
-	if (newPoi.find(checkDown) != end)  return checkDown;
-	if (newPoi.find(checkRight) != end) return checkRight;
-	if (newPoi.find(checkLeft) != end)  return checkLeft;
-	*/
+	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
+		Position p = it->getP();
+		if (p == checkUp || p == checkDown 
+			|| p == checkRight || p == checkLeft) {
+			return p.toString();
+		}
+	}
 
 	return "";
-
 }
 
-//  check if a position is outside the bounds of the gridworld
-bool Gridworld::inDomain(Position p) {
-
-	if (p.getX() < 0 || p.getX() >= this->width || p.getY() < 0 || p.getY() >= this->height) {
-		return false;
-	}
-	return true;
-}
 
 // at the end of a simulation, get reward for this grid
 double Gridworld::getGridReward() {
