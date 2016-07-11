@@ -33,10 +33,10 @@ void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 10;
-	int NUM_SIMULATIONS = 1;
-	int NUM_EPOCHS = 5;
-	int X_TOP_PERFORMERS = 1;
+	int MAX_STEPS = 50;
+	int NUM_SIMULATIONS = 20;
+	int NUM_EPOCHS = 10000;
+	int X_TOP_PERFORMERS = 2;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;

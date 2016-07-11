@@ -292,9 +292,9 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 	this->poi = newpoi;
 	this->agents = newAgents;
 
-	std::cout << "STEP\n";
-	this->printWorld();
-	std::cout << "\n";
+	//std::cout << "STEP\n";
+	//this->printWorld();
+	//std::cout << "\n";
 }
 
 //  check if any POI border the given position 
@@ -386,16 +386,6 @@ void Gridworld::printWorld() {
 		}
 		std::cout << "\n";
 	}
-
-	for (auto it = agents.begin(); it != agents.end(); ++it) {
-		Position p = it->getP();
-		std::cout << "Agent position: " << p.toString() << "\n";
-	}
-	for (auto it = poi.begin(); it != poi.end(); ++it) {
-		Position p = it->getP();
-		std::cout << "poi position: " << p.toString() << "\n";
-	}
-	//std::cout << this->home.getPosition();
 
 }
 
