@@ -5,9 +5,6 @@
 int HOME_X = 0;
 int HOME_Y = 0;
 
-POI POI_FOUND;
-
-
 // constructor
 Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
 
@@ -251,9 +248,10 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			//  if it has a POI within one block of it and it's action is to pickup,
 			//  mark the POI as having another potential carrier.
 			if (findNearbyPOI(nextPos)) {
+				POI found = nearbyPOI(nextPos);
 				std::cout << "FOUND\n";
-				if (!POI_FOUND.isComplete()) {
-					POI_FOUND.addAvailableAgent(*it);
+				if (!found.isComplete()) {
+					found.addAvailableAgent(*it);
 				}
 			}
 		}
@@ -269,8 +267,10 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 	//  iterate through POI to see if any have been fully picked up
 	//  remove from the table if this is the case
+	int i = 0;
 	for (auto POIit = this->poi.begin(); POIit != this->poi.end(); ++POIit) {
-		std::cout << "made it here\n";
+		i++;
+		std::cout << "made it here:  " << i << "\n";
 		if (POIit->isComplete())
 		{
 			std::cout << "A COMPLETE POI!!!!!!!\n";
@@ -299,6 +299,22 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 	//std::cout << "\n";
 }
 
+POI Gridworld::nearbyPOI(Position pos) {
+
+	Position checkUp    = Position(pos.getX(), pos.getY() + 1);
+	Position checkDown  = Position(pos.getX(), pos.getY() - 1);
+	Position checkRight = Position(pos.getX() - 1, pos.getY());
+	Position checkLeft  = Position(pos.getX() + 1, pos.getY());
+
+	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
+		Position p = it->getP();
+		if (p == checkUp || p == checkDown 
+			|| p == checkRight || p == checkLeft) {
+			return *it;
+		}
+	}
+}
+
 //  check if any POI border the given position 
 //  return the string of their position if so or null if not
 bool Gridworld::findNearbyPOI(Position pos) {
@@ -312,7 +328,6 @@ bool Gridworld::findNearbyPOI(Position pos) {
 		Position p = it->getP();
 		if (p == checkUp || p == checkDown 
 			|| p == checkRight || p == checkLeft) {
-			POI_FOUND = *it;
 			return true;
 		}
 	}

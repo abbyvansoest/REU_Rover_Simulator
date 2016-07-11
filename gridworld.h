@@ -43,6 +43,7 @@ private:
 	bool positionAvailable(Position);
 	State getState(Position, Agent);
 	bool findNearbyPOI(Position);
+	POI nearbyPOI(Position);
 
 public:
 
