@@ -82,28 +82,32 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home hom
 		return rand() % 6;
 	}
 	
-	if (this->carrying)
+	if (this->isCarrying())
 	{
+		std::cout << "MADE IT HERE HI\n";
 		Position home_pos = home.getPosition();
+		if (home_pos == self_pos) return SET_DOWN;
 
-		if (this->getP() == home_pos) {
-			return SET_DOWN;
-		}
-		
 		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))
 		{
 			if (self_pos.getX() > home_pos.getX())
 			{
-				return MOVE_RIGHT;
+				std::cout << "moving left\n";
+				return MOVE_LEFT;
 			}
-			else { return MOVE_LEFT; }
+			else { 
+				std::cout << "moving right\n";
+				return MOVE_RIGHT; }
 		}
 		else{
 			if (self_pos.getY() > home_pos.getY())
 			{
+				std::cout << "moving down\n";
 				return MOVE_DOWN;
 			}
-			else { return MOVE_UP; }
+			else { 
+				std::cout << "moving up\n";
+				return MOVE_UP; }
 		}
 	}
 

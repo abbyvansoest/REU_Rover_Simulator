@@ -21,10 +21,9 @@ enum
 	MOVE_DOWN,
 	MOVE_RIGHT,
 	PICKUP,
-	BROADCAST
+	BROADCAST,
+	SET_DOWN
 };
-
-enum {SET_DOWN = -1};
 
 class Agent {
 

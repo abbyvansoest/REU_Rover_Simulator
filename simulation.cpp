@@ -30,6 +30,7 @@ void Simulation::logResults()
 	std::cout << "Reward: " << this->getReward() << 
 	"    Returned: " << this->world.currentAmount() << "\n";
 	if (this->world.currentAmount() > 0) std::cout << "SUCCESS OF SOME SORT!\n";
+	std::cout << "\n";
 }
 
 void Simulation::generateStats()

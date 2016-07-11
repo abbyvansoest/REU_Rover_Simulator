@@ -34,6 +34,7 @@ private:
 	//unordered_map<string, POI*> poi;
 	std::vector<Agent> agents;
 	std::vector<POI> poi;
+	std::vector<POI*> pickedUpPOIs;
 	Home home;
 	int numSteps;
 

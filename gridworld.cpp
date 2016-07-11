@@ -202,7 +202,8 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 		int action = it->nextAction(state, net, oldPos, this->home, .1); // a default epsilon value is a placeholder for now
-		std::cout << "action: " << action << "\n";
+	//	std::cout << "action: " << action << "\n";
+
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
 			std::cout << "SET DOWN\n";
@@ -223,13 +224,13 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
-			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
+			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
 		}
 		if (action == MOVE_DOWN) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
 		}
 		if (action == MOVE_LEFT) {
-			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
+			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
 		}
 		if (action == MOVE_UP) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
@@ -278,7 +279,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				AGit->setCarrying(true);
 				POI* poi = &(*POIit);
 				AGit->setHoldingPOI(poi);
-				std::cout << "FULL PICKUP\n";
+				this->pickedUpPOIs.push_back(poi);
 			}
 		}
 
@@ -291,6 +292,9 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 	this->numSteps++;
 	this->poi = newpoi;
 	this->agents = newAgents;
+
+	this->printWorld();
+	std::cout << "\n";
 
 	//std::cout << "STEP\n";
 	//this->printWorld();
@@ -344,6 +348,7 @@ void Gridworld::clear() {
 
 	agents.clear();
 	poi.clear();
+	pickedUpPOIs.clear();
 }
 
 //  reset the world with the given neural net, 
