@@ -251,13 +251,11 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			//  if it has a POI within one block of it and it's action is to pickup,
 			//  mark the POI as having another potential carrier.
 			if (findNearbyPOI(nextPos)) {
-
+				std::cout << "FOUND\n";
 				if (POI_FOUND.isComplete()) continue;
 
 				int success = POI_FOUND.addAvailableAgent(*it);
-				if (success == -1) {
-					POI_FOUND.completed();
-				}
+				if (success != -1) it->setHoldingPOI(&POI_FOUND);
 			}
 		}
 

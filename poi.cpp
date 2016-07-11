@@ -39,17 +39,17 @@ int POI::getWeight()
 }
 
 int POI::addAvailableAgent(Agent ag) {
+
+	this->agentsReady.push_back(ag);
 	
 	/* if we have enough agents lifting the poi, return -1 */
 	// TODO Do we want this to return -1? or should agents be made available
 	// for more than is necessary, and then allow only a subset to lift if?
 	if (this->agentsReady.size() >= this->weight) {
+		this->completed();
 		return -1;
 	}
 
-	this->agentsReady.push_back(ag);
-	ag.setHoldingPOI(this);
-	
 	return 0;
 }
 
@@ -59,7 +59,6 @@ std::vector<Agent> POI::getCarriers() {
 
 void POI::completed()
 {
-	std::cout << "POI DONE\n";
 	this->complete = true;
 }
 
