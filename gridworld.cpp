@@ -25,6 +25,23 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	this->numSteps = 0;
 }
 
+//  initialize home base to random location
+//  or pre-set global value
+void Gridworld::initHome(bool rand_flag) {
+	if (!rand_flag) {
+		Position p = Position(HOME_X, HOME_Y);
+		this->home = Home(p);
+	}
+
+	else {
+		int x, y;
+		x = rand() % width;
+		y = rand() % height;
+		Position p(x, y);
+		this->home = Home(p);
+	}
+}
+
 //  randomly initalize agents in the grid
 void Gridworld::initAgents() {
 	int x, y;
@@ -33,12 +50,10 @@ void Gridworld::initAgents() {
 	for (int i = 0; i < this->numAgents; i++) {
 		//  find open position on the board
 		Position pos;
-		bool open = false;
-		while (!open) {
+		while (!positionAvailable(pos)) {
 			x = rand() % width;
 			y = rand() % height;
 			pos = Position(x, y);
-			open = positionAvailable(pos);
 		}
 		
 		// add an agent to the open position
@@ -65,26 +80,8 @@ void Gridworld::initPOI() {
 		}
 
 		// add a POI to the open position
-		POI addPOI = POI(1,x,y);
+		POI addPOI = POI(1, x, y);
 		this->poi.push_back(addPOI);
-		string str = addPOI.getP().toString();
-	}
-}
-
-//  initialize home base to random location
-//  or pre-set global value
-void Gridworld::initHome(bool rand_flag) {
-	if (!rand_flag) {
-		Position p = Position(HOME_X, HOME_Y);
-		this->home = Home(p);
-	}
-
-	else {
-		int x, y;
-		x = rand() % width;
-		y = rand() % height;
-		Position p(x, y);
-		this->home = Home(p);
 	}
 }
 
@@ -208,7 +205,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 		int action = it->nextAction(state, net, oldPos, this->home, .1); // a default epsilon value is a placeholder for now
-
+		std::cout << "action: " << action << "\n";
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
 			std::cout << "SET DOWN\n";
@@ -295,6 +292,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 	this->poi = newpoi;
 	this->agents = newAgents;
 
+	std::cout << "STEP\n";
 	this->printWorld();
 	std::cout << "\n";
 }

@@ -30,6 +30,7 @@ POI::POI()
 POI::POI(int weight, int x, int y)
 {
 	this->weight = weight;
+	this->p = Position(x, y);
 }
 
 int POI::getWeight()

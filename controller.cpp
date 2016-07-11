@@ -35,7 +35,7 @@ int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 10;
 	int NUM_SIMULATIONS = 1;
-	int NUM_EPOCHS = 1;
+	int NUM_EPOCHS = 5;
 	int X_TOP_PERFORMERS = 1;
 
 	//  control gridworld
@@ -45,7 +45,7 @@ int main(void) {
 	int WORLD_WIDTH = 3;
 	int WORLD_HEIGHT = 3;
 
-	bool RANDOM_HOME_LOCATION = true;
+	bool RANDOM_HOME_LOCATION = false;
 
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 3;

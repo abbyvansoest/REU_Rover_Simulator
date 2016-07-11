@@ -20,6 +20,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 {
 	if (NC.randWeights) { this->net.randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
+	std::cout << "INIT WORLD\n";
 	world.printWorld();
 
 }
@@ -52,7 +53,6 @@ int Simulation::runEpoch()
 	this->reward -= steps * 0.05;
 	this->reward += this->world.currentAmount();
 
-	this->world.printWorld();
 	return 0;
 }
 
