@@ -38,7 +38,7 @@ int POI::getWeight()
 	return this->weight;
 }
 
-int POI::addAvailableAgent(Agent ag) {
+void POI::addAvailableAgent(Agent ag) {
 
 	this->agentsReady.push_back(ag);
 	
@@ -47,10 +47,7 @@ int POI::addAvailableAgent(Agent ag) {
 	// for more than is necessary, and then allow only a subset to lift if?
 	if (this->agentsReady.size() >= this->weight) {
 		this->completed();
-		return -1;
 	}
-
-	return 0;
 }
 
 std::vector<Agent> POI::getCarriers() {

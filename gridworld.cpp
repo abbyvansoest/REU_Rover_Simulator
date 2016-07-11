@@ -252,10 +252,9 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			//  mark the POI as having another potential carrier.
 			if (findNearbyPOI(nextPos)) {
 				std::cout << "FOUND\n";
-				if (POI_FOUND.isComplete()) continue;
-
-				int success = POI_FOUND.addAvailableAgent(*it);
-				if (success != -1) it->setHoldingPOI(&POI_FOUND);
+				if (!POI_FOUND.isComplete()) {
+					POI_FOUND.addAvailableAgent(*it);
+				}
 			}
 		}
 
@@ -270,19 +269,24 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 	//  iterate through POI to see if any have been fully picked up
 	//  remove from the table if this is the case
-	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
-		if (it->isComplete())
+	for (auto POIit = this->poi.begin(); POIit != this->poi.end(); ++POIit) {
+		std::cout << "made it here\n";
+		if (POIit->isComplete())
 		{
+			std::cout << "A COMPLETE POI!!!!!!!\n";
 			//  set carrying information for all agents in vector list
-			std::vector<Agent> carriers = it->getCarriers();
-			for (auto it = carriers.begin(); it != carriers.end(); ++it) {
-				it->setCarrying(true);
+			std::vector<Agent> carriers = POIit->getCarriers();
+			for (auto AGit = carriers.begin(); AGit != carriers.end(); ++AGit) {
+				AGit->setCarrying(true);
+				POI* poi = &(*POIit);
+				AGit->setHoldingPOI(poi);
+				std::cout << "FULLPICKUP\n";
 			}
 		}
 
 		else
 		{
-			newpoi.push_back(*it);
+			newpoi.push_back(*POIit);
 		}
 	}
 

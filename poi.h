@@ -42,7 +42,7 @@ class POI {
 		std::vector<Agent> getCarriers();
 
 		/* Adds an agent to the list of available agents to pick up the poi if it is not full */
-		int addAvailableAgent(Agent);
+		void addAvailableAgent(Agent);
 
 		Position getP();
 };
