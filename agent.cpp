@@ -21,15 +21,17 @@
 Agent::Agent() {
 	this->broadcasting = false;
 	this->carrying = false;
+	this->holding = NULL;
 }
 
-Agent::Agent(bool broadcasting, bool carrying) {
+Agent::Agent(bool broadcasting, bool carrying, POI* holding) {
 	this->broadcasting = broadcasting;
 	this->carrying = carrying;
+	this->holding = holding;
 }
 
 Agent Agent::copy() {
-	return Agent(this->isBroadcasting(), this->isCarrying());
+	return Agent(this->isBroadcasting(), this->isCarrying(), this->holding);
 }
 
 //  is the agent in the middle of broadcasting?
@@ -52,6 +54,18 @@ void Agent::setCarrying(bool set) {
 	this->carrying = set;
 }
 
+//  set the POI the agent is holding
+void Agent::setHoldingPOI(POI* poi) {
+	if (!this->isCarrying()) this->holding = poi;
+}
+
+//  return the POI the agent is holding
+POI Agent::getHoldingPOI() {
+	if (this->isCarrying()) return *(this->holding);
+	//  error otherwise
+	else std::cout << "ERROR: AGENT IS NOT CARRYING\n";
+}
+
 /* get next action based on state and return to Gridworld
  * The action is represented as a single integer, found as the index in the
  * ouput array with the max value. The output is the 6-array of [0,1] continuous 
@@ -70,12 +84,12 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home hom
 	
 	if (this->carrying)
 	{
-		if (this->getP() == home.getPosition()) {
-			this->carrying = false;
-			int load = 1;
-			home.recieveValues(load);
-		}
 		Position home_pos = home.getPosition();
+
+		if (this->getP() == home_pos) {
+			return SET_DOWN;
+		}
+		
 		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))
 		{
 			if (self_pos.getX() > home_pos.getX())

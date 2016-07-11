@@ -1,6 +1,8 @@
 #ifndef _POI_H
 #define _POI_H
 
+class Agent;
+
 #include <iostream>
 #include "position.h"
 #include <vector>

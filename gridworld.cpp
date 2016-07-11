@@ -19,9 +19,9 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	this->width = width;
 	this->height = height;
 
+	initHome(randHome);
 	initAgents();
 	initPOI();
-	initHome(randHome);
 	this->numSteps = 0;
 }
 
@@ -42,10 +42,11 @@ void Gridworld::initAgents() {
 		}
 		
 		// add an agent to the open position
-		str = pos.toString();
-		//Agent* addAgent = new Agent();
-		//this->agents[str] = addAgent;
-		this->agents.push_back(Agent());
+		//str = pos.toString();
+	//	std::cout << "AGENT POSITION: " << str << "\n";
+		Agent addAgent;
+		addAgent.setP(pos);
+		this->agents.push_back(addAgent);
 	}
 }
 
@@ -57,16 +58,16 @@ void Gridworld::initPOI() {
 	for (int i = 0; i < this->numPOI; i++) {
 		//  find open position on the board
 		Position pos;
-		bool open = false;
-		while (!open) {
+		while (!positionAvailable(pos)) {
 			x = rand() % width;
 			y = rand() % height;
 			pos = Position(x, y);
-			open = positionAvailable(pos);
 		}
 
 		// add a POI to the open position
-		this->poi.push_back(POI(2,x,y));
+		POI addPOI = POI(1,x,y);
+		this->poi.push_back(addPOI);
+		string str = addPOI.getP().toString();
 	}
 }
 
@@ -94,7 +95,9 @@ bool Gridworld::positionAvailable(Position p) {
 		return false;
 	}
 
-	if (this->home.getPosition() == p) return false;
+	if (this->home.getPosition() == p) {
+		return false;
+	}
 
 	for (auto it = agents.begin(); it != agents.end(); ++it) {  
 		Position pos = Position(it->getP());
@@ -206,6 +209,24 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		state = getState(oldPos, *it);
 		int action = it->nextAction(state, net, oldPos, this->home, .1); // a default epsilon value is a placeholder for now
 
+		//  set down the POI a group of agents is holding
+		if (action == SET_DOWN) {
+			std::cout << "SET DOWN\n";
+			//  find all agents carrying a given POI
+			POI poi = it->getHoldingPOI();
+			std::vector<Agent> carriers = poi.getCarriers();
+			int amt = poi.getWeight();
+
+			for (auto iter = carriers.begin(); iter != carriers.end(); ++iter) {
+				//  set all their carrying values to false
+				iter->setCarrying(false);
+				iter->setHoldingPOI(NULL);
+			}
+			
+			this->home.receiveValues(amt);
+			continue;
+		}
+
 		//  set next position for all cases
 		if (action == MOVE_RIGHT) {
 			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
@@ -233,7 +254,9 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			//  if it has a POI within one block of it and it's action is to pickup,
 			//  mark the POI as having another potential carrier.
 			if (findNearbyPOI(nextPos)) {
-				//POI foundPOI = *foundPOI;
+
+				if (POI_FOUND.isComplete()) continue;
+
 				int success = POI_FOUND.addAvailableAgent(*it);
 				if (success == -1) {
 					POI_FOUND.completed();
@@ -271,6 +294,9 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 	this->numSteps++;
 	this->poi = newpoi;
 	this->agents = newAgents;
+
+	this->printWorld();
+	std::cout << "\n";
 }
 
 //  check if any POI border the given position 
@@ -330,5 +356,48 @@ bool Gridworld::worldComplete()
 	if (this->home.currentAmount() == this->numPOI)
 		return true;
 	return false;
+}
+
+void Gridworld::printWorld() {
+
+	bool print;
+
+	for (int i = 0; i < this->height; i++) {
+		//std::cout << i << "\n";
+		for (int j = 0; j < this->width; j++) {
+			Position p = Position(i, j);
+			print = false;
+			//std::cout << "J IS " << j << "\n";
+			for (auto it = agents.begin(); it != agents.end(); ++it) {
+				if (it->getP() == p) {
+					std::cout << "A ";
+					print = true;
+				}
+			}
+			for (auto it = poi.begin(); it != poi.end(); ++it) {
+				if (it->getP() == p) {
+					std::cout << "P ";
+					print = true;
+				}
+			}
+			if (this->home.getPosition() == p) {
+				std::cout << "H ";
+				print = true;
+			}
+			if (!print) std::cout << "* ";
+		}
+		std::cout << "\n";
+	}
+
+	for (auto it = agents.begin(); it != agents.end(); ++it) {
+		Position p = it->getP();
+		std::cout << "Agent position: " << p.toString() << "\n";
+	}
+	for (auto it = poi.begin(); it != poi.end(); ++it) {
+		Position p = it->getP();
+		std::cout << "poi position: " << p.toString() << "\n";
+	}
+	//std::cout << this->home.getPosition();
+
 }
 

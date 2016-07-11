@@ -20,6 +20,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 {
 	if (NC.randWeights) { this->net.randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
+	world.printWorld();
 
 }
 
@@ -27,6 +28,7 @@ void Simulation::logResults()
 {
 	std::cout << "Reward: " << this->getReward() << 
 	"    Returned: " << this->world.currentAmount() << "\n";
+	if (this->world.currentAmount() > 0) std::cout << "SUCCESS OF SOME SORT!\n";
 }
 
 void Simulation::generateStats()
@@ -50,7 +52,7 @@ int Simulation::runEpoch()
 	this->reward -= steps * 0.05;
 	this->reward += this->world.currentAmount();
 
-
+	this->world.printWorld();
 	return 0;
 }
 

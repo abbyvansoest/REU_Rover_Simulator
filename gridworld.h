@@ -72,6 +72,8 @@ public:
 
 	double getDistance(Position, Position);
 
+	void printWorld();
+
 };
 
 #endif

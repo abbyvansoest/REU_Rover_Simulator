@@ -47,6 +47,7 @@ int POI::addAvailableAgent(Agent ag) {
 	}
 
 	this->agentsReady.push_back(ag);
+	ag.setHoldingPOI(this);
 	
 	return 0;
 }
@@ -57,6 +58,7 @@ std::vector<Agent> POI::getCarriers() {
 
 void POI::completed()
 {
+	std::cout << "POI DONE\n";
 	this->complete = true;
 }
 

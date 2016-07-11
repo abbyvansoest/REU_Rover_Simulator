@@ -33,17 +33,17 @@ void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 250;
-	int NUM_SIMULATIONS = 20;
-	int NUM_EPOCHS = 1000;
-	int X_TOP_PERFORMERS = 5;
+	int MAX_STEPS = 10;
+	int NUM_SIMULATIONS = 1;
+	int NUM_EPOCHS = 1;
+	int X_TOP_PERFORMERS = 1;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
 	int NUMBER_OF_POI = 1;
 
-	int WORLD_WIDTH = 4;
-	int WORLD_HEIGHT = 4;
+	int WORLD_WIDTH = 3;
+	int WORLD_HEIGHT = 3;
 
 	bool RANDOM_HOME_LOCATION = true;
 
