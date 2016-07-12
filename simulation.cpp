@@ -5,8 +5,8 @@
  * almost arbitrary values */
 Simulation::Simulation()
 	: world(2, 1, 5, 5, false)
-	, net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6})
 {
+	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6});
 	this->reward = 0;
 	this->timesteps = 250;
 }
@@ -15,14 +15,20 @@ Simulation::Simulation()
  * to call the subsequent non default constructors for the members */
 Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.randHome)
-	, net(NC.net_type, NC.num_layers, NC.layers)
 	
 {
-	if (NC.randWeights) { this->net.randomize_weights(NC.randMin, NC.randMax); }
+
+	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
+
+	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
 	std::cout << "INIT WORLD\n";
 	world.printWorld();
 
+}
+
+Simulation::~Simulation() {
+	delete this->net;
 }
 
 void Simulation::logResults()
@@ -38,6 +44,10 @@ void Simulation::generateStats()
 
 }
 
+FANN::neural_net* Simulation::getNet() {
+	return this->net;
+}
+
 /* Runs a single epoch, which runs for a given number of timesteps */
 int Simulation::runEpoch()
 {
@@ -45,7 +55,7 @@ int Simulation::runEpoch()
 	int steps = 0;
 	for (; steps < this->timesteps; ++steps)
 	{
-		this->world.stepAgents(this->net);
+		this->world.stepAgents(*(this->net));
 		if (this->world.worldComplete())
 			break;
 	}
@@ -70,13 +80,24 @@ void Simulation::reset(bool randHome)
 	this->reward = 0;
 }
 
+void Simulation::destroyNet() {
+	delete this->net;
+	this->net = NULL;
+}
+
+void Simulation::recreateNet(FANN::neural_net* net) {
+	if (this->net == NULL) {
+		this->net = new FANN::neural_net(*net);
+	}
+}
+
 /* Performs an in place mutation of a single weight in the given network */
 void Simulation::mutate()
 {
-	int length = this->net.get_total_connections();
+	int length = this->net->get_total_connections();
 
 	FANN::connection connections[length];
-	this->net.get_connection_array(connections);
+	this->net->get_connection_array(connections);
 	/* mutate a random weight */
 	int index = rand() % length;
 	int sign = rand() % 2 ? 1 : -1;
@@ -85,7 +106,7 @@ void Simulation::mutate()
 	std::cout << "mag: " << magnitude << std::endl;
 	connections[index].weight += (fann_type) sign*magnitude;
 
-	this->net.set_weight_array(connections, length);
+	this->net->set_weight_array(connections, length);
 }
 
 bool Simulation::operator<(const Simulation &rhs) const
