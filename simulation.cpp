@@ -70,9 +70,22 @@ void Simulation::reset(bool randHome)
 	this->reward = 0;
 }
 
-void Simulation::mutate()
+/* Performs an in place mutation of a single weight in the given network */
+void Simulation::mutate(FANN::neural_net* net)
 {
+	int length = net->get_total_connections();
 
+	FANN::connection connections[length];
+	net->get_connection_array(connections);
+	/* mutate a random weight */
+	int index = rand() % length;
+	int sign = rand() % 2 ? 1 : -1;
+	fann_type magnitude = 1/((fann_type) ((rand() % 50) + 10));
+
+	std::cout << "mag: " << magnitude << std::endl;
+	connections[index].weight += (fann_type) sign*magnitude;
+
+	net->set_weight_array(connections, length);
 }
 
 bool Simulation::operator<(const Simulation &rhs) const

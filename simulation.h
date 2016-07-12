@@ -58,7 +58,7 @@ class Simulation
 		int runEpoch();
 		double getReward() const;
 		void reset(bool);
-		void mutate();
+		void mutate(FANN::neural_net *);
 		bool operator<(const Simulation &) const;
 };
 
