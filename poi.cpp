@@ -22,6 +22,7 @@ POI::POI()
 {
 	this->complete = false;
 	this->weight = 1;
+	this->removed = false;
 }
 
 
@@ -31,6 +32,7 @@ POI::POI(int weight, int x, int y)
 {
 	this->weight = weight;
 	this->p = Position(x, y);
+	this->removed = false;
 }
 
 int POI::getWeight()
@@ -64,6 +66,14 @@ void POI::completed()
 bool POI::isComplete()
 {
 	return this->complete;
+}
+
+bool POI::isRemoved() {
+ 	return this->removed;
+}
+
+void POI::remove() {
+	this->removed = true;
 }
 
 Position POI::getP() { return this->p; }

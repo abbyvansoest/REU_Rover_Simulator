@@ -18,6 +18,7 @@ class POI {
 		int weight;
 		std::vector<Agent*> agentsReady;
 		Position p;
+		bool removed;
 
 	public:
 
@@ -45,6 +46,9 @@ class POI {
 		void addAvailableAgent(Agent*);
 
 		Position getP();
+
+		bool isRemoved();
+		void POI::remove();
 };
 
 #endif

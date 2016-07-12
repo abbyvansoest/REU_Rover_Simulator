@@ -193,8 +193,6 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 	State state;
 	Position oldPos, nextPos;
-	std::vector<Agent> newAgents;
-	std::vector<POI> newpoi;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -254,8 +252,10 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				found = nearbyPOI(nextPos);
 				std::cout << "FOUND\n";
 				if (!found->isComplete()) {
+					//  increment until adequate # agents
 					found->addAvailableAgent(&(*it));
 				}
+				if (found->isComplete()) std::cout << "COMPLETE POI\n";
 			}
 		}
 
@@ -265,15 +265,13 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			nextPos = oldPos;
 		}
 		it->setP(nextPos);
-		newAgents.push_back(*it);
+		//newAgents.push_back(*it);
 	}
 
 	//  iterate through POI to see if any have been fully picked up
-	//  remove from the table if this is the case
 	for (auto POIit = this->poi.begin(); POIit != this->poi.end(); ++POIit) {
-		if (POIit->isComplete())
+		if (POIit->isComplete() && !POIit->isRemoved())
 		{
-			std::cout << "A COMPLETE POI!!!!!!!\n";
 			//  set carrying information for all agents in vector list
 			std::vector<Agent*> carriers = POIit->getCarriers();
 			for (auto AGit = carriers.begin(); AGit != carriers.end(); ++AGit) {
@@ -281,19 +279,15 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				agent->setCarrying(true);
 				POI* poi = &(*POIit);
 				agent->setHoldingPOI(poi);
-				this->pickedUpPOIs.push_back(poi);
-			}
-		}
 
-		else
-		{
-			newpoi.push_back(*POIit);
+			}
+			//  'remove' from POI table
+			std::cout << "REMOVING A NEWLY COMPLETE POI\n";
+			POIit->remove();
 		}
 	}
 
 	this->numSteps++;
-	this->poi = newpoi;
-	this->agents = newAgents;
 
 	this->printWorld();
 	std::cout << "\n";
@@ -329,6 +323,8 @@ bool Gridworld::findNearbyPOI(Position pos) {
 	Position checkLeft  = Position(pos.getX() + 1, pos.getY());
 
 	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
+		//  ignore if poi has been marked as complete or removed
+		if (it->isComplete() || it->isRemoved()) continue;
 		Position p = it->getP();
 		if (p == checkUp || p == checkDown 
 			|| p == checkRight || p == checkLeft) {
