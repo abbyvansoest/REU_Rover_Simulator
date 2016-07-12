@@ -34,7 +34,7 @@ public:
 
 	// Receives an int value from an agent and 
 	//  adds the value held by the agent to the capacity
-	void recieveValues(int);
+	void receiveValues(int);
 
 };
 

@@ -37,7 +37,7 @@ void Home::setPosition(Position pos){
 
 // Receives an amount of size newLoad from an agent and 
 //  adds it to the quantity at the home base
-void Home::recieveValues(int newLoad){
+void Home::receiveValues(int newLoad){
 	this->quantityReturned += newLoad;
 }
 

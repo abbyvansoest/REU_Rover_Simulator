@@ -1,6 +1,8 @@
 #ifndef _POI_H
 #define _POI_H
 
+class Agent;
+
 #include <iostream>
 #include "position.h"
 #include <vector>
@@ -15,6 +17,8 @@ class POI {
 		bool complete;
 		int weight;
 		std::vector<Agent*> agentsReady;
+		Position p;
+		bool removed;
 
 	public:
 
@@ -39,7 +43,12 @@ class POI {
 		std::vector<Agent*> getCarriers();
 
 		/* Adds an agent to the list of available agents to pick up the poi if it is not full */
-		int addAvailableAgent(Agent*);
+		void addAvailableAgent(Agent*);
+
+		Position getP();
+
+		bool isRemoved();
+		void remove();
 };
 
 #endif

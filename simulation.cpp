@@ -1,5 +1,5 @@
 #include "simulation.h"
-
+#include <iostream>
 
 /* Calls the non-default constructors on the members with predetermined, 
  * almost arbitrary values */
@@ -20,12 +20,17 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 {
 	if (NC.randWeights) { this->net.randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
+	std::cout << "INIT WORLD\n";
+	world.printWorld();
 
 }
 
 void Simulation::logResults()
 {
-
+	std::cout << "Reward: " << this->getReward() << 
+	"    Returned: " << this->world.currentAmount() << "\n";
+	if (this->world.currentAmount() > 0) std::cout << "SUCCESS OF SOME SORT!\n";
+	std::cout << "\n";
 }
 
 void Simulation::generateStats()
@@ -37,8 +42,8 @@ void Simulation::generateStats()
 int Simulation::runEpoch()
 {
 	// Run the simulation until the time runs out or the simulation ends prematurely
-	int steps;
-	for (int steps = 0; steps < this->timesteps; ++steps)
+	int steps = 0;
+	for (; steps < this->timesteps; ++steps)
 	{
 		this->world.stepAgents(this->net);
 		if (this->world.worldComplete())
@@ -48,7 +53,6 @@ int Simulation::runEpoch()
 	// Calculate the reward
 	this->reward -= steps * 0.05;
 	this->reward += this->world.currentAmount();
-
 
 	return 0;
 }
@@ -63,6 +67,7 @@ void Simulation::reset(bool randHome)
 {
 	this->world.reset(randHome);
 	// Reset any statistics variables here
+	this->reward = 0;
 }
 
 void Simulation::mutate()

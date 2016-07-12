@@ -30,8 +30,11 @@ private:
 	int numPOI;
 	int width;
 	int height;
-	unordered_map<string, Agent*> agents;
-	unordered_map<string, POI*> poi;
+	//unordered_map<string, Agent*> agents;
+	//unordered_map<string, POI*> poi;
+	std::vector<Agent> agents;
+	std::vector<POI> poi;
+	std::vector<POI*> pickedUpPOIs;
 	Home home;
 	int numSteps;
 
@@ -40,8 +43,8 @@ private:
 	void initHome(bool);
 	bool positionAvailable(Position);
 	State getState(Position, Agent);
-	bool inDomain(Position);
-	string findNearbyPOI(Position, unordered_map<string, POI*>);
+	bool findNearbyPOI(Position);
+	POI* nearbyPOI(Position);
 
 public:
 
@@ -70,6 +73,8 @@ public:
 	int currentAmount();
 
 	double getDistance(Position, Position);
+
+	void printWorld();
 
 };
 

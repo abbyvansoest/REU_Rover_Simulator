@@ -21,21 +21,17 @@
 Agent::Agent() {
 	this->broadcasting = false;
 	this->carrying = false;
+	this->holding = NULL;
 }
 
-Agent::Agent(std::deque<State> trajectory, bool broadcasting, bool carrying) {
-	this->stateTrajectory = trajectory;
+Agent::Agent(bool broadcasting, bool carrying, POI* holding) {
 	this->broadcasting = broadcasting;
 	this->carrying = carrying;
+	this->holding = holding;
 }
 
 Agent Agent::copy() {
-	return Agent(this->stateTrajectory, this->isBroadcasting(), this->isCarrying());
-}
-
-// push most recent agent state to trajectory stack 
-void Agent::setState(State state) {
-	stateTrajectory.push_back(state);
+	return Agent(this->isBroadcasting(), this->isCarrying(), this->holding);
 }
 
 //  is the agent in the middle of broadcasting?
@@ -58,13 +54,23 @@ void Agent::setCarrying(bool set) {
 	this->carrying = set;
 }
 
+//  set the POI the agent is holding
+void Agent::setHoldingPOI(POI* poi) {
+	if (!this->isCarrying()) this->holding = poi;
+}
+
+//  return the POI the agent is holding
+POI* Agent::getHoldingPOI() {
+	return this->holding;
+}
+
 /* get next action based on state and return to Gridworld
  * The action is represented as a single integer, found as the index in the
  * ouput array with the max value. The output is the 6-array of [0,1] continuous 
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position home_pos, double eps) {
+int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home home, double eps) {
 
 	//stateTrajectory.push_back(s);
 	
@@ -74,22 +80,32 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 		return rand() % 6;
 	}
 	
-	if (this->carrying)
+	if (this->isCarrying())
 	{
+		std::cout << "MADE IT HERE HI\n";
+		Position home_pos = home.getPosition();
+		if (home_pos == self_pos) return SET_DOWN;
+
 		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))
 		{
 			if (self_pos.getX() > home_pos.getX())
 			{
-				return MOVE_RIGHT;
+				std::cout << "moving left\n";
+				return MOVE_LEFT;
 			}
-			else { return MOVE_LEFT; }
+			else { 
+				std::cout << "moving right\n";
+				return MOVE_RIGHT; }
 		}
 		else{
 			if (self_pos.getY() > home_pos.getY())
 			{
+				std::cout << "moving down\n";
 				return MOVE_DOWN;
 			}
-			else { return MOVE_UP; }
+			else { 
+				std::cout << "moving up\n";
+				return MOVE_UP; }
 		}
 	}
 
@@ -103,4 +119,10 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Position
 	}
 
 	return max_i;
+}
+
+Position Agent::getP() { return this->p; }
+
+void Agent::setP(Position pos) {
+	this->p = pos;
 }

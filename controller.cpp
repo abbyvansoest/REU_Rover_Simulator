@@ -4,7 +4,7 @@
 
 void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool RANDOM_HOME_LOCATION)
 {
-	std::sort(simulations.begin(), simulations.end());
+	//std::sort(simulations.begin(), simulations.end());
 	auto it = simulations.begin();
 	for (it = simulations.begin(); it != (simulations.end()-X); ++it)
 	{
@@ -17,24 +17,35 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool R
 	}
 }
 
+void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch) {
+
+	double avg = 0.0;
+
+	for (int i = 0; i < num_sims; i++) {
+		avg += simulations[i].getReward();
+	}
+
+	avg = avg / num_sims;
+	std::cout << "EPOCH: " << epoch << "  " << "AVG REWARD: " << avg << "\n";
+}
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 250;
-	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 1000;
-	int X_TOP_PERFORMERS = 10;
+	int MAX_STEPS = 50;
+	int NUM_SIMULATIONS = 5;
+	int NUM_EPOCHS = 10000;
+	int X_TOP_PERFORMERS = 2;
 
 	//  control gridworld
-	int NUMBER_OF_AGENTS = 10;
-	int NUMBER_OF_POI = 10;
+	int NUMBER_OF_AGENTS = 2;
+	int NUMBER_OF_POI = 1;
 
-	int WORLD_WIDTH = 10;
-	int WORLD_HEIGHT = 10;
+	int WORLD_WIDTH = 3;
+	int WORLD_HEIGHT = 3;
 
-	bool RANDOM_HOME_LOCATION = true;
+	bool RANDOM_HOME_LOCATION = false;
 
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 3;
@@ -59,31 +70,39 @@ int main(void) {
 	NC.layers[1] = 8;
 	NC.layers[2] = 6;
 	NC.randWeights = RANDOM_WEIGHTS;
-	NC.randMin = RANDOM_NET_MIN; 
+	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
 
-	std::vector<Simulation> simulations;
+	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
 
-	// initiaize simulations
-	for (int i = 0; i < NUM_SIMULATIONS; i++) {
-		simulations[i] = Simulation(GC, NC, MAX_STEPS);
-	}
 
 	//  for each learning epoch, we run the set of simulations and 
 	//  then evolve the population based on basic neuroevolutionary 
 	//  algorithms.
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
+		std::cout << "EPOCH " << i << "\n";
+		std::cout << "**********************************" << "\n";
+
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
 			simulations[j].runEpoch();
+			std::cout << "simulation " << j << "   ";
+			simulations[j].logResults();
 		}
 
-		evolve_reset_population(simulations, X_TOP_PERFORMERS, RANDOM_HOME_LOCATION);
+		std::cout << "\n";
 
+		//printAvgReward(simulations, NUM_SIMULATIONS, i);
+		evolve_reset_population(simulations, X_TOP_PERFORMERS, RANDOM_HOME_LOCATION);
 	}
+
+	/* Cleanup configuration memory */
+	delete [] NC.layers;
 
 	return 0;
 }
+
+
 
 
