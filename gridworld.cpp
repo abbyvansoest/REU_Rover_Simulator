@@ -209,13 +209,14 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			std::cout << "SET DOWN\n";
 			//  find all agents carrying a given POI
 			POI poi = it->getHoldingPOI();
-			std::vector<Agent> carriers = poi.getCarriers();
+			std::vector<Agent*> carriers = poi.getCarriers();
 			int amt = poi.getWeight();
 
 			for (auto iter = carriers.begin(); iter != carriers.end(); ++iter) {
+				Agent* agent = *iter;
 				//  set all their carrying values to false
-				iter->setCarrying(false);
-				iter->setHoldingPOI(NULL);
+				agent->setCarrying(false);
+				agent->setHoldingPOI(NULL);
 			}
 			
 			this->home.receiveValues(amt);
@@ -253,7 +254,7 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 				found = nearbyPOI(nextPos);
 				std::cout << "FOUND\n";
 				if (!found->isComplete()) {
-					found->addAvailableAgent(*it);
+					found->addAvailableAgent(&(*it));
 				}
 			}
 		}
@@ -274,11 +275,12 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 		{
 			std::cout << "A COMPLETE POI!!!!!!!\n";
 			//  set carrying information for all agents in vector list
-			std::vector<Agent> carriers = POIit->getCarriers();
+			std::vector<Agent*> carriers = POIit->getCarriers();
 			for (auto AGit = carriers.begin(); AGit != carriers.end(); ++AGit) {
-				AGit->setCarrying(true);
+				Agent* agent = *AGit;
+				agent->setCarrying(true);
 				POI* poi = &(*POIit);
-				AGit->setHoldingPOI(poi);
+				agent->setHoldingPOI(poi);
 				this->pickedUpPOIs.push_back(poi);
 			}
 		}

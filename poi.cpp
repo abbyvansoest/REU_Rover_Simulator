@@ -38,9 +38,11 @@ int POI::getWeight()
 	return this->weight;
 }
 
-void POI::addAvailableAgent(Agent ag) {
+void POI::addAvailableAgent(Agent* ag) {
 
 	this->agentsReady.push_back(ag);
+
+	std::cout << "ADDED NEW AG SIZE IS " <<this->agentsReady.size()<<"\n";
 	
 	/* if we have enough agents lifting the poi, return -1 */
 	// TODO Do we want this to return -1? or should agents be made available
@@ -50,7 +52,7 @@ void POI::addAvailableAgent(Agent ag) {
 	}
 }
 
-std::vector<Agent> POI::getCarriers() {
+std::vector<Agent*> POI::getCarriers() {
 	return this->agentsReady;
 }
 
