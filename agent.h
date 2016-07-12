@@ -40,7 +40,7 @@ class Agent {
 
 		//  get the next action for hte agent based on the
 		//  current state and the neural net
-		int nextAction(State, FANN::neural_net, Position, Home, double);
+		int nextAction(State, FANN::neural_net*&, Position, Home, double);
 
 		//  is the broadcasting signal positive or negative?
 		bool isBroadcasting();

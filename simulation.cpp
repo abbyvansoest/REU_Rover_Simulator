@@ -27,8 +27,28 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 }
 
+// destructor
 Simulation::~Simulation() {
 	delete this->net;
+}
+
+//  copy constructor
+Simulation::Simulation(const Simulation& that) {
+
+	this->net = new FANN::neural_net(*that.net);
+	this->reward = that.reward;
+	this->world = that.world;
+	this->timesteps = that.timesteps;
+}
+
+// copy assignment operator
+Simulation& Simulation::operator=(const Simulation& that)
+{
+    this->net = new FANN::neural_net(*that.net);
+	this->reward = that.reward;
+	this->world = that.world;
+	this->timesteps = that.timesteps;
+    return *this;
 }
 
 void Simulation::logResults()
@@ -55,7 +75,7 @@ int Simulation::runEpoch()
 	int steps = 0;
 	for (; steps < this->timesteps; ++steps)
 	{
-		this->world.stepAgents(*(this->net));
+		this->world.stepAgents(this->net);
 		if (this->world.worldComplete())
 			break;
 	}

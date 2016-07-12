@@ -192,7 +192,7 @@ double Gridworld::getDistance(Position p1, Position p2) {
 
 /*  step all agents in the world.
  *  Does not calculate or provide a reward. */
-void Gridworld::stepAgents(FANN::neural_net net) {
+void Gridworld::stepAgents(FANN::neural_net* net) {
 
 	State state;
 	Position oldPos, nextPos;

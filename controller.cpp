@@ -12,6 +12,7 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, int Y,
 	int halfPop = 0.5*(simulations.size());
 	for (auto it = simulations.begin(); it != simulations.end() - halfPop; ++it) {
 		it->destroyNet();
+		std::cout << "here" << std::endl;
 		int random = rand() % X;
 		it->recreateNet((simulations.end() - random)->getNet());
 	}
@@ -26,27 +27,15 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, int Y,
 
 }
 
-void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch) {
-
-	double avg = 0.0;
-
-	for (int i = 0; i < num_sims; i++) {
-		avg += simulations[i].getReward();
-	}
-
-	avg = avg / num_sims;
-	std::cout << "EPOCH: " << epoch << "  " << "AVG REWARD: " << avg << "\n";
-}
-
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 50;
-	int NUM_SIMULATIONS = 5;
-	int NUM_EPOCHS = 10000;
-	int X_TOP_PERFORMERS = 2;
-	int Y_MUTATIONS = 5;
+	int MAX_STEPS = 2;
+	int NUM_SIMULATIONS = 2;
+	int NUM_EPOCHS = 1;
+	int X_TOP_PERFORMERS = 1;
+	int Y_MUTATIONS = 1;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
@@ -92,6 +81,8 @@ int main(void) {
 	//  algorithms.
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
+		double avg = 0.0;
+
 		std::cout << "EPOCH " << i << "\n";
 		std::cout << "**********************************" << "\n";
 
@@ -100,8 +91,11 @@ int main(void) {
 			simulations[j].runEpoch();
 			std::cout << "simulation " << j << "   ";
 			simulations[j].logResults();
+			avg += simulations[j].getReward();
 		}
 
+		avg /= NUM_SIMULATIONS;
+		std::cout << "EPOCH AVERAGE " << avg << std::endl;
 		std::cout << "\n";
 
 		//printAvgReward(simulations, NUM_SIMULATIONS, i);

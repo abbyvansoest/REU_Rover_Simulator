@@ -52,6 +52,7 @@ class Simulation
 	public:
 		Simulation();
 		~Simulation();
+		Simulation(const Simulation&);
 		Simulation(struct gridConfig, struct netConfig, int timesteps);
 		void logResults();
 		void generateStats();
@@ -64,6 +65,7 @@ class Simulation
 		void destroyNet();
 		void recreateNet(FANN::neural_net*);
 		bool operator<(const Simulation &) const;
+		Simulation& operator=(const Simulation&);
 };
 
 #endif
