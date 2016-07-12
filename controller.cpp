@@ -14,6 +14,7 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, int Y,
 		it->destroyNet();
 		std::cout << "here" << std::endl;
 		int random = rand() % X;
+		++random;
 		it->recreateNet((simulations.end() - random)->getNet());
 	}
 
