@@ -60,10 +60,8 @@ void Agent::setHoldingPOI(POI* poi) {
 }
 
 //  return the POI the agent is holding
-POI Agent::getHoldingPOI() {
-	if (this->isCarrying()) return *(this->holding);
-	//  error otherwise
-	else std::cout << "ERROR: AGENT IS NOT CARRYING\n";
+POI* Agent::getHoldingPOI() {
+	return this->holding;
 }
 
 /* get next action based on state and return to Gridworld

@@ -54,7 +54,7 @@ class Agent {
 		//  set the POI the agent is holding
 		void setHoldingPOI(POI*);
 		//  return the POI the agent is holding
-		POI getHoldingPOI();
+		POI* getHoldingPOI();
 
 		//  set the carrying signal appropriately
 		void setCarrying(bool);

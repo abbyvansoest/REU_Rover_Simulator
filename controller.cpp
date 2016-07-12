@@ -4,7 +4,7 @@
 
 void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool RANDOM_HOME_LOCATION)
 {
-	std::sort(simulations.begin(), simulations.end());
+	//std::sort(simulations.begin(), simulations.end());
 	auto it = simulations.begin();
 	for (it = simulations.begin(); it != (simulations.end()-X); ++it)
 	{
@@ -34,7 +34,7 @@ void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 50;
-	int NUM_SIMULATIONS = 20;
+	int NUM_SIMULATIONS = 5;
 	int NUM_EPOCHS = 10000;
 	int X_TOP_PERFORMERS = 2;
 

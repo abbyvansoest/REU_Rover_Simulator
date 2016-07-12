@@ -89,18 +89,21 @@ bool Gridworld::positionAvailable(Position p) {
 		return false;
 	}
 
-	if (this->home.getPosition() == p) {
-		return false;
-	}
+	// if (this->home.getPosition() == p) {
+	// 	return false;
+	// }
 
 	for (auto it = agents.begin(); it != agents.end(); ++it) {  
 		Position pos = Position(it->getP());
 		if (pos == p) return false;
 	}
 
-	for (auto it = poi.begin(); it != poi.end(); ++it) {  
+	for (auto it = poi.begin(); it != poi.end(); ++it) { 
 		Position pos = Position(it->getP());
-		if (pos == p) return false;
+		if (pos == p) {
+			if (it->isRemoved() || it->isComplete()) return true; 
+			return false;
+		}
 	}
 
 	return true;
@@ -199,16 +202,20 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
-		int action = it->nextAction(state, net, oldPos, this->home, .1); // a default epsilon value is a placeholder for now
+		// .1 = a default epsilon value that is a placeholder for now
+		int action = it->nextAction(state, net, oldPos, this->home, .1); 
 	//	std::cout << "action: " << action << "\n";
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
-			std::cout << "SET DOWN\n";
+			
+			std::cout << "SET DOWN" << std::endl;
+			if (it->isCarrying()) std::cout << "CARRYING" << std::endl;
+
 			//  find all agents carrying a given POI
-			POI poi = it->getHoldingPOI();
-			std::vector<Agent*> carriers = poi.getCarriers();
-			int amt = poi.getWeight();
+			POI* poi = it->getHoldingPOI();
+			std::vector<Agent*> carriers = poi->getCarriers();
+			int amt = poi->getWeight();
 
 			for (auto iter = carriers.begin(); iter != carriers.end(); ++iter) {
 				Agent* agent = *iter;
@@ -276,9 +283,9 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 			std::vector<Agent*> carriers = POIit->getCarriers();
 			for (auto AGit = carriers.begin(); AGit != carriers.end(); ++AGit) {
 				Agent* agent = *AGit;
-				agent->setCarrying(true);
 				POI* poi = &(*POIit);
 				agent->setHoldingPOI(poi);
+				agent->setCarrying(true);
 
 			}
 			//  'remove' from POI table
@@ -291,10 +298,6 @@ void Gridworld::stepAgents(FANN::neural_net net) {
 
 	this->printWorld();
 	std::cout << "\n";
-
-	//std::cout << "STEP\n";
-	//this->printWorld();
-	//std::cout << "\n";
 }
 
 POI* Gridworld::nearbyPOI(Position pos) {

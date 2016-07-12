@@ -48,7 +48,7 @@ class POI {
 		Position getP();
 
 		bool isRemoved();
-		void POI::remove();
+		void remove();
 };
 
 #endif
