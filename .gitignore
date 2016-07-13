@@ -36,3 +36,6 @@
 
 # valgrind
 vgcore.*
+
+# Mac
+*.dSYM/
