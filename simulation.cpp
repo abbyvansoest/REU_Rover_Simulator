@@ -22,7 +22,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
-	std::cout << "INIT WORLD" << std::endl;
+	std::cout << "simulation constructor" << std::endl;
 	world.printWorld();
 
 }
@@ -35,6 +35,7 @@ Simulation::~Simulation() {
 //  copy constructor
 Simulation::Simulation(const Simulation& that) {
 
+	std::cout << "copy constructor" << std::endl;
 	this->net = new FANN::neural_net(*that.net);
 	this->reward = that.reward;
 	this->world = that.world;
@@ -74,6 +75,7 @@ FANN::neural_net* Simulation::getNet() {
 /* Runs a single epoch, which runs for a given number of timesteps */
 int Simulation::runEpoch()
 {
+	this->world.printWorld();
 	// Run the simulation until the time runs out or the simulation ends prematurely
 	int steps = 0;
 	for (; steps < this->timesteps; ++steps)

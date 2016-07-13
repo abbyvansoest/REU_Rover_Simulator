@@ -20,6 +20,17 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initAgents();
 	initPOI();
 	this->numSteps = 0;
+	std::cout << "in gridworld constructor" << std::endl;
+	this->printWorld();
+}
+
+Gridworld::Gridworld(const Gridworld& that) {
+	this->numAgents = that.numAgents;
+	this->numPOI = that.numPOI;
+	this->numSteps = that.numSteps;
+	this->width = that.width;
+	this->height = that.height;
+	this->home = that.home;
 }
 
 //  initialize home base to random location
@@ -204,13 +215,13 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 		state = getState(oldPos, *it);
 		// .1 = a default epsilon value that is a placeholder for now
 		int action = it->nextAction(state, net, oldPos, this->home, .1); 
+		std::cout << "step " << this->numSteps << " action " << action << std::endl;
 	//	std::cout << "action: " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
 			
 			std::cout << "SET DOWN" << std::endl;
-			if (it->isCarrying()) std::cout << "CARRYING" << std::endl;
 
 			//  find all agents carrying a given POI
 			POI* poi = it->getHoldingPOI();
@@ -233,13 +244,13 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
 		}
 		if (action == MOVE_DOWN) {
-			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
+			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
 		}
 		if (action == MOVE_LEFT) {
 			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
 		}
 		if (action == MOVE_UP) {
-			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
+			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
 		}
 
 		if (action == BROADCAST) {
@@ -257,12 +268,12 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 			POI* found;
 			if (findNearbyPOI(nextPos)) {
 				found = nearbyPOI(nextPos);
-				std::cout << "FOUND" << std::endl;
+				std::cout << "FOUND AT " << found->getP().toString() <<" AGENT AT "<< it->getP().toString()<< std::endl;
+				this->printWorld();
 				if (!found->isComplete()) {
 					//  increment until adequate # agents
 					found->addAvailableAgent(&(*it));
 				}
-				if (found->isComplete()) std::cout << "COMPLETE POI" << std::endl;
 			}
 		}
 
@@ -353,6 +364,7 @@ void Gridworld::reset(bool randomHome) {
 
 	//  clear gridworld
 	clear();
+	this->numSteps = 0;
 
 	//  reset POI and agents
 	initAgents();
@@ -384,7 +396,7 @@ void Gridworld::printWorld() {
 	for (int i = 0; i < this->height; i++) {
 		//std::cout << i << std::endl;
 		for (int j = 0; j < this->width; j++) {
-			Position p = Position(i, j);
+			Position p = Position(j, i);
 			print = false;
 			//std::cout << "J IS " << j << std::endl;
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
