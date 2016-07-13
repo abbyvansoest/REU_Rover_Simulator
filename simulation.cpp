@@ -44,6 +44,8 @@ Simulation::Simulation(const Simulation& that) {
 // copy assignment operator
 Simulation& Simulation::operator=(const Simulation& that)
 {
+	//std::cout << "Call to equal operator" << std::endl;
+	if (this->net != NULL) { delete this->net; }
     this->net = new FANN::neural_net(*that.net);
 	this->reward = that.reward;
 	this->world = that.world;
@@ -76,7 +78,7 @@ int Simulation::runEpoch()
 {
 	// Run the simulation until the time runs out or the simulation ends prematurely
 	int steps = 0;
-	for (; steps < this->timesteps; ++steps)
+	for (steps = 0; steps < this->timesteps; ++steps)
 	{
 		this->world.stepAgents(this->net);
 		if (this->world.worldComplete())
