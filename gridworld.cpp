@@ -339,11 +339,6 @@ bool Gridworld::findNearbyPOI(Position pos) {
 }
 
 
-// at the end of a simulation, get reward for this grid
-double Gridworld::getGridReward() {
-	return (-.05*this->numSteps + this->home.currentAmount());
-}
-
 //  entirely clear the gridworld of agents and POIs
 void Gridworld::clear() {
 
