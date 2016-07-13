@@ -56,9 +56,6 @@ public:
 	//  potential for threading?
 	void stepAgents(FANN::neural_net*); 
 
-	// at the end of a simulation, get reward for this grid
-	double getGridReward();
-
 	// clear the gridworld of all agents and POI
 	void clear();
 
