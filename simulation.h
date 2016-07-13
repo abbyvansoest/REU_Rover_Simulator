@@ -64,6 +64,7 @@ class Simulation
 		void mutate();
 		void destroyNet();
 		void recreateNet(FANN::neural_net*);
+		void printGrid();
 		bool operator<(const Simulation &) const;
 		Simulation& operator=(const Simulation&);
 };

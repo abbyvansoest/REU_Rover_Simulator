@@ -22,8 +22,6 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
-	std::cout << "simulation constructor" << std::endl;
-	world.printWorld();
 
 }
 
@@ -35,7 +33,6 @@ Simulation::~Simulation() {
 //  copy constructor
 Simulation::Simulation(const Simulation& that) {
 
-	std::cout << "copy constructor" << std::endl;
 	this->net = new FANN::neural_net(*that.net);
 	this->reward = that.reward;
 	this->world = that.world;
@@ -58,6 +55,7 @@ void Simulation::logResults()
 	"    Returned: " << this->world.currentAmount() << std::endl;
 	if (this->world.currentAmount() > 0)
 	{
+		this->world.printWorld();
 		std::cout << "SUCCESS OF SOME SORT!" << std::endl;
 	}
 	std::cout << std::endl;
@@ -66,6 +64,10 @@ void Simulation::logResults()
 void Simulation::generateStats()
 {
 
+}
+
+void Simulation::printGrid() {
+	this->world.printWorld();
 }
 
 FANN::neural_net* Simulation::getNet() {
@@ -89,7 +91,7 @@ int Simulation::runEpoch()
 	// Calculate the reward
 	this->reward -= steps * 0.05;
 	this->reward += this->world.currentAmount();
-	std::cout << "Reward: " << this-> reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
+	//std::cout << "Reward: " << this-> reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
 
 	return 0;
 }
@@ -130,7 +132,7 @@ void Simulation::mutate()
 	int sign = rand() % 2 ? 1 : -1;
 	fann_type magnitude = 1/((fann_type) ((rand() % 50) + 10));
 
-	std::cout << "mag: " << magnitude << std::endl;
+	//std::cout << "mag: " << magnitude << std::endl;
 	connections[index].weight += (fann_type) sign*magnitude;
 
 	this->net->set_weight_array(connections, length);

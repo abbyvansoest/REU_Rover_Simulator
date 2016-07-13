@@ -20,17 +20,6 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initAgents();
 	initPOI();
 	this->numSteps = 0;
-	std::cout << "in gridworld constructor" << std::endl;
-	this->printWorld();
-}
-
-Gridworld::Gridworld(const Gridworld& that) {
-	this->numAgents = that.numAgents;
-	this->numPOI = that.numPOI;
-	this->numSteps = that.numSteps;
-	this->width = that.width;
-	this->height = that.height;
-	this->home = that.home;
 }
 
 //  initialize home base to random location
@@ -88,7 +77,7 @@ void Gridworld::initPOI() {
 		}
 
 		// add a POI to the open position
-		POI addPOI = POI(1, x, y);
+		POI addPOI = POI(2, x, y);
 		this->poi.push_back(addPOI);
 	}
 }
@@ -208,6 +197,8 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 	State state;
 	Position oldPos, nextPos;
 
+	this->printWorld();
+
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
 
@@ -216,7 +207,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 		// .1 = a default epsilon value that is a placeholder for now
 		int action = it->nextAction(state, net, oldPos, this->home, .1); 
 		std::cout << "step " << this->numSteps << " action " << action << std::endl;
-	//	std::cout << "action: " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
@@ -268,8 +258,8 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 			POI* found;
 			if (findNearbyPOI(nextPos)) {
 				found = nearbyPOI(nextPos);
-				std::cout << "FOUND AT " << found->getP().toString() <<" AGENT AT "<< it->getP().toString()<< std::endl;
-				this->printWorld();
+				//std::cout << "FOUND AT " << found->getP().toString() <<" AGENT AT "<< it->getP().toString()<< std::endl;
+				//this->printWorld();
 				if (!found->isComplete()) {
 					//  increment until adequate # agents
 					found->addAvailableAgent(&(*it));
@@ -306,8 +296,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 	}
 
 	this->numSteps++;
-
-	//this->printWorld();
 	std::cout << std::endl;
 }
 
@@ -379,7 +367,7 @@ int Gridworld::currentAmount()
 
 bool Gridworld::worldComplete()
 {
-	std::cout << "check complete: " << home.currentAmount() << " : " << numPOI << std::endl;
+	//std::cout << "returned poi out of total: " << home.currentAmount() << " / " << numPOI << std::endl;
 	if (this->home.currentAmount() == this->numPOI)
 	{
 		std::cout << "worldComplete returning true" << std::endl;
@@ -401,14 +389,18 @@ void Gridworld::printWorld() {
 			//std::cout << "J IS " << j << std::endl;
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
 				if (it->getP() == p) {
-					std::cout << "A ";
+					if (it->isCarrying()) std::cout << "+ ";
+					else std::cout << "A ";
 					print = true;
 				}
 			}
 			for (auto it = poi.begin(); it != poi.end(); ++it) {
 				if (it->getP() == p) {
-					std::cout << "P ";
-					print = true;
+					if (!it->isRemoved()) {
+						std::cout << "P ";
+						print = true;
+					}
+					else print = false;
 				}
 			}
 			if (this->home.getPosition() == p) {

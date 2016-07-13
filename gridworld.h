@@ -51,7 +51,6 @@ public:
 	// constructor
 	Gridworld();
 	Gridworld(int, int, int, int, bool);
-	Gridworld(const Gridworld&);
 
 	// step all agents in the world
 	//  potential for threading?

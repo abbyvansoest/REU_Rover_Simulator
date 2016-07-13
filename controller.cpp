@@ -31,11 +31,11 @@ void evolve_population(std::vector<Simulation> &simulations, int X, int Y)
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 1;
-	int NUM_SIMULATIONS = 5;
-	int NUM_EPOCHS = 3;
-	int X_TOP_PERFORMERS = 1;
-	int Y_MUTATIONS = 50;
+	int MAX_STEPS = 50;
+	int NUM_SIMULATIONS = 10;
+	int NUM_EPOCHS = 10;
+	int X_TOP_PERFORMERS = 3;
+	int Y_MUTATIONS = 10;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
@@ -74,12 +74,12 @@ int main(void) {
 
 	srand(time(NULL));
 
-	std::cout << "simulations vector init" << std::endl;
 	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
 
 	//  for each learning epoch, we run the set of simulations and 
 	//  then evolve the population based on basic neuroevolutionary 
 	//  algorithms.
+	std::cout << std::endl;
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
 		double avg = 0.0;
