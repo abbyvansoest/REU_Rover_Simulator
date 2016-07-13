@@ -2,7 +2,7 @@
 
 //remove comparator
 
-void evolve_reset_population(std::vector<Simulation> &simulations, int X, int Y, bool RANDOM_HOME_LOCATION)
+void evolve_population(std::vector<Simulation> &simulations, int X, int Y)
 {
 
 	//  sort to find the top X performers
@@ -33,10 +33,10 @@ void evolve_reset_population(std::vector<Simulation> &simulations, int X, int Y,
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 2;
-	int NUM_SIMULATIONS = 2;
-	int NUM_EPOCHS = 1;
-	int X_TOP_PERFORMERS = 1;
-	int Y_MUTATIONS = 1;
+	int NUM_SIMULATIONS = 50;
+	int NUM_EPOCHS = 200;
+	int X_TOP_PERFORMERS = 10;
+	int Y_MUTATIONS = 50;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
@@ -97,10 +97,16 @@ int main(void) {
 
 		avg /= NUM_SIMULATIONS;
 		std::cout << "EPOCH AVERAGE " << avg << std::endl;
-		std::cout << "\n";
+		std::cout << std::endl;
 
 		//printAvgReward(simulations, NUM_SIMULATIONS, i);
-		evolve_reset_population(simulations, X_TOP_PERFORMERS, Y_MUTATIONS, RANDOM_HOME_LOCATION);
+		evolve_population(simulations, X_TOP_PERFORMERS, Y_MUTATIONS);
+		for (auto it = simulations.begin(); it != simulations.end(); ++it)
+		{
+			it->reset(RANDOM_HOME_LOCATION);
+		}
+		if (Y_MUTATIONS != 0 )
+			Y_MUTATIONS -= 1;
 	}
 
 	/* Cleanup configuration memory */
