@@ -55,7 +55,6 @@ void Simulation::logResults()
 	"    Returned: " << this->world.currentAmount() << std::endl;
 	if (this->world.currentAmount() > 0)
 	{
-		this->world.printWorld();
 		std::cout << "SUCCESS OF SOME SORT!" << std::endl;
 	}
 	std::cout << std::endl;
@@ -77,7 +76,6 @@ FANN::neural_net* Simulation::getNet() {
 /* Runs a single epoch, which runs for a given number of timesteps */
 int Simulation::runEpoch()
 {
-	this->world.printWorld();
 	// Run the simulation until the time runs out or the simulation ends prematurely
 	int steps = 0;
 	for (; steps < this->timesteps; ++steps)
@@ -91,7 +89,6 @@ int Simulation::runEpoch()
 	// Calculate the reward
 	this->reward -= steps * 0.05;
 	this->reward += this->world.currentAmount();
-	//std::cout << "Reward: " << this-> reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
 
 	return 0;
 }
@@ -132,7 +129,6 @@ void Simulation::mutate()
 	int sign = rand() % 2 ? 1 : -1;
 	fann_type magnitude = 1/((fann_type) ((rand() % 50) + 10));
 
-	//std::cout << "mag: " << magnitude << std::endl;
 	connections[index].weight += (fann_type) sign*magnitude;
 
 	this->net->set_weight_array(connections, length);

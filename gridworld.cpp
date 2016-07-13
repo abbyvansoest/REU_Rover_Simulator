@@ -206,7 +206,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 		state = getState(oldPos, *it);
 		// .1 = a default epsilon value that is a placeholder for now
 		int action = it->nextAction(state, net, oldPos, this->home, .1); 
-		std::cout << "step " << this->numSteps << " action " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
@@ -258,8 +257,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 			POI* found;
 			if (findNearbyPOI(nextPos)) {
 				found = nearbyPOI(nextPos);
-				//std::cout << "FOUND AT " << found->getP().toString() <<" AGENT AT "<< it->getP().toString()<< std::endl;
-				//this->printWorld();
 				if (!found->isComplete()) {
 					//  increment until adequate # agents
 					found->addAvailableAgent(&(*it));
@@ -272,8 +269,8 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 		if (!positionAvailable(nextPos)) {
 			nextPos = oldPos;
 		}
+
 		it->setP(nextPos);
-		//newAgents.push_back(*it);
 	}
 
 	//  iterate through POI to see if any have been fully picked up
@@ -367,7 +364,7 @@ int Gridworld::currentAmount()
 
 bool Gridworld::worldComplete()
 {
-	//std::cout << "returned poi out of total: " << home.currentAmount() << " / " << numPOI << std::endl;
+
 	if (this->home.currentAmount() == this->numPOI)
 	{
 		std::cout << "worldComplete returning true" << std::endl;
@@ -382,11 +379,10 @@ void Gridworld::printWorld() {
 	bool print;
 
 	for (int i = 0; i < this->height; i++) {
-		//std::cout << i << std::endl;
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(j, i);
 			print = false;
-			//std::cout << "J IS " << j << std::endl;
+			
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
 				if (it->getP() == p) {
 					if (it->isCarrying()) std::cout << "+ ";
