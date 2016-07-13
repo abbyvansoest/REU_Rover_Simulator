@@ -33,6 +33,7 @@ POI::POI(int weight, int x, int y)
 	this->weight = weight;
 	this->p = Position(x, y);
 	this->removed = false;
+	this->complete = false;
 }
 
 int POI::getWeight()
