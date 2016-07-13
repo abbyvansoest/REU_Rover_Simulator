@@ -12,7 +12,6 @@ void evolve_population(std::vector<Simulation> &simulations, int X, int Y)
 	int halfPop = 0.5*(simulations.size());
 	for (auto it = simulations.begin(); it != simulations.end() - halfPop; ++it) {
 		it->destroyNet();
-		std::cout << "here" << std::endl;
 		int random = rand() % X;
 		++random;
 		it->recreateNet((simulations.end() - random)->getNet());
@@ -84,8 +83,8 @@ int main(void) {
 
 		double avg = 0.0;
 
-		std::cout << "EPOCH " << i << "\n";
-		std::cout << "**********************************" << "\n";
+		std::cout << "EPOCH " << i << std::endl;
+		std::cout << "**********************************" << std::endl;
 
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {

@@ -82,7 +82,6 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 	
 	if (this->isCarrying())
 	{
-		std::cout << "MADE IT HERE HI\n";
 		Position home_pos = home.getPosition();
 		if (home_pos == self_pos) return SET_DOWN;
 
@@ -90,21 +89,21 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 		{
 			if (self_pos.getX() > home_pos.getX())
 			{
-				std::cout << "moving left\n";
+				std::cout << "moving left" << std::endl;
 				return MOVE_LEFT;
 			}
 			else { 
-				std::cout << "moving right\n";
+				std::cout << "moving right" << std::endl;
 				return MOVE_RIGHT; }
 		}
 		else{
 			if (self_pos.getY() > home_pos.getY())
 			{
-				std::cout << "moving down\n";
+				std::cout << "moving down" << std::endl;
 				return MOVE_DOWN;
 			}
 			else { 
-				std::cout << "moving up\n";
+				std::cout << "moving up" << std::endl;
 				return MOVE_UP; }
 		}
 	}

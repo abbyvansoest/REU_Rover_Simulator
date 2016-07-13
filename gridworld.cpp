@@ -55,7 +55,7 @@ void Gridworld::initAgents() {
 		
 		// add an agent to the open position
 		//str = pos.toString();
-	//	std::cout << "AGENT POSITION: " << str << "\n";
+	//	std::cout << "AGENT POSITION: " << str << std::endl;
 		Agent addAgent;
 		addAgent.setP(pos);
 		this->agents.push_back(addAgent);
@@ -204,7 +204,7 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 		state = getState(oldPos, *it);
 		// .1 = a default epsilon value that is a placeholder for now
 		int action = it->nextAction(state, net, oldPos, this->home, .1); 
-	//	std::cout << "action: " << action << "\n";
+	//	std::cout << "action: " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
@@ -257,12 +257,12 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 			POI* found;
 			if (findNearbyPOI(nextPos)) {
 				found = nearbyPOI(nextPos);
-				std::cout << "FOUND\n";
+				std::cout << "FOUND" << std::endl;
 				if (!found->isComplete()) {
 					//  increment until adequate # agents
 					found->addAvailableAgent(&(*it));
 				}
-				if (found->isComplete()) std::cout << "COMPLETE POI\n";
+				if (found->isComplete()) std::cout << "COMPLETE POI" << std::endl;
 			}
 		}
 
@@ -289,15 +289,15 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 
 			}
 			//  'remove' from POI table
-			std::cout << "REMOVING A NEWLY COMPLETE POI\n";
+			std::cout << "REMOVING A NEWLY COMPLETE POI" << std::endl;
 			POIit->remove();
 		}
 	}
 
 	this->numSteps++;
 
-	this->printWorld();
-	std::cout << "\n";
+	//this->printWorld();
+	std::cout << std::endl;
 }
 
 POI* Gridworld::nearbyPOI(Position pos) {
@@ -367,8 +367,13 @@ int Gridworld::currentAmount()
 
 bool Gridworld::worldComplete()
 {
+	std::cout << "check complete: " << home.currentAmount() << " : " << numPOI << std::endl;
 	if (this->home.currentAmount() == this->numPOI)
+	{
+		std::cout << "worldComplete returning true" << std::endl;
 		return true;
+	}
+
 	return false;
 }
 
@@ -377,11 +382,11 @@ void Gridworld::printWorld() {
 	bool print;
 
 	for (int i = 0; i < this->height; i++) {
-		//std::cout << i << "\n";
+		//std::cout << i << std::endl;
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(i, j);
 			print = false;
-			//std::cout << "J IS " << j << "\n";
+			//std::cout << "J IS " << j << std::endl;
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
 				if (it->getP() == p) {
 					std::cout << "A ";
@@ -400,7 +405,7 @@ void Gridworld::printWorld() {
 			}
 			if (!print) std::cout << "* ";
 		}
-		std::cout << "\n";
+		std::cout << std::endl;
 	}
 
 }
