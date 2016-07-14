@@ -202,8 +202,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
-			
-			std::cout << "SET DOWN: step " << this->numSteps << std::endl;
 
 			//  find all agents carrying a given POI
 			POI* poi = it->getHoldingPOI();
@@ -280,7 +278,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 
 			}
 			//  'remove' from POI table
-			std::cout << "REMOVING A NEWLY COMPLETE POI" << std::endl;
 			POIit->remove();
 		}
 	}
@@ -358,7 +355,7 @@ bool Gridworld::worldComplete()
 
 	if (this->home.currentAmount() == this->poiWeight*this->numPOI)
 	{
-		std::cout << "worldComplete returning true" << std::endl;
+		std::cout << "World Complete!" << std::endl;
 		return true;
 	}
 

@@ -22,8 +22,6 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
-	//std::cout << "INIT WORLD" << std::endl;
-	//world.printWorld();
 	this->reward = 0;
 
 }
@@ -62,11 +60,7 @@ void Simulation::logResults()
 {
 	std::cout << "Reward: " << this->getReward() << 
 	"    Returned: " << this->world.currentAmount() << "   Steps: " << this->world.stepsTaken() << std::endl;
-	if (this->world.currentAmount() > 0)
-	{
-		std::cout << "SUCCESS OF SOME SORT!" << std::endl;
-	}
-	std::cout << std::endl;
+
 }
 
 void Simulation::generateStats()
@@ -97,8 +91,7 @@ int Simulation::runEpoch()
 
 	// Calculate the reward
 	this->reward -= steps * 0.05;
-	this->reward += this->world.currentAmount()*10;
-	//std::cout << "Reward: " << this->reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
+	this->reward += this->world.currentAmount()*100;
 
 	return 0;
 }

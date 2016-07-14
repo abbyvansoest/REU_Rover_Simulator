@@ -31,7 +31,7 @@ struct netConfig
 {
 	FANN::network_type_enum net_type;
 	unsigned int num_layers;
-	unsigned int *layers;
+	unsigned int *layers; 
 	bool randWeights;
 	float randMin;
 	float randMax;
