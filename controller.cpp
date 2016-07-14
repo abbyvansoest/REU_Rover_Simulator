@@ -2,31 +2,29 @@
 
 //remove comparator
 
-void evolve_reset_population(std::vector<Simulation> &simulations, int X, bool RANDOM_HOME_LOCATION)
+void evolve_population(std::vector<Simulation> &simulations, int X, int Y)
 {
-	//std::sort(simulations.begin(), simulations.end());
-	auto it = simulations.begin();
-	for (it = simulations.begin(); it != (simulations.end()-X); ++it)
-	{
-		it->mutate();
-		it->reset(RANDOM_HOME_LOCATION);
-	}
-	while (it != simulations.end()) {
-		it->reset(RANDOM_HOME_LOCATION);
-		++it;
-	}
-}
 
-void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch) {
+	//  sort to find the top X performers
+	std::sort(simulations.begin(), simulations.end());
 
-	double avg = 0.0;
-
-	for (int i = 0; i < num_sims; i++) {
-		avg += simulations[i].getReward();
+	//  delete the nets of the lowest performing half of the population
+	int halfPop = 0.5*(simulations.size());
+	for (auto it = simulations.begin(); it != simulations.end() - halfPop; ++it) {
+		it->destroyNet();
+		int random = rand() % X;
+		++random;
+		it->recreateNet((simulations.end() - random)->getNet());
 	}
 
-	avg = avg / num_sims;
-	std::cout << "EPOCH: " << epoch << "  " << "AVG REWARD: " << avg << "\n";
+	//   mutate up to Y randomly chosen nets
+	int i = 0;
+	while (i < Y) {
+		int chosenOne = rand() % simulations.size();
+		(simulations.begin() + chosenOne)->mutate();
+		i++;
+	}
+
 }
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
@@ -34,9 +32,10 @@ void printAvgReward(std::vector<Simulation> simulations, int num_sims, int epoch
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 50;
-	int NUM_SIMULATIONS = 5;
+	int NUM_SIMULATIONS = 100;
 	int NUM_EPOCHS = 10000;
-	int X_TOP_PERFORMERS = 2;
+	int X_TOP_PERFORMERS = 5;
+	int Y_MUTATIONS = 100;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
@@ -45,7 +44,7 @@ int main(void) {
 	int WORLD_WIDTH = 3;
 	int WORLD_HEIGHT = 3;
 
-	bool RANDOM_HOME_LOCATION = false;
+	int POI_WEIGHT = 2;
 
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 3;
@@ -59,7 +58,7 @@ int main(void) {
 	GC.numPOI = NUMBER_OF_POI;
 	GC.width = WORLD_WIDTH;
 	GC.height = WORLD_HEIGHT;
-	GC.randHome = RANDOM_HOME_LOCATION;
+	GC.poiWeight = POI_WEIGHT;
 
 	//  set up initial net configuration
 	struct netConfig NC;
@@ -73,28 +72,42 @@ int main(void) {
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
 
-	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
+	srand(time(NULL));
 
+	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
 
 	//  for each learning epoch, we run the set of simulations and 
 	//  then evolve the population based on basic neuroevolutionary 
 	//  algorithms.
+	std::cout << std::endl;
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
-		std::cout << "EPOCH " << i << "\n";
-		std::cout << "**********************************" << "\n";
+		double avg = 0.0;
+
+		std::cout << "EPOCH " << i << std::endl;
+		std::cout << "**********************************" << std::endl;
 
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
+			std::cout << "------------------------------------" << std::endl;
 			simulations[j].runEpoch();
 			std::cout << "simulation " << j << "   ";
 			simulations[j].logResults();
+			avg += simulations[j].getReward();
 		}
 
-		std::cout << "\n";
+		avg /= NUM_SIMULATIONS;
+		std::cout << "EPOCH AVERAGE " << avg << std::endl;
+		std::cout << std::endl;
 
 		//printAvgReward(simulations, NUM_SIMULATIONS, i);
-		evolve_reset_population(simulations, X_TOP_PERFORMERS, RANDOM_HOME_LOCATION);
+		evolve_population(simulations, X_TOP_PERFORMERS, Y_MUTATIONS);
+		for (auto it = simulations.begin(); it != simulations.end(); ++it)
+		{
+			it->reset();
+		}
+		if (Y_MUTATIONS != 0 )
+			Y_MUTATIONS -= 1;
 	}
 
 	/* Cleanup configuration memory */

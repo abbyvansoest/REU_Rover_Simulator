@@ -24,7 +24,7 @@ struct gridConfig
 	int numPOI;
 	int width;
 	int height;
-	bool randHome;
+	int poiWeight;
 };
 
 struct netConfig
@@ -43,7 +43,7 @@ class Simulation
 {
 	private:
 		Gridworld world;
-		FANN::neural_net net;
+		FANN::neural_net* net;
 		int timesteps;
 		//double stats[];
 		double reward;
@@ -51,15 +51,22 @@ class Simulation
 
 	public:
 		Simulation();
+		~Simulation();
+		Simulation(const Simulation&);
 		Simulation(struct gridConfig, struct netConfig, int timesteps);
 		void logResults();
 		void generateStats();
+		FANN::neural_net* getNet();
 		void saveModel();
 		int runEpoch();
 		double getReward() const;
-		void reset(bool);
+		void reset();
 		void mutate();
+		void destroyNet();
+		void recreateNet(FANN::neural_net*);
+		void printGrid();
 		bool operator<(const Simulation &) const;
+		Simulation& operator=(const Simulation&);
 };
 
 #endif

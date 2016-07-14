@@ -70,7 +70,7 @@ POI* Agent::getHoldingPOI() {
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home home, double eps) {
+int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home home, double eps) {
 
 	//stateTrajectory.push_back(s);
 	
@@ -82,7 +82,6 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home hom
 	
 	if (this->isCarrying())
 	{
-		std::cout << "MADE IT HERE HI\n";
 		Position home_pos = home.getPosition();
 		if (home_pos == self_pos) return SET_DOWN;
 
@@ -90,27 +89,23 @@ int Agent::nextAction(State s, FANN::neural_net net, Position self_pos, Home hom
 		{
 			if (self_pos.getX() > home_pos.getX())
 			{
-				std::cout << "moving left\n";
 				return MOVE_LEFT;
 			}
 			else { 
-				std::cout << "moving right\n";
 				return MOVE_RIGHT; }
 		}
 		else{
 			if (self_pos.getY() > home_pos.getY())
 			{
-				std::cout << "moving down\n";
-				return MOVE_DOWN;
+				return MOVE_UP;
 			}
 			else { 
-				std::cout << "moving up\n";
-				return MOVE_UP; }
+				return MOVE_DOWN; }
 		}
 	}
 
 	/* Picks the output from the neural net */
-	fann_type* output = net.run( (fann_type*) s.array);
+	fann_type* output = net->run( (fann_type*) s.array);
 
 	int max_i = 0;
 	for (int i = 0; i < 6; ++i)
