@@ -1,3 +1,25 @@
+/*********************************************************************
+* gridworld.cpp
+*
+* This class represents a single simulation, which can manipulate and 
+* step a gridworld for a full epoch.
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates
+
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*********************************************************************/
+
 #include "simulation.h"
 #include <iostream>
 
@@ -22,8 +44,6 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
-	//std::cout << "INIT WORLD" << std::endl;
-	//world.printWorld();
 	this->reward = 0;
 
 }
@@ -58,6 +78,13 @@ Simulation& Simulation::operator=(const Simulation& that)
     return *this;
 }
 
+// override relational operator based on rewards received
+bool Simulation::operator<(const Simulation &rhs) const
+{
+	return this->reward < rhs.reward;
+}
+
+//  print the results from the simulation's learning epoch
 void Simulation::logResults()
 {
 	std::cout << "Reward: " << this->getReward() << 
@@ -68,23 +95,10 @@ void Simulation::logResults()
 	}
 }
 
-void Simulation::generateStats()
-{
-
-}
-
-void Simulation::printGrid() {
-	//this->world.printWorld();
-}
-
-FANN::neural_net* Simulation::getNet() {
-	return this->net;
-}
-
 /* Runs a single epoch, which runs for a given number of timesteps */
+// runs the simulation until the time runs out or the simulation ends prematurely
 int Simulation::runEpoch()
 {
-	// Run the simulation until the time runs out or the simulation ends prematurely
 	int steps = 0;
 	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
@@ -92,21 +106,19 @@ int Simulation::runEpoch()
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
-			std::cout << "returning early" << std::endl;
 			break;
 		}
 		eps -= 0.001;
 	}
 
-
 	// Calculate the reward
 	this->reward -= steps * 0.05;
 	this->reward += 2000*this->world.currentAmount();
-	//std::cout << "Reward: " << this->reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
 
 	return 0;
 }
 
+//  return the reward the simulation earned in the epoch
 double Simulation::getReward() const 
 {
 	return this->reward;
@@ -116,15 +128,17 @@ double Simulation::getReward() const
 void Simulation::reset()
 {
 	this->world.reset();
-	// Reset any statistics variables here
 	this->reward = 0;
 }
 
+//  destroy the simulation's old net (for use during evolution)
 void Simulation::destroyNet() {
 	delete this->net;
 	this->net = NULL;
 }
 
+//  give the simualtion a new neural net based on the net provided
+//  (for use during evolution)
 void Simulation::recreateNet(FANN::neural_net* net) {
 	if (this->net == NULL) {
 		this->net = new FANN::neural_net(*net);
@@ -135,6 +149,11 @@ void Simulation::recreateNet(FANN::neural_net* net) {
 	}
 }
 
+// return a pointer to the simulation's current net
+FANN::neural_net* Simulation::getNet() {
+	return this->net;
+}
+// set the simulation's current net pointer to the one provided
 void Simulation::setNet(FANN::neural_net* net)
 {
 	if (this->net == NULL)
@@ -164,7 +183,3 @@ void Simulation::mutate()
 	this->net->set_weight_array(connections, length);
 }
 
-bool Simulation::operator<(const Simulation &rhs) const
-{
-	return this->reward < rhs.reward;
-}

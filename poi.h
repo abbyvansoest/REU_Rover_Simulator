@@ -1,3 +1,15 @@
+/*********************************************************************
+* poi.h
+*
+* This class is an object representation of the Points of Interest (POI)
+* in the experimental gridworld. The simple object has a position, a 
+* weight and the ability to track completion and removal from the world. 
+* The POI is also able to track the agents which are available to pick it
+* up and transport it home.
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates
+*********************************************************************/
+
 #ifndef _POI_H
 #define _POI_H
 
@@ -14,11 +26,11 @@ class POI {
 
 	private:
 
-		bool complete;
-		int weight;
-		std::vector<Agent*> agentsReady;
-		Position p;
-		bool removed;
+		Position p;      //  location of the poi in the world
+		int weight;      //  number of agents needed to carry poi
+		std::vector<Agent*> agentsReady;   //  pointers to the agents available to carry the poi
+		bool complete;   // true if the poi has enough agents to be picked up
+		bool removed;    // true if the agent has been picked up
 
 	public:
 
@@ -33,22 +45,23 @@ class POI {
 		/* Returns the weight of the POI */
 		int getWeight();
 
-		/* Triggers the POI to become completed */
-		void completed();
-
-		/* Returns the bool to check if the POI is completed */
-		bool isComplete();
-
+		/* Adds an agent to the list of available agents to pick up the poi if it is not full */
+		void addAvailableAgent(Agent*);
 		/* returns the array of carriers for the POI */
 		std::vector<Agent*> getCarriers();
 
-		/* Adds an agent to the list of available agents to pick up the poi if it is not full */
-		void addAvailableAgent(Agent*);
+		/* Returns the bool to check if the POI is completed */
+		bool isComplete();
+		/* Triggers the POI to become completed */
+		void completed();
 
-		Position getP();
-
+		//  has the agent been completely picked up?
 		bool isRemoved();
+		//  remove the agent if it has not already been removed
 		void remove();
+
+		//  return the location of the poi in the world
+		Position getP();
 };
 
 #endif

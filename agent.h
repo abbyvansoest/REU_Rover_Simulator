@@ -1,7 +1,17 @@
+/*********************************************************************
+* agent.h
+*
+* This class is an object representation of the agents in an 
+* experimental gridworld. The agents remember their position, whether 
+* or not they are carrying a POI, and if they are broadcasting.
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates
+*********************************************************************/
+
 #ifndef AGENT_INCLUDED
 #define AGENT_INCLUDED
 
-class POI;
+class POI; 
 
 #include <deque>
 #include <iostream>
@@ -13,7 +23,7 @@ class POI;
 #include "state.h"
 #include "Home.h"
 
-/* Definition of action behaviors relative numbers */
+/* enumeration of action behaviors */
 enum
 {
 	MOVE_UP,
@@ -28,15 +38,16 @@ enum
 class Agent {
 
 	private:
-		bool broadcasting;
-		bool carrying;
-		Position p;
-		POI* holding;
+		bool broadcasting;   // is the agent broadcasting?
+		bool carrying;       // is the agent carrying a poi?
+		Position p;          // current position in world
+		POI* holding;        // points to the poi an agent is carrying (or NULL)
 
 	public:	
 		//  constructors
 		Agent();
 		Agent(bool, bool, POI*);
+		Agent copy();
 
 		//  get the next action for hte agent based on the
 		//  current state and the neural net
@@ -44,24 +55,22 @@ class Agent {
 
 		//  is the broadcasting signal positive or negative?
 		bool isBroadcasting();
-
 		//  set broadcasting signal
 		void setBroadcast(bool);
 
 		//  is the agent carrying anything?
 		bool isCarrying();
-
-		//  set the POI the agent is holding
-		void setHoldingPOI(POI*);
-		//  return the POI the agent is holding
-		POI* getHoldingPOI();
-
 		//  set the carrying signal appropriately
 		void setCarrying(bool);
-		Agent copy();
+
+		//  return the POI the agent is holding
+		POI* getHoldingPOI();
+		//  set the POI the agent is holding
+		void setHoldingPOI(POI*);
 
 		Position getP();
 		void setP(Position);
+
 };
 
 #endif

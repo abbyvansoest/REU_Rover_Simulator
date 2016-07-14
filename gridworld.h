@@ -1,3 +1,13 @@
+/*********************************************************************
+* gridworld.h
+*
+* This class is an object representation of a gridworld. The world 
+* remembers all agents, poi, and the home base. It can step all agents
+* and mark a world as "complete" when all POIs have been fully returned.
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates
+*********************************************************************/
+
 #ifndef GRIDWORLD_INCLUDED
 #define GRIDWORLD_INCLUDED
 
@@ -26,23 +36,32 @@ class Gridworld
 
 private:
 	
-	int numAgents;
-	int numPOI;
-	int width;
-	int height;
-	int poiWeight;
-	std::vector<Agent> agents;
-	std::vector<POI> poi;;
-	Home home;
-	int numSteps;
+	int numAgents;   // number of agents in the world
+	int numPOI;      // number of poi in the world
+	int width;       //  width dimension
+	int height;      //  height dimension
+	int poiWeight;   //  weight of all POIs
+	std::vector<Agent> agents;  //  vector to store all agents
+	std::vector<POI> poi;;      //  vector to store all POI
+	Home home;                  //  world's home base
+	int numSteps;               //  number of steps taken in the world
 
+	//  initialize POI, agents, and home base
 	void initPOI();
 	void initAgents();
 	void initHome();
+	//  check if a location in the grid is occupied
 	bool positionAvailable(Position);
+	//  return the state of the agent in the given position
 	State getState(Position, Agent);
+	//  find the distance between two (x, y) locations
+	double getDistance(Position, Position);
+	// is there a poi within one step?
 	bool findNearbyPOI(Position);
+	//  return a pointer to the poi within one step
 	POI* nearbyPOI(Position);
+	// clear the gridworld of all agents and POI
+	void clear();
 
 public:
 
@@ -51,26 +70,21 @@ public:
 	Gridworld(int, int, int, int, int);
 
 	// step all agents in the world
-	//  potential for threading?
 	void stepAgents(FANN::neural_net*, double&); 
 
-	// clear the gridworld of all agents and POI
-	void clear();
-
-	//  reset the world with the given neural net, 
-	//  or keep using the same neural net if NULL
+	//  reset the world 
 	void reset();
 	
-	/* Checks if all the POI's have been returned to the homebase */
+	// check if all the POI's have been returned to the homebase
 	bool worldComplete();
 
-	/* A passthrough accessor to return the home current amount */
+	//  passthrough accessor to return the current amount at home
 	int currentAmount();
 
-	double getDistance(Position, Position);
-
+	// visualizor of the current gridworld
 	void printWorld();
 
+	//  the total number of steps taken by the world thus far
 	int stepsTaken();
 
 };

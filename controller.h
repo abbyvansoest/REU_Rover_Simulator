@@ -1,3 +1,13 @@
+/*********************************************************************
+* controller.h
+*
+* This simulation controller implements a rover domain gridworld for 
+* theoretical research purposes. 
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates
+*********************************************************************/
+
+
 #ifndef _CONTROLLER_H
 #define _CONTROLLER_H
 
