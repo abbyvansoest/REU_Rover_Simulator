@@ -32,10 +32,10 @@ void evolve_population(std::vector<Simulation> &simulations, int X, int Y)
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 50;
-	int NUM_SIMULATIONS = 20;
+	int NUM_SIMULATIONS = 100;
 	int NUM_EPOCHS = 10000;
 	int X_TOP_PERFORMERS = 5;
-	int Y_MUTATIONS = 20;
+	int Y_MUTATIONS = 100;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
@@ -44,7 +44,7 @@ int main(void) {
 	int WORLD_WIDTH = 3;
 	int WORLD_HEIGHT = 3;
 
-	bool RANDOM_HOME_LOCATION = false;
+	int POI_WEIGHT = 2;
 
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 3;
@@ -58,7 +58,7 @@ int main(void) {
 	GC.numPOI = NUMBER_OF_POI;
 	GC.width = WORLD_WIDTH;
 	GC.height = WORLD_HEIGHT;
-	GC.randHome = RANDOM_HOME_LOCATION;
+	GC.poiWeight = POI_WEIGHT;
 
 	//  set up initial net configuration
 	struct netConfig NC;
@@ -104,7 +104,7 @@ int main(void) {
 		evolve_population(simulations, X_TOP_PERFORMERS, Y_MUTATIONS);
 		for (auto it = simulations.begin(); it != simulations.end(); ++it)
 		{
-			it->reset(RANDOM_HOME_LOCATION);
+			it->reset();
 		}
 		if (Y_MUTATIONS != 0 )
 			Y_MUTATIONS -= 1;

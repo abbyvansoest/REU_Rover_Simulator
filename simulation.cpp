@@ -4,7 +4,7 @@
 /* Calls the non-default constructors on the members with predetermined, 
  * almost arbitrary values */
 Simulation::Simulation()
-	: world(2, 1, 5, 5, false)
+	: world(2, 1, 5, 5, 1)
 {
 	//std::cout << "call to default constructor" << std::endl;
 	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6});
@@ -15,7 +15,7 @@ Simulation::Simulation()
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
 Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
-	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.randHome)
+	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.poiWeight)
 {
 	//std::cout << "Call to non default constructor" << std::endl;
 	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
@@ -61,7 +61,7 @@ Simulation& Simulation::operator=(const Simulation& that)
 void Simulation::logResults()
 {
 	std::cout << "Reward: " << this->getReward() << 
-	"    Returned: " << this->world.currentAmount() << std::endl;
+	"    Returned: " << this->world.currentAmount() << "   Steps: " << this->world.stepsTaken() << std::endl;
 	if (this->world.currentAmount() > 0)
 	{
 		std::cout << "SUCCESS OF SOME SORT!" << std::endl;
@@ -109,9 +109,9 @@ double Simulation::getReward() const
 }
 
 /* Resets the gridworld and the statistics variables internal to the class */
-void Simulation::reset(bool randHome)
+void Simulation::reset()
 {
-	this->world.reset(randHome);
+	this->world.reset();
 	// Reset any statistics variables here
 	this->reward = 0;
 }
