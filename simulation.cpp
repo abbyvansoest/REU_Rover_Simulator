@@ -74,7 +74,7 @@ void Simulation::generateStats()
 }
 
 void Simulation::printGrid() {
-	this->world.printWorld();
+	//this->world.printWorld();
 }
 
 FANN::neural_net* Simulation::getNet() {

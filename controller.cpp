@@ -40,13 +40,16 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 	int halfPop = 0.5*(simulations.size());
 	for (auto it = simulations.begin(); it != simulations.end() - halfPop; ++it) {
 		it->destroyNet();
-		//int random = (rand() % X) + 1;
-		//it->recreateNet((simulations.end() - random)->getNet());
+		int random = (rand() % X) + 1;
+		it->recreateNet((simulations.end() - random)->getNet());
+
+		/*
 		int p1 = (rand() % X) + simulations.size() - X;
 		int p2 = (rand() % X) + simulations.size() - X;
-		std::cout << "p1: " << p1 << " : p2: " << p2 << std::endl;
+		//std::cout << "p1: " << p1 << " : p2: " << p2 << std::endl;
 		FANN::neural_net* new_net = crossover((simulations.begin()+p1)->getNet(), (simulations.begin()+p2)->getNet());
 		it->setNet(new_net);
+		*/
 	}
 
 	for (auto it = simulations.begin(); it != simulations.end(); ++it)
@@ -65,8 +68,8 @@ int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 250;
 	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 100000;
-	int X_TOP_PERFORMERS = 5;
+	int NUM_EPOCHS = 10000;
+	int X_TOP_PERFORMERS = 10;
 	int Y_MUTATIONS = 100;
 	double mutation_rate = .1;
 
@@ -116,21 +119,23 @@ int main(void) {
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
 		double avg = 0.0;
+		double max = 0.0;
 
 		std::cout << "EPOCH " << i << std::endl;
 		std::cout << "**********************************" << std::endl;
 
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
-			std::cout << "------------------------------------" << std::endl;
+			//std::cout << "------------------------------------" << std::endl;
 			simulations[j].runEpoch();
 			//std::cout << "simulation " << j << "   ";
 			//simulations[j].logResults();
 			avg += simulations[j].getReward();
+			max = (max > simulations[j].getReward()) ? max : simulations[j].getReward();
 		}
 
 		avg /= NUM_SIMULATIONS;
-		std::cout << "EPOCH AVERAGE " << avg << std::endl;
+		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << std::endl;
 
 		//printAvgReward(simulations, NUM_SIMULATIONS, i);
 		evolve_population(simulations, X_TOP_PERFORMERS, mutation_rate);
