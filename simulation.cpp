@@ -66,7 +66,6 @@ void Simulation::logResults()
 	{
 		std::cout << "SUCCESS OF SOME SORT!" << std::endl;
 	}
-	std::cout << std::endl;
 }
 
 void Simulation::generateStats()
@@ -87,17 +86,22 @@ int Simulation::runEpoch()
 {
 	// Run the simulation until the time runs out or the simulation ends prematurely
 	int steps = 0;
+	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
-		this->world.stepAgents(this->net);
+		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
+		{
+			std::cout << "returning early" << std::endl;
 			break;
+		}
+		eps -= 0.001;
 	}
 
 
 	// Calculate the reward
 	this->reward -= steps * 0.05;
-	this->reward += this->world.currentAmount()*10;
+	this->reward += 2000*this->world.currentAmount();
 	//std::cout << "Reward: " << this->reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
 
 	return 0;
@@ -124,6 +128,22 @@ void Simulation::destroyNet() {
 void Simulation::recreateNet(FANN::neural_net* net) {
 	if (this->net == NULL) {
 		this->net = new FANN::neural_net(*net);
+	}
+	else
+	{
+		std::cout << "Net not NULL in recreateNet()" << std::endl;
+	}
+}
+
+void Simulation::setNet(FANN::neural_net* net)
+{
+	if (this->net == NULL)
+	{
+		this->net = net;
+	}
+	else
+	{
+		std::cout << "Net not NULL in setNet()" << std::endl;
 	}
 }
 

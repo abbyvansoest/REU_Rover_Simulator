@@ -74,8 +74,8 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 
 	//stateTrajectory.push_back(s);
 	
-	//TODO if adding threading, change to drand48_r() and rand_r()
-	if (drand48() < eps)
+	//TODO if adding threading, change to rand_r()
+	if (( (double)rand()/(double)RAND_MAX+1.0) < eps)
 	{
 		return rand() % 6;
 	}
@@ -83,6 +83,7 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 	if (this->isCarrying())
 	{
 		Position home_pos = home.getPosition();
+		std::cout << "HOME: ("<<home_pos.getX()<<","<<home_pos.getY()<<") ROVER: ("<<self_pos.getX()<<","<<self_pos.getY()<<")"<<std::endl;
 		if (home_pos == self_pos) return SET_DOWN;
 
 		if (abs(self_pos.getX() - home_pos.getX()) > abs(self_pos.getY() - home_pos.getY()))

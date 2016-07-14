@@ -52,7 +52,7 @@ public:
 
 	// step all agents in the world
 	//  potential for threading?
-	void stepAgents(FANN::neural_net*); 
+	void stepAgents(FANN::neural_net*, double&); 
 
 	// clear the gridworld of all agents and POI
 	void clear();

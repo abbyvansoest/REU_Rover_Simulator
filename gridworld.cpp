@@ -185,7 +185,7 @@ double Gridworld::getDistance(Position p1, Position p2) {
 
 /*  step all agents in the world.
  *  Does not calculate or provide a reward. */
-void Gridworld::stepAgents(FANN::neural_net* net) {
+void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 
 	State state;
 	Position oldPos, nextPos;
@@ -198,7 +198,8 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 		// .1 = a default epsilon value that is a placeholder for now
-		int action = it->nextAction(state, net, oldPos, this->home, .1); 
+		int action = it->nextAction(state, net, oldPos, this->home, eps); 
+	//	std::cout << "action: " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
@@ -355,10 +356,9 @@ int Gridworld::currentAmount()
 
 bool Gridworld::worldComplete()
 {
-
 	if (this->home.currentAmount() == this->poiWeight*this->numPOI)
 	{
-		std::cout << "worldComplete returning true" << std::endl;
+		//std::cout << "worldComplete returning true" << std::endl;
 		return true;
 	}
 
