@@ -6,6 +6,7 @@
 Simulation::Simulation()
 	: world(2, 1, 5, 5, false)
 {
+	//std::cout << "call to default constructor" << std::endl;
 	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6});
 	this->reward = 0;
 	this->timesteps = 250;
@@ -15,24 +16,30 @@ Simulation::Simulation()
  * to call the subsequent non default constructors for the members */
 Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.randHome)
-	
 {
-
+	//std::cout << "Call to non default constructor" << std::endl;
 	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
+	//std::cout << "INIT WORLD" << std::endl;
+	world.printWorld();
+	this->reward = 0;
 
 }
 
 // destructor
-Simulation::~Simulation() {
+Simulation::~Simulation()
+{
+	//std::cout << "Call to destructor" << std::endl;
 	delete this->net;
+	this->net = NULL;
 }
 
 //  copy constructor
-Simulation::Simulation(const Simulation& that) {
-
+Simulation::Simulation(const Simulation& that)
+{
+	//std::cout << "call to copy constructor" << std::endl;
 	this->net = new FANN::neural_net(*that.net);
 	this->reward = that.reward;
 	this->world = that.world;
@@ -42,6 +49,8 @@ Simulation::Simulation(const Simulation& that) {
 // copy assignment operator
 Simulation& Simulation::operator=(const Simulation& that)
 {
+	//std::cout << "Call to equal operator" << std::endl;
+	if (this->net != NULL) { delete this->net; }
     this->net = new FANN::neural_net(*that.net);
 	this->reward = that.reward;
 	this->world = that.world;
@@ -78,7 +87,7 @@ int Simulation::runEpoch()
 {
 	// Run the simulation until the time runs out or the simulation ends prematurely
 	int steps = 0;
-	for (; steps < this->timesteps; ++steps)
+	for (steps = 0; steps < this->timesteps; ++steps)
 	{
 		this->world.stepAgents(this->net);
 		if (this->world.worldComplete())
@@ -89,6 +98,7 @@ int Simulation::runEpoch()
 	// Calculate the reward
 	this->reward -= steps * 0.05;
 	this->reward += this->world.currentAmount();
+	//std::cout << "Reward: " << this->reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
 
 	return 0;
 }
