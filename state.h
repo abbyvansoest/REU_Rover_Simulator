@@ -1,6 +1,6 @@
 #ifndef _STATE_H
 #define _STATE_H
-/* This struct is a nice wrapper around the state, allowing it to be treated as a singular object
+/* This struct is a wrapper around an agent's state, allowing it to be treated as a singular object
  * (with additional bracketing being overloaded, if it is desired)
  * and encapsulates the int array away.
  * The internal array can be directly accessed if needed */

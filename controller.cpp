@@ -1,3 +1,27 @@
+/*********************************************************************
+* controller.cpp
+*
+* This simulation controller implements a rover domain gridworld for 
+* theoretical research purposes. It is the top-level manager of a 
+* large number of experimental simulations, and uses neuroevolutionary 
+* techniques on neural nets.
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates
+
+*  This program is free software: you can redistribute it and/or modify
+*  it under the terms of the GNU General Public License as published by
+*  the Free Software Foundation, either version 3 of the License, or
+*  (at your option) any later version.
+*
+*  This program is distributed in the hope that it will be useful,
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*  GNU General Public License for more details.
+*
+*  You should have received a copy of the GNU General Public License
+*  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*********************************************************************/
+
 #include "controller.h"
 
 /* takes in two parents to produce the child */
@@ -68,7 +92,7 @@ int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 250;
 	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 10000;
+	int NUM_EPOCHS = 100000;
 	int X_TOP_PERFORMERS = 10;
 	int Y_MUTATIONS = 100;
 	double mutation_rate = .1;
@@ -77,8 +101,8 @@ int main(void) {
 	int NUMBER_OF_AGENTS = 2;
 	int NUMBER_OF_POI = 2;
 
-	int WORLD_WIDTH = 6;
-	int WORLD_HEIGHT = 6;
+	int WORLD_WIDTH = 3;
+	int WORLD_HEIGHT = 3;
 
 	int POI_WEIGHT = 2;
 
@@ -137,7 +161,6 @@ int main(void) {
 		avg /= NUM_SIMULATIONS;
 		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << std::endl;
 
-		//printAvgReward(simulations, NUM_SIMULATIONS, i);
 		evolve_population(simulations, X_TOP_PERFORMERS, mutation_rate);
 		for (auto it = simulations.begin(); it != simulations.end(); ++it)
 		{

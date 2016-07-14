@@ -1,9 +1,12 @@
-/*
- * Home.h
- *
- *  Created on: Jun 30, 2016
- *      Authors: Tobi Ogunyale, Abby Van Soest
- */
+/*********************************************************************
+* Home.h
+*
+* Home is an object representing a special return-to-base location 
+* in the gridworld. The object remembers the position of the homebase
+* and the 'quantity' of material returned to it.
+*
+* Copyright (C) 2016 Abby Van Soest, Connor Yates, Tobi Oguyale
+*********************************************************************/
 
 #ifndef HOME_INCLUDED
 #define HOME_INCLUDED
@@ -13,27 +16,27 @@
 class Home {
 
 private:
-	int quantityReturned;
-	Position position;
+	int quantityReturned;  //  amount of POI material returned to the home base
+	Position position;     // position of Home in the gridworld
 
 public:
 
-	// constructor
+	// constructors
 	Home();
 	Home(Position);
 
 
-	// Returns the value of the position of the base
+	// Return the value of the position of the base
 	Position getPosition();
 
-	// Sets the position of homebase, by accepting a position value
+	// Set the position of homebase, by accepting a position value
 	void setPosition(Position pos);
 
-	//  returns the current amount stored in the base
+	//  return the current amount stored in the base
 	double currentAmount();
 
-	// Receives an int value from an agent and 
-	//  adds the value held by the agent to the capacity
+	// Receive an int value from an agent and 
+		//  add the value held by the agent to the capacity
 	void receiveValues(int);
 
 };
