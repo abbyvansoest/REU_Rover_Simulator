@@ -197,7 +197,7 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 	State state;
 	Position oldPos, nextPos;
 
-	this->printWorld();
+	//this->printWorld();
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -293,7 +293,6 @@ void Gridworld::stepAgents(FANN::neural_net* net) {
 	}
 
 	this->numSteps++;
-	std::cout << std::endl;
 }
 
 POI* Gridworld::nearbyPOI(Position pos) {
@@ -382,7 +381,7 @@ void Gridworld::printWorld() {
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(j, i);
 			print = false;
-			
+
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
 				if (it->getP() == p) {
 					if (it->isCarrying()) std::cout << "+ ";

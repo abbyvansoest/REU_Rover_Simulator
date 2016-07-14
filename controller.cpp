@@ -32,10 +32,10 @@ void evolve_population(std::vector<Simulation> &simulations, int X, int Y)
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 50;
-	int NUM_SIMULATIONS = 10;
-	int NUM_EPOCHS = 10;
-	int X_TOP_PERFORMERS = 3;
-	int Y_MUTATIONS = 10;
+	int NUM_SIMULATIONS = 20;
+	int NUM_EPOCHS = 10000;
+	int X_TOP_PERFORMERS = 5;
+	int Y_MUTATIONS = 20;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
