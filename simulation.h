@@ -24,7 +24,7 @@ struct gridConfig
 	int numPOI;
 	int width;
 	int height;
-	bool randHome;
+	int poiWeight;
 };
 
 struct netConfig
@@ -60,10 +60,11 @@ class Simulation
 		void saveModel();
 		int runEpoch();
 		double getReward() const;
-		void reset(bool);
+		void reset();
 		void mutate();
 		void destroyNet();
 		void recreateNet(FANN::neural_net*);
+		void printGrid();
 		bool operator<(const Simulation &) const;
 		Simulation& operator=(const Simulation&);
 };

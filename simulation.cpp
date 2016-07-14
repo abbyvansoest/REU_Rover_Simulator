@@ -4,7 +4,7 @@
 /* Calls the non-default constructors on the members with predetermined, 
  * almost arbitrary values */
 Simulation::Simulation()
-	: world(2, 1, 5, 5, false)
+	: world(2, 1, 5, 5, 1)
 {
 	//std::cout << "call to default constructor" << std::endl;
 	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6});
@@ -15,8 +15,7 @@ Simulation::Simulation()
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
 Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
-	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.randHome)
-	
+	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.poiWeight)
 {
 	//std::cout << "Call to non default constructor" << std::endl;
 	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
@@ -24,7 +23,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps;
 	//std::cout << "INIT WORLD" << std::endl;
-	world.printWorld();
+	//world.printWorld();
 	this->reward = 0;
 
 }
@@ -62,7 +61,7 @@ Simulation& Simulation::operator=(const Simulation& that)
 void Simulation::logResults()
 {
 	std::cout << "Reward: " << this->getReward() << 
-	"    Returned: " << this->world.currentAmount() << std::endl;
+	"    Returned: " << this->world.currentAmount() << "   Steps: " << this->world.stepsTaken() << std::endl;
 	if (this->world.currentAmount() > 0)
 	{
 		std::cout << "SUCCESS OF SOME SORT!" << std::endl;
@@ -73,6 +72,10 @@ void Simulation::logResults()
 void Simulation::generateStats()
 {
 
+}
+
+void Simulation::printGrid() {
+	this->world.printWorld();
 }
 
 FANN::neural_net* Simulation::getNet() {
@@ -94,7 +97,7 @@ int Simulation::runEpoch()
 
 	// Calculate the reward
 	this->reward -= steps * 0.05;
-	this->reward += this->world.currentAmount();
+	this->reward += this->world.currentAmount()*10;
 	//std::cout << "Reward: " << this->reward << " from " << steps << " steps and " << this->world.currentAmount() << " POI found" << std::endl;
 
 	return 0;
@@ -106,9 +109,9 @@ double Simulation::getReward() const
 }
 
 /* Resets the gridworld and the statistics variables internal to the class */
-void Simulation::reset(bool randHome)
+void Simulation::reset()
 {
-	this->world.reset(randHome);
+	this->world.reset();
 	// Reset any statistics variables here
 	this->reward = 0;
 }
@@ -136,7 +139,6 @@ void Simulation::mutate()
 	int sign = rand() % 2 ? 1 : -1;
 	fann_type magnitude = 1/((fann_type) ((rand() % 50) + 10));
 
-	std::cout << "mag: " << magnitude << std::endl;
 	connections[index].weight += (fann_type) sign*magnitude;
 
 	this->net->set_weight_array(connections, length);

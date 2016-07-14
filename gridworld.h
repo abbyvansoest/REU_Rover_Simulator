@@ -30,17 +30,15 @@ private:
 	int numPOI;
 	int width;
 	int height;
-	//unordered_map<string, Agent*> agents;
-	//unordered_map<string, POI*> poi;
+	int poiWeight;
 	std::vector<Agent> agents;
-	std::vector<POI> poi;
-	std::vector<POI*> pickedUpPOIs;
+	std::vector<POI> poi;;
 	Home home;
 	int numSteps;
 
 	void initPOI();
 	void initAgents();
-	void initHome(bool);
+	void initHome();
 	bool positionAvailable(Position);
 	State getState(Position, Agent);
 	bool findNearbyPOI(Position);
@@ -50,7 +48,7 @@ public:
 
 	// constructor
 	Gridworld();
-	Gridworld(int, int, int, int, bool);
+	Gridworld(int, int, int, int, int);
 
 	// step all agents in the world
 	//  potential for threading?
@@ -61,7 +59,7 @@ public:
 
 	//  reset the world with the given neural net, 
 	//  or keep using the same neural net if NULL
-	void reset(bool);
+	void reset();
 	
 	/* Checks if all the POI's have been returned to the homebase */
 	bool worldComplete();
@@ -72,6 +70,8 @@ public:
 	double getDistance(Position, Position);
 
 	void printWorld();
+
+	int stepsTaken();
 
 };
 

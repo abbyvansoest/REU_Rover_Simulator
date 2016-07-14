@@ -89,22 +89,18 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 		{
 			if (self_pos.getX() > home_pos.getX())
 			{
-				std::cout << "moving left" << std::endl;
 				return MOVE_LEFT;
 			}
 			else { 
-				std::cout << "moving right" << std::endl;
 				return MOVE_RIGHT; }
 		}
 		else{
 			if (self_pos.getY() > home_pos.getY())
 			{
-				std::cout << "moving down" << std::endl;
-				return MOVE_DOWN;
+				return MOVE_UP;
 			}
 			else { 
-				std::cout << "moving up" << std::endl;
-				return MOVE_UP; }
+				return MOVE_DOWN; }
 		}
 	}
 
