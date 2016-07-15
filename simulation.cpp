@@ -1,5 +1,5 @@
 /*********************************************************************
-* gridworld.cpp
+* simulation.cpp
 *
 * This class represents a single simulation, which can manipulate and 
 * step a gridworld for a full epoch.
