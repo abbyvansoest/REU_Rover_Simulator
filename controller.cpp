@@ -59,7 +59,7 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 
 	//  sort to find the top X performers
 	std::sort(simulations.begin(), simulations.end());
-/*	int size = simulations.size();
+	int size = simulations.size();
 	int population[size*(size+1)/2];
 	int value = 1;
 	int count = 0;
@@ -72,7 +72,7 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 		}
 		population[i] = value;
 		count += 1;
-	} */
+	} 
 
 	//  delete the nets of the lowest performing half of the population
 	for (auto it = simulations.begin(); it != simulations.end() - X; ++it) {
