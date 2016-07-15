@@ -1,5 +1,5 @@
 /*********************************************************************
-* gridworld.cpp
+* simulation.cpp
 *
 * This class represents a single simulation, which can manipulate and 
 * step a gridworld for a full epoch.
@@ -99,10 +99,12 @@ void Simulation::logResults()
 // runs the simulation until the time runs out or the simulation ends prematurely
 int Simulation::runEpoch()
 {
+
 	int steps = 0;
 	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
+		//if (steps < 10) this->world.printWorld();
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
@@ -113,9 +115,13 @@ int Simulation::runEpoch()
 
 	// Calculate the reward
 	this->reward -= steps * 0.05;
-	this->reward += 2000*this->world.currentAmount();
+	this->reward += 5*this->world.currentAmount();
 
 	return 0;
+}
+
+int Simulation::getSteps() {
+	return this->world.stepsTaken();
 }
 
 //  return the reward the simulation earned in the epoch

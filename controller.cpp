@@ -59,6 +59,7 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 
 	//  sort to find the top X performers
 	std::sort(simulations.begin(), simulations.end());
+
 	int size = simulations.size();
 	int population[size*(size+1)/2];
 	int value = 1;
@@ -74,17 +75,15 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 		count += 1;
 	} 
 
-	//  delete the nets of the lowest performing half of the population
+	//  delete the nets of the lowest performing portion of the population
 	for (auto it = simulations.begin(); it != simulations.end() - X; ++it) {
-		it->destroyNet();
-		/*
-		int random = (rand() % X) + 1;
-		it->recreateNet((simulations.end() - random)->getNet());
-		*/
 
+		it->destroyNet();
 
 		FANN::neural_net* p1 = NULL;
 		FANN::neural_net* p2 = NULL;
+
+		// pick two parent nets from population (not self)
 		while (p1 == NULL)
 		{
 			int rand_i = population[(rand() % size*(size+1)/2)];
@@ -97,22 +96,15 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 			--rand_i;
 			p2 = (simulations.begin() + rand_i)->getNet();
 		}
-		FANN::neural_net* new_net = crossover(p1,p2);
+		FANN::neural_net* new_net = crossover(p1, p2);
 		it->setNet(new_net);
 
-		if (( (double)rand()/((double)RAND_MAX+1.0)) < mutation_rate)
+		if (((double)rand()/((double)RAND_MAX+1.0)) < mutation_rate)
 		{
 			//std::cout << "mutating" << std::endl;
 			it->mutate();
 		}
 	}
-
-	/*
-	for (auto it = simulations.begin(); it != simulations.end(); ++it)
-	{
-	}
-	*/
-
 }
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
@@ -121,17 +113,17 @@ int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 600;
 	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 1000;
+	int NUM_EPOCHS = 10000;
 	int X_TOP_PERFORMERS = 10;
-	int Y_MUTATIONS = 100;
+	int Y_MUTATIONS = 5;
 	double mutation_rate = .1;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
 	int NUMBER_OF_POI = 1;
 
-	int WORLD_WIDTH = 5;
-	int WORLD_HEIGHT = 5;
+	int WORLD_WIDTH = 6;
+	int WORLD_HEIGHT = 6;
 
 	int POI_WEIGHT = 2;
 
@@ -165,6 +157,12 @@ int main(void) {
 	srand(time(NULL));
 
 	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
+	//  randomize all nets
+	FANN::neural_net* net;
+	for (auto it = simulations.begin(); it != simulations.end(); ++it) {
+		net = it->getNet();
+		net->randomize_weights(RANDOM_NET_MIN, RANDOM_NET_MAX);
+	}
 
 	//  for each learning epoch, we run the set of simulations and 
 	//  then evolve the population based on basic neuroevolutionary 
@@ -174,18 +172,20 @@ int main(void) {
 
 		double avg = 0.0;
 		double max = 0.0;
+		double avgSteps = 0.0;
 		FANN::neural_net* max_i = NULL;
 
-		std::cout << "EPOCH " << i << std::endl;
 		std::cout << "**********************************" << std::endl;
+		std::cout << "EPOCH " << i << std::endl;
 
 		//  run each simulation
 		for (int j = 0; j < NUM_SIMULATIONS; j++) {
 			//std::cout << "------------------------------------" << std::endl;
+			//std::cout << "simulation " << j << "   " << std::endl;
 			simulations[j].runEpoch();
-			//std::cout << "simulation " << j << "   ";
 			//simulations[j].logResults();
 			avg += simulations[j].getReward();
+			avgSteps += simulations[j].getSteps();
 			if (max < simulations[j].getReward())
 			{
 				max = simulations[j].getReward();
@@ -194,8 +194,9 @@ int main(void) {
 		}
 
 		avg /= NUM_SIMULATIONS;
-		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << std::endl;//"\tat: " << max_i << std::endl;
-
+		avgSteps /= NUM_SIMULATIONS;
+		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
+		std::cout << std::endl;
 		evolve_population(simulations, X_TOP_PERFORMERS, mutation_rate);
 		for (auto it = simulations.begin(); it != simulations.end(); ++it)
 		{
