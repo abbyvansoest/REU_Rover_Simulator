@@ -59,30 +59,59 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 
 	//  sort to find the top X performers
 	std::sort(simulations.begin(), simulations.end());
+	int size = simulations.size();
+	int population[size*(size+1)/2];
+	int value = 1;
+	int count = 0;
+	for (int i = 0; i < size*(size+1)/2; ++i)
+	{
+		if (value == count)
+		{
+			value += 1;
+			count = 0;
+		}
+		population[i] = value;
+		count += 1;
+	} 
 
 	//  delete the nets of the lowest performing half of the population
-	int halfPop = 0.5*(simulations.size());
-	for (auto it = simulations.begin(); it != simulations.end() - halfPop; ++it) {
+	for (auto it = simulations.begin(); it != simulations.end() - X; ++it) {
 		it->destroyNet();
+		/*
 		int random = (rand() % X) + 1;
 		it->recreateNet((simulations.end() - random)->getNet());
-
-		/*
-		int p1 = (rand() % X) + simulations.size() - X;
-		int p2 = (rand() % X) + simulations.size() - X;
-		//std::cout << "p1: " << p1 << " : p2: " << p2 << std::endl;
-		FANN::neural_net* new_net = crossover((simulations.begin()+p1)->getNet(), (simulations.begin()+p2)->getNet());
-		it->setNet(new_net);
 		*/
-	}
 
-	for (auto it = simulations.begin(); it != simulations.end(); ++it)
-	{
-		if (( (double)rand()/(double)RAND_MAX+1.0) < mutation_rate)
+
+		FANN::neural_net* p1 = NULL;
+		FANN::neural_net* p2 = NULL;
+		while (p1 == NULL)
 		{
+			int rand_i = population[(rand() % size*(size+1)/2)];
+			--rand_i;
+			p1 = (simulations.begin() + rand_i)->getNet();
+		}
+		while (p2 == NULL)
+		{
+			int rand_i = population[(rand() % size*(size+1)/2)];
+			--rand_i;
+			p2 = (simulations.begin() + rand_i)->getNet();
+		}
+		FANN::neural_net* new_net = crossover(p1,p2);
+		it->setNet(new_net);
+
+		if (( (double)rand()/((double)RAND_MAX+1.0)) < mutation_rate)
+		{
+			//std::cout << "mutating" << std::endl;
 			it->mutate();
 		}
 	}
+
+	/*
+	for (auto it = simulations.begin(); it != simulations.end(); ++it)
+	{
+	}
+	*/
 
 }
 
@@ -90,24 +119,24 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 250;
+	int MAX_STEPS = 600;
 	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 100000;
+	int NUM_EPOCHS = 1000;
 	int X_TOP_PERFORMERS = 10;
 	int Y_MUTATIONS = 100;
 	double mutation_rate = .1;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
-	int NUMBER_OF_POI = 2;
+	int NUMBER_OF_POI = 1;
 
-	int WORLD_WIDTH = 3;
-	int WORLD_HEIGHT = 3;
+	int WORLD_WIDTH = 5;
+	int WORLD_HEIGHT = 5;
 
 	int POI_WEIGHT = 2;
 
 	//  control neural nets
-	int NUMBER_OF_LAYERS = 3;
+	int NUMBER_OF_LAYERS = 4;
 	bool RANDOM_WEIGHTS = true;
 	double RANDOM_NET_MIN = -0.5;
 	double RANDOM_NET_MAX =  0.5;
@@ -124,10 +153,11 @@ int main(void) {
 	struct netConfig NC;
 	NC.net_type = FANN::LAYER;
 	NC.num_layers = NUMBER_OF_LAYERS;
-	NC.layers = new unsigned int[3];
+	NC.layers = new unsigned int[NUMBER_OF_LAYERS];
 	NC.layers[0] = 13;
-	NC.layers[1] = 8;
-	NC.layers[2] = 6;
+	NC.layers[1] = 26;
+	NC.layers[2] = 13;
+	NC.layers[3] = 6;
 	NC.randWeights = RANDOM_WEIGHTS;
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
@@ -144,6 +174,7 @@ int main(void) {
 
 		double avg = 0.0;
 		double max = 0.0;
+		FANN::neural_net* max_i = NULL;
 
 		std::cout << "EPOCH " << i << std::endl;
 		std::cout << "**********************************" << std::endl;
@@ -155,11 +186,15 @@ int main(void) {
 			//std::cout << "simulation " << j << "   ";
 			//simulations[j].logResults();
 			avg += simulations[j].getReward();
-			max = (max > simulations[j].getReward()) ? max : simulations[j].getReward();
+			if (max < simulations[j].getReward())
+			{
+				max = simulations[j].getReward();
+				//max_i = simulations[j].getNet();
+			}
 		}
 
 		avg /= NUM_SIMULATIONS;
-		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << std::endl;
+		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << std::endl;//"\tat: " << max_i << std::endl;
 
 		evolve_population(simulations, X_TOP_PERFORMERS, mutation_rate);
 		for (auto it = simulations.begin(); it != simulations.end(); ++it)
