@@ -24,8 +24,8 @@
 #include "gridworld.h"
 
 //  define constants for homebase location
-int HOME_X = 0;
-int HOME_Y = 0;
+int HOME_X = 1;
+int HOME_Y = 1;
 
 // default constructor -- bascially random values
 Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
@@ -59,11 +59,12 @@ void Gridworld::initAgents() {
 
 	// for each agent, find open position on the board
 	for (int i = 0; i < this->numAgents; i++) {
-		Position pos;
+		Position pos = Position(rand() % width, rand() % height);
 		while (!positionAvailable(pos)) {
 			x = rand() % width;
 			y = rand() % height;
 			pos = Position(x, y);
+			//std::cout << "agent pos: " << pos.toString() << std::endl;
 		}
 
 		Agent addAgent;
@@ -79,7 +80,7 @@ void Gridworld::initPOI() {
 
 	//  for each POI, find open position on the board
 	for (int i = 0; i < this->numPOI; i++) {
-		Position pos;
+		Position pos = Position(rand() % width, rand() % height);
 		while (!positionAvailable(pos)) {
 			x = rand() % width;
 			y = rand() % height;
@@ -201,6 +202,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 
 	State state;
 	Position oldPos, nextPos;
+	int index = 1;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -209,6 +211,8 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		state = getState(oldPos, *it);
 		// .1 is a default epsilon value that is a placeholder for now
 		int action = it->nextAction(state, net, oldPos, this->home, eps); 
+		//if (this->numSteps < 10) std::cout << "action " << index << ": " << action << std::endl;
+		index++;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
@@ -291,6 +295,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		}
 	}
 
+	//if (this->numSteps < 10) std::cout << std::endl;
 	this->numSteps++;
 }
 
@@ -374,37 +379,44 @@ int Gridworld::currentAmount()
 void Gridworld::printWorld() {
 
 	bool print;
+	bool homePrint;
 
 	for (int i = 0; i < this->height; i++) {
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(j, i);
 			print = false;
+			homePrint = false;
 
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
 				if (it->getP() == p) {
-					if (it->isCarrying()) std::cout << "+ ";
-					else std::cout << "A ";
+					if (this->home.getPosition() == p)  {
+						if (it->isCarrying()) std::cout << "H+  ";
+						else std::cout << "HA  ";
+						homePrint = true;
+					}
+					else if (it->isCarrying()) std::cout << "+  ";
+					else std::cout << "A  ";
 					print = true;
 				}
 			}
 			for (auto it = poi.begin(); it != poi.end(); ++it) {
 				if (it->getP() == p) {
 					if (!it->isRemoved()) {
-						std::cout << "P ";
+						std::cout << "P  ";
 						print = true;
 					}
 					else print = false;
 				}
 			}
-			if (this->home.getPosition() == p) {
-				std::cout << "H ";
+			if (this->home.getPosition() == p && !homePrint) {
+				std::cout << "H  ";
 				print = true;
 			}
-			if (!print) std::cout << "* ";
+			if (!print) std::cout << "*  ";
 		}
 		std::cout << std::endl;
 	}
-
+	std::cout << std::endl;
 }
 
 //  return the total number of steps taken in the world

@@ -74,6 +74,8 @@ class Simulation
 		void logResults();
 		//  run the simulation in an epoch with a certain number of timesteps
 		int runEpoch();
+		//  how many steps the simulation took to complete in the last epoch
+		int getSteps();
 		//  return the simulation's reward from the last epoch
 		double getReward() const;
 		// reset the simulation
