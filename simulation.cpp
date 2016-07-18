@@ -104,13 +104,14 @@ int Simulation::runEpoch()
 	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
-		//if (steps < 10) this->world.printWorld();
+		//this->world.printWorld();
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
 			break;
 		}
 		eps -= 0.001;
+		this->world.clearPOI();
 	}
 
 	// Calculate the reward

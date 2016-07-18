@@ -62,6 +62,9 @@ class POI {
 
 		//  return the location of the poi in the world
 		Position getP();
+
+		// Clears the ready agents vector
+		void clearReadyAgents();
 };
 
 #endif

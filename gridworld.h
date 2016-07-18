@@ -87,6 +87,9 @@ public:
 	//  the total number of steps taken by the world thus far
 	int stepsTaken();
 
+	// Resets the POI's ready agents vectors, so agents can't build up the ready
+	// list by waiting around
+	void clearPOI();
 };
 
 #endif
