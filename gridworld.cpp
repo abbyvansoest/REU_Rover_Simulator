@@ -54,7 +54,7 @@ void Gridworld::initHome() {
 
 //  randomly initalize agents in the grid
 void Gridworld::initAgents() {
-	int x, y;
+	int x = 0, y = 0;
 	string str;
 
 	// for each agent, find open position on the board
@@ -75,12 +75,13 @@ void Gridworld::initAgents() {
 
 //  randomly initialize POI positions in the grid
 void Gridworld::initPOI() {
-	int x, y;
+	int x = rand() % width;
+	int y = rand() % height;
 	string str;
 
 	//  for each POI, find open position on the board
 	for (int i = 0; i < this->numPOI; i++) {
-		Position pos = Position(rand() % width, rand() % height);
+		Position pos = Position(x, y);
 		while (!positionAvailable(pos)) {
 			x = rand() % width;
 			y = rand() % height;
@@ -130,19 +131,19 @@ State Gridworld::getState(Position pos, Agent ag) {
 		Position p = Position(it->getP());
 
 		if (p.getX() < pos.getX() && p.getY() >= pos.getY()) {
-			agentsA += 1/getDistance(p, pos);
+			agentsA += 1.0/getDistance(p, pos);
 			if (it->isBroadcasting()) { broadcastCountA++; }
 		}
 		if (p.getX() >= pos.getX() && p.getY() > pos.getY()) {
-			agentsB += 1/getDistance(p, pos);
+			agentsB += 1.0/getDistance(p, pos);
 			if (it->isBroadcasting()) { broadcastCountB++; }
 		}
 		if (p.getX() <= pos.getX() && p.getY() < pos.getY()) {
-			agentsC += 1/getDistance(p, pos);
+			agentsC += 1.0/getDistance(p, pos);
 			if (it->isBroadcasting()) { broadcastCountC++; }
 		}
 		if (p.getX() > pos.getX() && p.getY() <= pos.getY()) {
-			agentsD += 1/getDistance(p, pos);
+			agentsD += 1.0/getDistance(p, pos);
 			if (it->isBroadcasting()) { broadcastCountD++; }
 		}
 	}
@@ -153,16 +154,16 @@ State Gridworld::getState(Position pos, Agent ag) {
 		Position p = Position(it->getP());
 
 		if (p.getX() <  pos.getX() && p.getY() >= pos.getY()) { 
-			poiA += 1/getDistance(p, pos);
+			poiA += 1.0/getDistance(p, pos);
 		}
 		if (p.getX() >= pos.getX() && p.getY() >  pos.getY()) { 
-			poiB += 1/getDistance(p, pos);
+			poiB += 1.0/getDistance(p, pos);
 		}
 		if (p.getX() <= pos.getX() && p.getY() <  pos.getY()) { 
-			poiC += 1/getDistance(p, pos);
+			poiC += 1.0/getDistance(p, pos);
 		}
 		if (p.getX() >  pos.getX() && p.getY() <= pos.getY()) {
-			poiD += 1/getDistance(p, pos);
+			poiD += 1.0/getDistance(p, pos);
 		}
 	}
 
@@ -346,12 +347,12 @@ void Gridworld::clear() {
 
 //  reset the world entirely
 void Gridworld::reset() {
-
 	//  clear gridworld
 	clear();
 	this->numSteps = 0;
 
 	//  reset POI and agents
+	
 	initAgents();
 	initPOI();
 	initHome();
