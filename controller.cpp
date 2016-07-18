@@ -101,9 +101,8 @@ void evolve_population(std::vector<Simulation> &simulations, int X, float mutati
 
 		if (((double)rand()/((double)RAND_MAX+1.0)) < mutation_rate)
 		{
-			//std::cout << "mutating" << std::endl;
-			it->mutate();
-		}
+			it->mutate(mutation_rate);
+		}	
 	}
 }
 
@@ -113,17 +112,17 @@ int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 600;
 	int NUM_SIMULATIONS = 100;
-	int NUM_EPOCHS = 10000;
+	int NUM_EPOCHS = 100000;
 	int X_TOP_PERFORMERS = 10;
 	int Y_MUTATIONS = 5;
-	double mutation_rate = .1;
+	double MUTATION_RATE = .1;
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
-	int NUMBER_OF_POI = 1;
+	int NUMBER_OF_POI = 2;
 
-	int WORLD_WIDTH = 6;
-	int WORLD_HEIGHT = 6;
+	int WORLD_WIDTH = 4;
+	int WORLD_HEIGHT = 4;
 
 	int POI_WEIGHT = 2;
 
@@ -197,13 +196,13 @@ int main(void) {
 		avgSteps /= NUM_SIMULATIONS;
 		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
 		std::cout << std::endl;
-		evolve_population(simulations, X_TOP_PERFORMERS, mutation_rate);
+		evolve_population(simulations, X_TOP_PERFORMERS, MUTATION_RATE);
 		for (auto it = simulations.begin(); it != simulations.end(); ++it)
 		{
 			it->reset();
 		}
-		if (mutation_rate > 0 )
-			mutation_rate -= 0.001;
+		if (MUTATION_RATE > 0 )
+			MUTATION_RATE -= 0.001;
 	}
 
 	/* Cleanup configuration memory */

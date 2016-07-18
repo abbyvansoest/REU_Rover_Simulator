@@ -81,7 +81,7 @@ class Simulation
 		// reset the simulation
 		void reset();
 		//  in place mutation of the simulation's neural net
-		void mutate();
+		void mutate(double);
 		//  destroy the current neural net
 		void destroyNet();
 		//  recreate the neural net identical to the one given

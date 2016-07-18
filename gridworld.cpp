@@ -403,7 +403,11 @@ void Gridworld::printWorld() {
 			for (auto it = poi.begin(); it != poi.end(); ++it) {
 				if (it->getP() == p) {
 					if (!it->isRemoved()) {
-						std::cout << "P  ";
+						if (this->home.getPosition() == p)  {
+							std::cout << "HP  ";
+							homePrint = true;
+						}
+						else std::cout << "P  ";
 						print = true;
 					}
 					else print = false;

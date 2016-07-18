@@ -104,6 +104,7 @@ int Simulation::runEpoch()
 	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
+		this->world.printWorld();
 		//if (steps < 10) this->world.printWorld();
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
@@ -173,19 +174,23 @@ void Simulation::setNet(FANN::neural_net* net)
 }
 
 /* Performs an in place mutation of a single weight in the given network */
-void Simulation::mutate()
+void Simulation::mutate(double percent)
 {
 	int length = this->net->get_total_connections();
+	int numMutations = percent*length;
 
 	FANN::connection connections[length];
 	this->net->get_connection_array(connections);
-	/* mutate a random weight */
-	int index = rand() % length;
-	int sign = rand() % 2 ? 1 : -1;
-	fann_type magnitude = 1/((fann_type) ((rand() % 50) + 10));
 
-	connections[index].weight += (fann_type) sign*magnitude;
+	/* mutate a percentage of random weight */
+	for (int i = 0; i < numMutations; i++) {
+		int index = rand() % length;
+		int sign = rand() % 2 ? 1 : -1;
+		fann_type current = connections[index].weight;
+		double random = ((double)rand()/((double)RAND_MAX+1.0))/10.0;
+
+		connections[index].weight += (fann_type) sign*random*current;
+	}
 
 	this->net->set_weight_array(connections, length);
 }
-
