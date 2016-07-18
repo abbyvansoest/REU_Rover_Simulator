@@ -87,4 +87,7 @@ void POI::remove() {
 //  return the location of te poi in the world
 Position POI::getP() { return this->p; }
 
-
+void POI::clearReadyAgents()
+{
+	this->agentsReady.clear();
+}

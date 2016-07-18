@@ -429,3 +429,10 @@ int Gridworld::stepsTaken() {
 	return this->numSteps;
 }
 
+void Gridworld::clearPOI()
+{
+	for (auto it = this->poi.begin(); it != this->poi.end(); ++it)
+	{
+		it->clearReadyAgents();
+	}
+}
