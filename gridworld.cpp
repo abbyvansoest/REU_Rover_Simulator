@@ -294,6 +294,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 			//  'remove' from POI table
 			POIit->remove();
 		}
+		else if (!POIit->isComplete() && !POIit->isRemoved()) this->clearPOI();
 	}
 
 	//if (this->numSteps < 10) std::cout << std::endl;

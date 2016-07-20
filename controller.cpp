@@ -101,7 +101,7 @@ int main(void) {
 		std::cout << "EPOCH " << i << std::endl;
 
 		for (int k = 0; k < NUM_SIMULATIONS; k++) {
-			std::cout << "BEGIN: " << simulations[k].getReward() << std::endl;
+			std::cout << "BEGIN: " << simulations[k].getReward() << "\tSTEPS: " << simulations[k].getSteps() << std::endl;
 		}
 
 		//  mutate some new simulations and add them to the simulations population
@@ -112,6 +112,12 @@ int main(void) {
 			sim.reset();
 			sim.mutate(MUTATION_RATE);
 			sim.runEpoch();
+
+			if (sim.getSteps() <= 5) {
+				// sim.reset();
+				// sim.runEpochAndPrint();
+				// exit(0);
+			}
 			
 			simulations.push_back(sim);
 		}

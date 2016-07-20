@@ -110,12 +110,32 @@ int Simulation::runEpoch()
 			break;
 		}
 		eps -= 0.001;
-		this->world.clearPOI();
 	}
 
 	// Calculate the reward
 	this->reward -= steps * 0.05;
 	this->reward += 5*this->world.currentAmount();
+
+	return 0;
+}
+
+/* Runs a single epoch, which runs for a given number of timesteps */
+// runs the simulation until the time runs out or the simulation ends prematurely
+int Simulation::runEpochAndPrint()
+{
+
+	int steps = 0;
+	double eps = 0.1;
+	for (steps = 0; steps < this->timesteps; ++steps)
+	{
+		this->world.printWorld();
+		this->world.stepAgents(this->net, eps);
+		if (this->world.worldComplete())
+		{
+			break;
+		}
+		eps -= 0.001;
+	}
 
 	return 0;
 }
