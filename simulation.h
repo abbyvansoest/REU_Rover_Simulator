@@ -77,7 +77,7 @@ class Simulation
 		//  how many steps the simulation took to complete in the last epoch
 		int getSteps();
 		//  return the simulation's reward from the last epoch
-		double getReward() const;
+		double getReward();
 		// reset the simulation
 		void reset();
 		//  in place mutation of the simulation's neural net

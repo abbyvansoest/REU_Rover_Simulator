@@ -125,9 +125,9 @@ int Simulation::getSteps() {
 }
 
 //  return the reward the simulation earned in the epoch
-double Simulation::getReward() const 
+double Simulation::getReward()  
 {
-	return this->reward;
+	return this->world.stepsTaken()*(-.05) + 5*this->world.currentAmount();
 }
 
 /* Resets the gridworld and the statistics variables internal to the class */
