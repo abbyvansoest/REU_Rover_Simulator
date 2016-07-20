@@ -107,15 +107,16 @@ int Simulation::runEpoch()
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
+			this->world.printWorld();
 			break;
 		}
 		eps -= 0.001;
-		this->world.clearPOI();
+		//this->world.clearPOI();
 	}
 
 	// Calculate the reward
 	this->reward -= steps * 0.05;
-	this->reward += 5*this->world.currentAmount();
+	this->reward += 20*this->world.currentAmount();
 
 	return 0;
 }

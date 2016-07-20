@@ -92,7 +92,7 @@ int main(void) {
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
 		double avg = 0.0;
-		double max = 0.0;
+		double max = -100000.0;
 		double avgSteps = 0.0;
 
 		std::cout << "**********************************" << std::endl;
@@ -120,10 +120,7 @@ int main(void) {
 		//  sorted in 
 		std::sort(simulations.begin(), simulations.end());
 		auto loser = simulations.begin();
-		for (int k = 0; k < (int)NUM_SIMULATIONS*PERCENT; k++) {
-			simulations.erase(loser);
-			loser++;
-		}
+		simulations.erase(loser, loser + (int)(NUM_SIMULATIONS*PERCENT));
 
 		// check population size continuity
 		assert(simulations.size() == NUM_SIMULATIONS);
