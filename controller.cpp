@@ -100,10 +100,14 @@ int main(void) {
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;
 
+		for (int k = 0; k < NUM_SIMULATIONS; k++) {
+			std::cout << "BEGIN: " << simulations[k].getReward() << std::endl;
+		}
+
 		//  mutate some new simulations and add them to the simulations population
 		for (int j = 0; j < (int)NUM_SIMULATIONS*PERCENT; j++) {
 
-			int index = rand() % (NUM_SIMULATIONS - X_TOP_PERFORMERS);
+			int index = rand() % NUM_SIMULATIONS;
 			Simulation sim = Simulation(simulations[index]);
 			sim.reset();
 			sim.mutate(MUTATION_RATE);
@@ -126,13 +130,13 @@ int main(void) {
 		//  remove the lowest performing simulations
 		std::sort(simulations.begin(), simulations.end());
 
-		// for (int k = 0; k < NUM_SIMULATIONS; k++) {
-		// 	std::cout << "REWARD: " << simulations[k].getReward() << std::endl;
+		// for (int k = 0; k < NUM_SIMULATIONS + 10; k++) {
+		// 	std::cout << "WITH MUTATES: " << simulations[k].getReward() << std::endl;
 		// }
 		simulations.erase(simulations.begin(), simulations.begin() + NUM_SIMULATIONS*PERCENT);
-		// std::cout << "CUT LENGTH IS " << simulations.size() << std::endl;
+		//std::cout << "CUT LENGTH IS " << simulations.size() << std::endl;
 		// for (int k = 0; k < NUM_SIMULATIONS; k++) {
-		// 	std::cout << "CHECK: " << simulations[k].getReward() << std::endl;
+		// 	std::cout << "TRIM: " << simulations[k].getReward() << std::endl;
 		// }
 
 		// check population size 
@@ -144,7 +148,7 @@ int main(void) {
 		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
 		std::cout << std::endl;
 
-		if (max == 0) totalfailures++;
+		if (max == -100) totalfailures++;
 		else something++;
 
 		if (MUTATION_RATE > 0) MUTATION_RATE -= 0.001;
