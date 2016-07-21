@@ -218,39 +218,40 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		index++;
 
 		//  set down the POI a group of agents is holding
-		if (action == SET_DOWN) {
+		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
 
-			this->printWorld();
 			//  find all agents carrying a given POI
 			POI* poi = it->getHoldingPOI();
 			std::vector<Agent*> carriers = poi->getCarriers();
 			int amt = poi->getWeight();
 
 			//  set all their carrying values to false
+			//std::cout << "carriers len: " << carriers.size() << std::endl;
 			for (auto iter = carriers.begin(); iter != carriers.end(); ++iter) {
+				//std::cout << "setting agent to no longer carry" << std::endl;
 				Agent* agent = *iter;
 				agent->setCarrying(false);
 				agent->setHoldingPOI(NULL);
 			}
 			//  increase amount returned home
-			this->home.receiveValues(amt);
-			continue;
+			this->home.receiveValues(1);
+			if (this->worldComplete()) break;
 		}
 
 		//  set next position for all cases
-		if (action == MOVE_RIGHT) {
+		else if (action == MOVE_RIGHT) {
 			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
 		}
-		if (action == MOVE_DOWN) {
+		else if (action == MOVE_DOWN) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
 		}
-		if (action == MOVE_LEFT) {
+		else if (action == MOVE_LEFT) {
 			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
 		}
-		if (action == MOVE_UP) {
+		else if (action == MOVE_UP) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
 		}
-		if (action == BROADCAST) {
+		else if (action == BROADCAST) {
 			it->setBroadcast(true);
 			nextPos = oldPos;
 		}
@@ -298,7 +299,11 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 			//  'remove' from POI table
 			POIit->remove();
 		}
-		else if (!POIit->isComplete() && !POIit->isRemoved()) this->clearPOI();
+
+		else if (!POIit->isRemoved())
+		{
+			POIit->clearReadyAgents();
+		}
 	}
 
 	//if (this->numSteps < 10) std::cout << std::endl;
@@ -366,9 +371,10 @@ void Gridworld::reset() {
 //  have all POIs been returned home?
 bool Gridworld::worldComplete()
 {
-	if (this->home.currentAmount() == this->poiWeight*this->numPOI)
+	if (this->home.currentAmount() == this->numPOI)
 	{
-		//std::cout << "worldComplete returning true" << std::endl;
+		std::cout << "worldComplete: " << this->home.currentAmount() << std::endl;
+		this->printWorld();
 		return true;
 	}
 

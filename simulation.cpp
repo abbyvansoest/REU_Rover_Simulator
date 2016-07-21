@@ -107,10 +107,13 @@ int Simulation::runEpoch()
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
+			this->world.printWorld();
 			break;
 		}
 		eps -= 0.001;
 	}
+
+	this->reward = this->world.stepsTaken()*(-.05) + 100*this->world.currentAmount();
 
 	return 0;
 }
@@ -124,7 +127,6 @@ int Simulation::runEpochAndPrint()
 	double eps = 0.1;
 	while (!this->world.worldComplete())
 	{
-		this->world.printWorld();
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
@@ -144,7 +146,7 @@ int Simulation::getSteps() {
 //  return the reward the simulation earned in the epoch
 double Simulation::getReward()  
 {
-	return this->world.stepsTaken()*(-.05) + 5*this->world.currentAmount();
+	return this->reward;
 }
 
 /* Resets the gridworld and the statistics variables internal to the class */
@@ -209,4 +211,8 @@ void Simulation::mutate(double percent)
 	}
 
 	this->net->set_weight_array(connections, length);
+}
+
+void Simulation::printWorld() {
+	this->world.printWorld();
 }
