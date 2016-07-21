@@ -118,33 +118,12 @@ int Simulation::runEpoch()
 	return 0;
 }
 
-/* Runs a single epoch, which runs for a given number of timesteps */
-// runs the simulation until the time runs out or the simulation ends prematurely
-int Simulation::runEpochAndPrint()
-{
-
-	int steps = 0;
-	double eps = 0.1;
-	while (!this->world.worldComplete())
-	{
-		this->world.stepAgents(this->net, eps);
-		if (this->world.worldComplete())
-		{
-			std::cout << "STEPS: " << this->world.stepsTaken() << std::endl;
-			break;
-		}
-		eps -= 0.001;
-	}
-
-	return 0;
-}
-
 int Simulation::getSteps() {
 	return this->world.stepsTaken();
 }
 
 //  return the reward the simulation earned in the epoch
-double Simulation::getReward()  
+double Simulation::getReward() 
 {
 	return this->reward;
 }
@@ -211,8 +190,4 @@ void Simulation::mutate(double percent)
 	}
 
 	this->net->set_weight_array(connections, length);
-}
-
-void Simulation::printWorld() {
-	this->world.printWorld();
 }
