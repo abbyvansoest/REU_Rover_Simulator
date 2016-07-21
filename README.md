@@ -18,7 +18,7 @@ The custom installation is useful for situations where superuser access is not a
 The disk usage of the installed libraries is minimal, so it can easily be done in a restricted-account in a multi-user server situation.
 
 This code relies on the most recent version of FANN, available directly from the source repository on [GitHub](https://github.com/libfann/fann).
-At time of writing, the most recent version was in commit d71d54788bee56ba4cf7522801270152da5209d7.
+At time of writing, the most recent version was in commit [`d71d54788bee56ba4cf7522801270152da5209d7`](https://github.com/libfann/fann/tree/d71d54788bee56ba4cf7522801270152da5209d7).
 
 To do a default installation of FANN, the instructions provided (`cmake . && sudo make install`) work fine.
 For a non-default installation, `cmake . && make` will fully build the library.
@@ -30,7 +30,7 @@ Copy these files to your desired installation location for the FANN library and 
 The provided makefile has been tested on x86-64 systems of Arch Linux (Kernel 4.6.4-1), CentOS 7.2.1511 (Kernel 3.10.0-327) and OSX El Capitan systems.
 ### Non-Default FANN Installation
 If the FANN library and headers were installed to a non-default location, the `-L` and `-I` flags must be passed to the compiler (either `g++` or `clang`) with the locations of the library and include directories, respectively.
-
+### `libfann.so.2` Not Found
 To run a program that relies on FANN, it is necessary to set the proper environment variables for the runtime linker.
 This seems to work automatically in OSX systems, but does not happen automatically on Linux systems, since the default installation directory (`/usr/local/lib`) is not searched by `ld` by default.
 
@@ -46,4 +46,4 @@ To add a rule, create a new file in the format `*.conf`, such as `fann.conf`.
 The contents of this file is the directory to search, such as `/usr/local/lib` (or the local installation directory).
 After creating the file, a root user invocation of `ldconfig` will reload the config files, adding the new directory to the search path of the runtime linker.
 
-The compiled simulator can now be run with `./grid_sim.out` (or whatever executable name is specified in the makefile.
+The compiled simulator can now be run with `./grid_sim.out` (or whatever executable name is specified in the makefile).
