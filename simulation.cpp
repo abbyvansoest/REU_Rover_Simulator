@@ -43,7 +43,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps)
 	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
-	this->timesteps = timesteps;
+	this->timesteps = timesteps; 
 	this->reward = 0;
 
 }
@@ -112,10 +112,6 @@ int Simulation::runEpoch()
 		eps -= 0.001;
 	}
 
-	// Calculate the reward
-	this->reward -= steps * 0.05;
-	this->reward += 5*this->world.currentAmount();
-
 	return 0;
 }
 
@@ -126,12 +122,13 @@ int Simulation::runEpochAndPrint()
 
 	int steps = 0;
 	double eps = 0.1;
-	for (steps = 0; steps < this->timesteps; ++steps)
+	while (!this->world.worldComplete())
 	{
 		this->world.printWorld();
 		this->world.stepAgents(this->net, eps);
 		if (this->world.worldComplete())
 		{
+			std::cout << "STEPS: " << this->world.stepsTaken() << std::endl;
 			break;
 		}
 		eps -= 0.001;

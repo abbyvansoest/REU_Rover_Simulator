@@ -69,6 +69,8 @@ void Gridworld::initAgents() {
 
 		Agent addAgent;
 		addAgent.setP(pos);
+		addAgent.setCarrying(false);
+		addAgent.setHoldingPOI(NULL);
 		this->agents.push_back(addAgent);
 	}
 }
@@ -218,6 +220,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN) {
 
+			this->printWorld();
 			//  find all agents carrying a given POI
 			POI* poi = it->getHoldingPOI();
 			std::vector<Agent*> carriers = poi->getCarriers();
@@ -268,6 +271,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 				}
 			}
 		}
+
 
 		//  check for collisions in new map -- change agent's position if unoccupied
 		//  insert agent to newAgents vector 
