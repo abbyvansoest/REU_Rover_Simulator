@@ -45,7 +45,7 @@ private:
 	std::vector<POI> poi;;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
-	//bool goodBroadcasting;      //  is any agent broadcasting at a POI?
+	bool goodBroadcasting;      //  is any agent broadcasting at a POI?
 
 	//  initialize POI, agents, and home base
 	void initPOI();
@@ -93,7 +93,7 @@ public:
 	void clearPOI();
 
 	//  in the last step, did an agent broadcast at a POI?
-	//bool broadcastAtPOI();
+	bool broadcastAtPOI();
 };
 
 #endif

@@ -99,22 +99,28 @@ void Simulation::logResults()
 // runs the simulation until the time runs out or the simulation ends prematurely
 int Simulation::runEpoch()
 {
-
+	int prev = 0;
 	int steps = 0;
 	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
+
 		this->world.stepAgents(this->net, eps);
-		//  if (this->world.broadcastAtPOI()) this->reward += .01;
+
+		int check = this->world.currentAmount();
+		if (check > prev) {
+			this->reward += 100;
+			prev = check;
+		}
+	
 		if (this->world.worldComplete())
 		{
 			this->world.printWorld();
 			break;
 		}
-		eps -= 0.001;
-	}
 
-	this->reward = this->world.stepsTaken()*(-.05) + 100*this->world.currentAmount();
+		this->reward += (-0.05);
+	}
 
 	return 0;
 }
@@ -192,3 +198,8 @@ void Simulation::mutate(double percent)
 
 	this->net->set_weight_array(connections, length);
 }
+
+int Simulation::amountReturned() {
+	return this->world.currentAmount();
+}
+

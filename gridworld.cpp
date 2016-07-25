@@ -204,7 +204,7 @@ double Gridworld::getDistance(Position p1, Position p2) {
 //  step all agents in the world. Reward is not provided here
 void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 
-	//this->goodBroadcasting = false;
+	this->goodBroadcasting = false;
 
 	State state;
 	Position oldPos, nextPos;
@@ -276,9 +276,9 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 			}
 		}
 
-		//  set good broadcast if broadcasting near POI
+		// set good broadcast if anyone is broadcasting near POI
 		if (action == BROADCAST) {
-			if (findNearbyPOI(oldPos)) {
+			if (findNearbyPOI(nextPos)) {
 				this->goodBroadcasting = true;
 			}
 		}
@@ -457,6 +457,6 @@ void Gridworld::clearPOI()
 	}
 }
 
-// bool Gridworld::broadcastAtPOI() {
-// 	return this->goodBroadcasting;
-// }
+bool Gridworld::broadcastAtPOI() {
+	return this->goodBroadcasting;
+}

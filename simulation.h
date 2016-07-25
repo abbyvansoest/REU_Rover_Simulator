@@ -90,6 +90,8 @@ class Simulation
 		FANN::neural_net* getNet();
 		// reset the neural net to point to a new net
 		void setNet(FANN::neural_net*);
+		//  return the current amount at the grid's home base
+		int amountReturned();
 		
 };
 

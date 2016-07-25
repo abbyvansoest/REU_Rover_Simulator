@@ -24,14 +24,21 @@
 #include "controller.h"
 #include <cassert>
 
+
+//  return the fitness for the provided simulation
+int fitness(Simulation sim, int max_steps) {
+	return 2*(sim.amountReturned()*sim.amountReturned()) + (int)(max_steps/sim.getSteps());
+}
+
 //  return a semi-random index between 0 and NUM SIMULATIONS - 1
 //  more likely to return indices at the upper end of the array
-int getIndex(int numSims) {
+int getIndex(int numSims, std::vector<Simulation> simulations, int max_steps) {
 
 	std::vector<int> probabilities;
 
 	for (int i = 0; i < numSims; i++) {
-		for (int j = 0; j < i; j++) {
+		int fit = fitness(simulations[i], max_steps);
+		for (int j = 0; j < fit; j++) {
 			probabilities.push_back(i);
 		}
 	}
@@ -56,8 +63,8 @@ int main(void) {
 	int NUMBER_OF_AGENTS = 3;
 	int NUMBER_OF_POI = 3;
 
-	int WORLD_WIDTH = 8;
-	int WORLD_HEIGHT = 8;
+	int WORLD_WIDTH = 6;
+	int WORLD_HEIGHT = 6;
 
 	int POI_WEIGHT = 2;
 
@@ -124,7 +131,7 @@ int main(void) {
 				index = rand() % NUM_SIMULATIONS;
 			}
 			else {
-				index = getIndex(NUM_SIMULATIONS);
+				index = getIndex(NUM_SIMULATIONS, simulations, MAX_STEPS);
 			}
 			Simulation sim = Simulation(simulations[index]);
 			sim.reset();
