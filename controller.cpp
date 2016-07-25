@@ -56,8 +56,8 @@ int main(void) {
 	int NUMBER_OF_AGENTS = 3;
 	int NUMBER_OF_POI = 3;
 
-	int WORLD_WIDTH = 6;
-	int WORLD_HEIGHT = 6;
+	int WORLD_WIDTH = 8;
+	int WORLD_HEIGHT = 8;
 
 	int POI_WEIGHT = 2;
 

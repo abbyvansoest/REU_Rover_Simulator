@@ -44,6 +44,7 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initAgents();
 	initPOI();
 	this->numSteps = 0;
+	this->goodBroadcasting = false;
 }
 
 //  initialize home base to pre-set global value
@@ -203,6 +204,8 @@ double Gridworld::getDistance(Position p1, Position p2) {
 //  step all agents in the world. Reward is not provided here
 void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 
+	//this->goodBroadcasting = false;
+
 	State state;
 	Position oldPos, nextPos;
 	int index = 1;
@@ -273,6 +276,12 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 			}
 		}
 
+		//  set good broadcast if broadcasting near POI
+		if (action == BROADCAST) {
+			if (findNearbyPOI(oldPos)) {
+				this->goodBroadcasting = true;
+			}
+		}
 
 		//  check for collisions in new map -- change agent's position if unoccupied
 		//  insert agent to newAgents vector 
@@ -447,3 +456,7 @@ void Gridworld::clearPOI()
 		it->clearReadyAgents();
 	}
 }
+
+// bool Gridworld::broadcastAtPOI() {
+// 	return this->goodBroadcasting;
+// }

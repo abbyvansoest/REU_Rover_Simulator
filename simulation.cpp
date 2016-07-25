@@ -105,6 +105,7 @@ int Simulation::runEpoch()
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
 		this->world.stepAgents(this->net, eps);
+		//  if (this->world.broadcastAtPOI()) this->reward += .01;
 		if (this->world.worldComplete())
 		{
 			this->world.printWorld();
