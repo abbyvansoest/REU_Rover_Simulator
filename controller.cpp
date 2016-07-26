@@ -52,7 +52,7 @@ int getIndex(int numSims, std::vector<Simulation> simulations, int max_steps) {
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 1000;
+	int MAX_STEPS = 800;
 	int NUM_SIMULATIONS = 100;
 	int NUM_EPOCHS = 100000;
 	int X_TOP_PERFORMERS = 10;
@@ -134,10 +134,18 @@ int main(void) {
 				index = getIndex(NUM_SIMULATIONS, simulations, MAX_STEPS);
 			}
 			Simulation sim = Simulation(simulations[index]);
-			sim.reset();
-			sim.mutate(MUTATION_RATE);
-			sim.runEpoch();
-			
+			if (index > NUM_SIMULATIONS - 50) {
+				sim.reset();
+				sim.mutate(MUTATION_RATE);
+				sim.runEpochAndPrint();
+				if (sim.getReward() > 200) exit(0);
+			}
+			else {
+				sim.reset();
+				sim.mutate(MUTATION_RATE);
+				sim.runEpoch();
+			}
+
 			simulations.push_back(sim);
 		}
 

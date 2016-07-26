@@ -125,6 +125,38 @@ int Simulation::runEpoch()
 	return 0;
 }
 
+int Simulation::runEpochAndPrint()
+{
+	int prev = 0;
+	int steps = 0;
+	int count = 0;
+	double eps = 0.1;
+	for (steps = 0; steps < this->timesteps; ++steps)
+	{
+		//if (count < 20) {
+			this->world.printWorld();
+		//	count++;
+		//}
+		this->world.stepAgents(this->net, eps);
+
+		int check = this->world.currentAmount();
+		if (check > prev) {
+			this->reward += 100;
+			prev = check;
+		}
+	
+		if (this->world.worldComplete())
+		{
+			this->world.printWorld();
+			break;
+		}
+
+		this->reward += (-0.05);
+	}
+
+	return 0;
+}
+
 int Simulation::getSteps() {
 	return this->world.stepsTaken();
 }

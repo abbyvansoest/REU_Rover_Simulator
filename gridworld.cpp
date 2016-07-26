@@ -103,6 +103,10 @@ bool Gridworld::positionAvailable(Position p) {
 	if (p.getX() < 0 || p.getX() >= this->width || p.getY() < 0 || p.getY() >= this->height) {
 		return false;
 	}
+	//  homebase has unlimited capacity for agents to fill
+	if (p == this->home.getPosition()) {
+		return true;
+	}
 
 	for (auto it = agents.begin(); it != agents.end(); ++it) {  
 		Position pos = Position(it->getP());
@@ -326,13 +330,17 @@ bool Gridworld::findNearbyPOI(Position pos) {
 	Position checkDown  = Position(pos.getX(), pos.getY() - 1);
 	Position checkRight = Position(pos.getX() - 1, pos.getY());
 	Position checkLeft  = Position(pos.getX() + 1, pos.getY());
+	Position checkUpLeft = Position(pos.getX() - 1, pos.getY() + 1);
+	Position checkDownLeft = Position(pos.getX() + 1, pos.getY() - 1);
+	Position checkUpRight = Position(pos.getX() + 1, pos.getY() + 1);
+	Position checkDownRight = Position(pos.getX() - 1, pos.getY() - 1);
 
 	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
 		//  ignore if poi has been marked as complete or removed
 		if (it->isComplete() || it->isRemoved()) continue;
 		Position p = it->getP();
-		if (p == checkUp || p == checkDown 
-			|| p == checkRight || p == checkLeft) {
+		if (p == checkUp || p == checkDown || p == checkRight || p == checkLeft
+			|| p == checkUpLeft || p == checkDownLeft || p == checkUpRight || p == checkDownRight) {
 			return true;
 		}
 	}
@@ -347,11 +355,15 @@ POI* Gridworld::nearbyPOI(Position pos) {
 	Position checkDown  = Position(pos.getX(), pos.getY() - 1);
 	Position checkRight = Position(pos.getX() - 1, pos.getY());
 	Position checkLeft  = Position(pos.getX() + 1, pos.getY());
+	Position checkUpLeft = Position(pos.getX() - 1, pos.getY() + 1);
+	Position checkDownLeft = Position(pos.getX() + 1, pos.getY() - 1);
+	Position checkUpRight = Position(pos.getX() + 1, pos.getY() + 1);
+	Position checkDownRight = Position(pos.getX() - 1, pos.getY() - 1);
 
 	for (auto it = this->poi.begin(); it != this->poi.end(); ++it) {
 		Position p = it->getP();
-		if (p == checkUp || p == checkDown 
-			|| p == checkRight || p == checkLeft) {
+		if (p == checkUp || p == checkDown || p == checkRight || p == checkLeft
+			|| p == checkUpLeft || p == checkDownLeft || p == checkUpRight || p == checkDownRight) {
 			return &(*it);
 		}
 	}
@@ -400,13 +412,12 @@ int Gridworld::currentAmount()
 void Gridworld::printWorld() {
 
 	bool print;
-	bool homePrint;
+	bool homePrint = false;
 
 	for (int i = 0; i < this->height; i++) {
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(j, i);
 			print = false;
-			homePrint = false;
 
 			for (auto it = agents.begin(); it != agents.end(); ++it) {
 				if (it->getP() == p) {
