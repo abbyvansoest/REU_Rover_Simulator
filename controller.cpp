@@ -87,10 +87,10 @@ int main(void) {
 	NC.net_type = FANN::LAYER;
 	NC.num_layers = NUMBER_OF_LAYERS;
 	NC.layers = new unsigned int[NUMBER_OF_LAYERS];
-	NC.layers[0] = 13;
-	NC.layers[1] = 26;
-	NC.layers[2] = 13;
-	NC.layers[3] = 6;
+	NC.layers[0] = 9;
+	NC.layers[1] = 18;
+	NC.layers[2] = 9;
+	NC.layers[3] = 5;
 	NC.randWeights = RANDOM_WEIGHTS;
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
@@ -134,17 +134,9 @@ int main(void) {
 				index = getIndex(NUM_SIMULATIONS, simulations, MAX_STEPS);
 			}
 			Simulation sim = Simulation(simulations[index]);
-			if (index > NUM_SIMULATIONS - 50) {
-				sim.reset();
-				sim.mutate(MUTATION_RATE);
-				sim.runEpochAndPrint();
-				if (sim.getReward() > 200) exit(0);
-			}
-			else {
-				sim.reset();
-				sim.mutate(MUTATION_RATE);
-				sim.runEpoch();
-			}
+			sim.reset();
+			sim.mutate(MUTATION_RATE);
+			sim.runEpoch();
 
 			simulations.push_back(sim);
 		}
