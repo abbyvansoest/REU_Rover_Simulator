@@ -214,6 +214,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		int action = it->nextAction(state, net, oldPos, this->home, eps); 
 		//if (this->numSteps < 10) std::cout << "action " << index << ": " << action << std::endl;
 		index++;
+		std::cout << "action " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
