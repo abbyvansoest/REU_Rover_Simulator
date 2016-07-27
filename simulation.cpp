@@ -29,7 +29,7 @@ Simulation::Simulation()
 	: world(2, 1, 5, 5, 1)
 {
 	//std::cout << "call to default constructor" << std::endl;
-	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,6});
+	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {9,6,5});
 	this->reward = 0;
 	this->timesteps = 250;
 }
@@ -104,6 +104,7 @@ int Simulation::runEpoch()
 	double eps = 0.1;
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
+		//this->world.printWorld();
 
 		this->world.stepAgents(this->net, eps);
 

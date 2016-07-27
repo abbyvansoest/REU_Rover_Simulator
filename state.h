@@ -11,23 +11,19 @@ enum
 {
 	AGENTS_A,
 	POI_A,
-	BROADCASTING_A,
 	AGENTS_B,
 	POI_B,
-	BROADCASTING_B,
 	AGENTS_C,
 	POI_C,
-	BROADCASTING_C,
 	AGENTS_D,
 	POI_D,
-	BROADCASTING_D,
 	CARRYING
 };
 
 typedef struct State {
 
 	double& operator[](int i) { return array[i]; }
-	double array[13];
+	double array[9];
 
 } State;
 

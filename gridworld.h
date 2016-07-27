@@ -45,12 +45,13 @@ private:
 	std::vector<POI> poi;;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
-	bool goodBroadcasting;      //  is any agent broadcasting at a POI?
 
 	//  initialize POI, agents, and home base
 	void initPOI();
 	void initAgents();
 	void initHome();
+	//  check if a position is within radius 1 of the home base
+	bool positionNearHome(Position);
 	//  check if a location in the grid is occupied
 	bool positionAvailable(Position);
 	//  return the state of the agent in the given position
@@ -92,8 +93,6 @@ public:
 	// list by waiting around
 	void clearPOI();
 
-	//  in the last step, did an agent broadcast at a POI?
-	bool broadcastAtPOI();
 };
 
 #endif

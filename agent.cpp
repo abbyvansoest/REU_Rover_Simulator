@@ -23,19 +23,17 @@
 #include "agent.h"
 
 Agent::Agent() {
-	this->broadcasting = false;
 	this->carrying = false;
 	this->holding = NULL;
 }
 
-Agent::Agent(bool broadcasting, bool carrying, POI* holding) {
-	this->broadcasting = broadcasting;
+Agent::Agent(bool carrying, POI* holding) {
 	this->carrying = carrying;
 	this->holding = holding;
 }
 
 Agent Agent::copy() {
-	return Agent(this->isBroadcasting(), this->isCarrying(), this->holding);
+	return Agent(this->isCarrying(), this->holding);
 }
 
 /* get next action based on state and return to Gridworld
@@ -84,15 +82,6 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 	}
 
 	return max_i;
-}
-
-//  is the agent in the middle of broadcasting?
-bool Agent::isBroadcasting() {
-	return this->broadcasting;
-}
-//  set the broadcast value appropriately
-void Agent::setBroadcast(bool set) {
-	this->broadcasting = set;
 }
 
 //  is the agent carrying anything?

@@ -52,19 +52,18 @@ int getIndex(int numSims, std::vector<Simulation> simulations, int max_steps) {
    techniques between each epoch */ 
 int main(void) {
 	//  control experiment data collection
-	int MAX_STEPS = 800;
+	int MAX_STEPS = 1000;
 	int NUM_SIMULATIONS = 100;
 	int NUM_EPOCHS = 100000;
-	int X_TOP_PERFORMERS = 10;
-	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
+	double MUTATION_RATE = .25;  //  number of connections to mutate within a net
 	double PERCENT = .1; 		//  percent of total simulations to mutate
 
 	//  control gridworld
-	int NUMBER_OF_AGENTS = 3;
+	int NUMBER_OF_AGENTS = 4;
 	int NUMBER_OF_POI = 3;
 
-	int WORLD_WIDTH = 6;
-	int WORLD_HEIGHT = 6;
+	int WORLD_WIDTH = 10;
+	int WORLD_HEIGHT = 10;
 
 	int POI_WEIGHT = 2;
 
@@ -87,10 +86,10 @@ int main(void) {
 	NC.net_type = FANN::LAYER;
 	NC.num_layers = NUMBER_OF_LAYERS;
 	NC.layers = new unsigned int[NUMBER_OF_LAYERS];
-	NC.layers[0] = 13;
-	NC.layers[1] = 26;
-	NC.layers[2] = 13;
-	NC.layers[3] = 6;
+	NC.layers[0] = 9;
+	NC.layers[1] = 18;
+	NC.layers[2] = 9;
+	NC.layers[3] = 5;
 	NC.randWeights = RANDOM_WEIGHTS;
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
@@ -134,17 +133,9 @@ int main(void) {
 				index = getIndex(NUM_SIMULATIONS, simulations, MAX_STEPS);
 			}
 			Simulation sim = Simulation(simulations[index]);
-			if (index > NUM_SIMULATIONS - 50) {
-				sim.reset();
-				sim.mutate(MUTATION_RATE);
-				sim.runEpochAndPrint();
-				if (sim.getReward() > 200) exit(0);
-			}
-			else {
-				sim.reset();
-				sim.mutate(MUTATION_RATE);
-				sim.runEpoch();
-			}
+			sim.reset();
+			sim.mutate(MUTATION_RATE);
+			sim.runEpoch();
 
 			simulations.push_back(sim);
 		}
@@ -172,7 +163,7 @@ int main(void) {
 		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
 		std::cout << std::endl;
 
-		if (max == -100) totalfailures++;
+		if (max == -100000) totalfailures++;
 		else something++;
 
 		if (MUTATION_RATE > 0) MUTATION_RATE -= 0.001;
