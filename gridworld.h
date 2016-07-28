@@ -62,6 +62,8 @@ private:
 	POI* nearbyPOI(Position);
 	// clear the gridworld of all agents and POI
 	void clear();
+	//  normalize the state vector 
+	State normalize(State); 
 
 public:
 

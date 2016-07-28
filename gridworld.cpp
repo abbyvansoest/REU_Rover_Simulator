@@ -188,7 +188,28 @@ State Gridworld::getState(Position pos, Agent ag) {
 	// agent carrying information
 	state[CARRYING] = (int)ag.isCarrying();
 
+	state = normalize(state);
+
 	return state;
+}
+
+State Gridworld::normalize(State state) {
+
+	int STATE_LENGTH = 9;
+
+	State normState;
+	double sum = 0.0;
+
+	for (int i = 0; i < STATE_LENGTH; i++) {
+		sum += state[i]*state[i];
+	}
+	double norm = std::sqrt(sum);
+
+	for (int i = 0; i < STATE_LENGTH; i++) {
+		normState[i] = state[i]/norm;
+	}
+
+	return normState;
 }
 
 //  return the distance between points p1 and p2
@@ -214,7 +235,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		int action = it->nextAction(state, net, oldPos, this->home, eps); 
 		//if (this->numSteps < 10) std::cout << "action " << index << ": " << action << std::endl;
 		index++;
-		std::cout << "action " << action << std::endl;
+		//std::cout << "action " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
