@@ -90,7 +90,7 @@ int main(void) {
 	NC.layers[0] = 9;
 	NC.layers[1] = 18;
 	NC.layers[2] = 9;
-	NC.layers[3] = 5;
+	NC.layers[3] = 4;
 	NC.randWeights = RANDOM_WEIGHTS;
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
