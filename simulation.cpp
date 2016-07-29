@@ -115,6 +115,7 @@ int Simulation::runEpoch()
 
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
+		//while (steps < 20) this->world.printWorld();
 
 		this->world.stepAgents(this->net, this->pickupNet);
 

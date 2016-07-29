@@ -26,12 +26,12 @@ class POI;
 /* enumeration of action behaviors */
 enum
 {
-	MOVE_UP,
-	MOVE_LEFT,
-	MOVE_DOWN,
-	MOVE_RIGHT,
-	PICKUP,
-	SET_DOWN
+	MOVE_UP,  //0
+	MOVE_LEFT, //1
+	MOVE_DOWN, //2
+	MOVE_RIGHT, //3
+	PICKUP,    //4
+	SET_DOWN   //5
 };
 
 class Agent {

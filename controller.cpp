@@ -53,26 +53,26 @@ int getIndex(int numSims, std::vector<Simulation> simulations, int max_steps) {
 int main(void) {
 	//  control experiment data collection
 	int MAX_STEPS = 800;
-	int NUM_SIMULATIONS = 100;
+	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 100000;
 	int X_TOP_PERFORMERS = 10;
 	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
 	double PERCENT = .1; 		//  percent of total simulations to mutate
 
 	//  control gridworld
-	int NUMBER_OF_AGENTS = 3;
+	int NUMBER_OF_AGENTS = 2;
 	int NUMBER_OF_POI = 3;
 
-	int WORLD_WIDTH = 6;
-	int WORLD_HEIGHT = 6;
+	int WORLD_WIDTH = 10;
+	int WORLD_HEIGHT = 10;
 
 	int POI_WEIGHT = 2;
 
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 4;
 	bool RANDOM_WEIGHTS = true;
-	double RANDOM_NET_MIN = -0.5;
-	double RANDOM_NET_MAX =  0.5;
+	double RANDOM_NET_MIN = -10.0;
+	double RANDOM_NET_MAX =  10.0;
 
 	//  set up gridworld configuration
 	struct gridConfig GC;

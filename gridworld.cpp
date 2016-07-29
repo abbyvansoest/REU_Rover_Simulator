@@ -235,16 +235,19 @@ void Gridworld::stepAgents(FANN::neural_net* net, FANN::neural_net* pickupNet) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 
-		fann_type* output = pickupNet->run( (fann_type*) state.array);
-		if (*output > .9) {
+		float* output = pickupNet->run( (fann_type*) state.array);
+		//std::cout << "output is " << *output << std::endl;
+		if (*output > .95) {
 			action = PICKUP;
-			std::cout << "PICKING UP" << std::endl;
+			//std::cout << "PICKING UP" << std::endl;
 		}
 
 		else {
-			int action = it->nextAction(state, net, oldPos, this->home); 
-			std::cout << "action " << action << std::endl;
+			action = it->nextAction(state, net, oldPos, this->home); 
+			//std::cout << "action " << action << std::endl;
 		}
+
+		//std::cout << "action " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
