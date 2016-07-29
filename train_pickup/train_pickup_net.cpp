@@ -19,12 +19,8 @@ enum
 	CARRYING
 };
 
-char** createWorld_rand(int num_agents, int num_poi, int size) 
+void createWorld_rand(int num_agents, int num_poi, int size, char **world) 
 {
-	// allocate memory
-	char **world = new char*[size];
-	for (int i = 0; i < size; ++i) { world[i] = new char[size]; }
-
 	// populate the world
 	for (int i = 0; i < size; ++i)
 	{
@@ -58,15 +54,10 @@ char** createWorld_rand(int num_agents, int num_poi, int size)
 			++i;
 		}
 	}
-
-	return world;
 }
 
-char **createWorld_fail(int num_agents, int num_poi, int size)
+void createWorld_fail(int num_agents, int num_poi, int size, char **world)
 {
-	char **world = new char*[size];
-	for (int i = 0; i < size; ++i) { world[i] = new char[size]; }
-	
 	for (int i = 0; i < size; ++i)
 	{
 
@@ -100,7 +91,7 @@ char **createWorld_fail(int num_agents, int num_poi, int size)
 			if (x+1 < size && world[x+1][y] == '.') {
 				if (x-1 >=0 && world[x-1][y] == '.') {
 					if (y+1 < size && world[x][y+1] == '.') {
-						if (y-x <= 0 && world[x][y-1] == '.') {
+						if (y-1 >= 0 && world[x][y-1] == '.') {
 							world[x][y] = 'P';
 							++i;
 						}
@@ -109,15 +100,10 @@ char **createWorld_fail(int num_agents, int num_poi, int size)
 			}
 		}
 	}
-
-	return world;
 }
 
-char **createWorld_success(int num_agents, int num_poi, int size, int observe_requirement)
+void createWorld_success(int num_agents, int num_poi, int size, int observe_requirement, char **world)
 {
-	char **world = new char*[size];
-	for (int i = 0; i < size; ++i) { world[i] = new char[size]; }
-	
 	for (int i = 0; i < size; ++i)
 	{
 
@@ -178,7 +164,6 @@ char **createWorld_success(int num_agents, int num_poi, int size, int observe_re
 
 		}
 	}
-	return world;
 }
 void print(char **world, int size)
 {
@@ -205,7 +190,6 @@ void gen_states(fann_type **states, char ** world, int size)
 	fann_type poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
 	std::vector<struct pos> agent_positions;
 	std::vector<struct pos> poi_positions;
-	int temp_state[9] = {0, 9};
 	// loop through world untill agent shows up
 	for (int i = 0; i < size; ++i) {
 		for (int j = 0; j < size; ++j) {
@@ -224,7 +208,6 @@ void gen_states(fann_type **states, char ** world, int size)
 	for (auto it = agent_positions.begin(); it != agent_positions.end(); ++it)
 	{
 		// zero out the temp state;
-		for (int i = 0; i < 9; ++i) { temp_state[i] = 0; }
 		for (auto it_other = agent_positions.begin(); it_other != agent_positions.end(); ++it_other)
 		{
 			if (it_other != it)
@@ -284,7 +267,7 @@ int main(int argc, char**argv)
 	int num_poi = 3;
 	int size = 10;
 	int observation_required = 2;
-	int num_worlds = 1000;
+	int num_worlds = 100000;
 
 	// create the net that we will train
 	srand(time(NULL));
@@ -297,17 +280,20 @@ int main(int argc, char**argv)
 	fann_type **states = new fann_type*[num_agents];
 	for (int i = 0; i < num_agents; ++i) { states[i] = new fann_type[9]; }
 	
-	char **world;
+	// allocate memory
+	char **world = new char*[size];
+	for (int i = 0; i < size; ++i) { world[i] = new char[size]; }
+
 
 	// Train on each of the worlds generated.
 	for (int w = 0; w < num_worlds; ++w)
 	{
 		if (rand() % 2 == 0) { 
-			world = createWorld_success(num_agents, num_poi, size, observation_required);
+			createWorld_success(num_agents, num_poi, size, observation_required, world);
 			desired_output[0] = 1;
 		}
 		else {
-			world = createWorld_fail(num_agents, num_poi, size);
+			createWorld_fail(num_agents, num_poi, size, world);
 			desired_output[0] = 0;
 		}
 
@@ -323,9 +309,6 @@ int main(int argc, char**argv)
 			}
 		}
 
-		// cleanup the world
-		for (int i = 0; i < size; ++i) { delete world[i]; }
-		delete world;
 
 	}
 
@@ -333,11 +316,11 @@ int main(int argc, char**argv)
 	for (int w = 0; w < num_worlds; ++w)
 	{
 		if (rand() % 2 == 0) { 
-			world = createWorld_success(num_agents, num_poi, size, observation_required);
+			createWorld_success(num_agents, num_poi, size, observation_required, world);
 			desired_output[0] = 1;
 		}
 		else {
-			world = createWorld_fail(num_agents, num_poi, size);
+			createWorld_fail(num_agents, num_poi, size, world);
 			desired_output[0] = 0;
 		}
 		gen_states(states, world, size);
@@ -352,7 +335,7 @@ int main(int argc, char**argv)
 	for (int w = 0; w < 10; ++w)
 	{
 		std::cout << " ************* " << " WORLD " << w +1 << " *************" << std::endl;
-		world = createWorld_rand(num_agents, num_poi, size);
+		createWorld_rand(num_agents, num_poi, size, world);
 		print(world, size);
 		gen_states(states, world, size);
 		for (int i = 0; i < num_agents; ++i)
@@ -365,6 +348,11 @@ int main(int argc, char**argv)
 
 	net1.print_connections();
 	net1.save("Pickup.net");
+	// cleanup the world and 
+	for (int i = 0; i < size; ++i) { delete [] world[i]; }
+	delete [] world;
+	for (int i = 0; i < num_agents; ++i) { delete [] states[i]; }
+	delete [] states;
 	
 	return 0;
 }
