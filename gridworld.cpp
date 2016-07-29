@@ -28,17 +28,24 @@ int HOME_X = 1;
 int HOME_Y = 1;
 
 // default constructor -- bascially random values
-Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
+Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true, "") {}
 
 //  constructor with arguments provided
 Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, 
-	int weight) {
+	int weight, std::string pickupNet) {
 		
 	this->numAgents = numAgents;
 	this->numPOI = numPOI;
 	this->width = width;
 	this->height = height;
 	this->poiWeight = weight;
+
+	std::cout << "hi" << std::endl;
+	bool success = this->pickupNet->create_from_file(pickupNet);
+	if (!success) {
+		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
+		exit(0);
+	}
 
 	initHome();
 	initAgents();
@@ -225,6 +232,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 	State state;
 	Position oldPos, nextPos;
 	int index = 1;
+	int action;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -232,10 +240,14 @@ void Gridworld::stepAgents(FANN::neural_net* net, double &eps) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 		// .1 is a default epsilon value that is a placeholder for now
-		int action = it->nextAction(state, net, oldPos, this->home, eps); 
-		//if (this->numSteps < 10) std::cout << "action " << index << ": " << action << std::endl;
-		index++;
-		//std::cout << "action " << action << std::endl;
+
+		fann_type* output = this->pickupNet->run( (fann_type*) state.array);
+		if (*output > .9) action = PICKUP;
+
+		else {
+			int action = it->nextAction(state, net, oldPos, this->home, eps); 
+			//std::cout << "action " << action << std::endl;
+		}
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {

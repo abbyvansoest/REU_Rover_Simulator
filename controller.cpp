@@ -97,7 +97,9 @@ int main(void) {
 
 	srand(time(NULL));
 
-	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS));
+	std::string pickupNet = "Pickup.net";
+
+	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS, pickupNet));
 	//  randomize all nets
 	FANN::neural_net* net;
 	for (auto it = simulations.begin(); it != simulations.end(); ++it) {

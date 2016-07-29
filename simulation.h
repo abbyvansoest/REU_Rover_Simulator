@@ -61,7 +61,7 @@ class Simulation
 	public:
 		//  constructors, destructor, copy constructor
 		Simulation();
-		Simulation(struct gridConfig, struct netConfig, int timesteps);
+		Simulation(struct gridConfig, struct netConfig, int timesteps, std::string pickupNet);
 		~Simulation();
 		Simulation(const Simulation&);
 
