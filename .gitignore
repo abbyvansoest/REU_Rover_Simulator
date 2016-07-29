@@ -39,3 +39,6 @@ vgcore.*
 
 # Mac
 *.dSYM/
+
+# saved NN files
+*.net
