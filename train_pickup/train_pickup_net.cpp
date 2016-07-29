@@ -199,7 +199,7 @@ fann_type distance(struct pos& a, struct pos& b)
 	return sqrt(deltaX*deltaX + deltaY*deltaY);
 }
 
-void gen_states(fann_type **states, char ** zaworldo, int size)
+void gen_states(fann_type **states, char ** world, int size)
 {
 	fann_type agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
 	fann_type poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
@@ -209,11 +209,11 @@ void gen_states(fann_type **states, char ** zaworldo, int size)
 	// loop through world untill agent shows up
 	for (int i = 0; i < size; ++i) {
 		for (int j = 0; j < size; ++j) {
-			if (zaworldo[i][j] == 'A') {
+			if (world[i][j] == 'A') {
 				struct pos p = {i, j};
 				agent_positions.push_back(p);
 			}
-			else if (zaworldo[i][j] == 'P') {
+			else if (world[i][j] == 'P') {
 				struct pos p = {i, j};
 				poi_positions.push_back(p);
 			}
