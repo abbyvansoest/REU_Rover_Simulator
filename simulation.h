@@ -56,7 +56,7 @@ class Simulation
 		FANN::neural_net* net;  //  pointer to the neural net used (on the heap)
 		int timesteps;          //  max timesteps in an epoch
 		double reward;          //  most recent reward received
-
+		FANN::neural_net* pickupNet;
 
 	public:
 		//  constructors, destructor, copy constructor

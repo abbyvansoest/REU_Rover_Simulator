@@ -45,7 +45,6 @@ private:
 	std::vector<POI> poi;;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
-	FANN::neural_net* pickupNet;
 
 	//  initialize POI, agents, and home base
 	void initPOI();
@@ -70,10 +69,10 @@ public:
 
 	// constructor
 	Gridworld();
-	Gridworld(int, int, int, int, int, std::string);
+	Gridworld(int, int, int, int, int);
 
 	// step all agents in the world
-	void stepAgents(FANN::neural_net*, double&); 
+	void stepAgents(FANN::neural_net*, FANN::neural_net*); 
 
 	//  reset the world 
 	void reset();

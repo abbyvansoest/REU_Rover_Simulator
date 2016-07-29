@@ -43,7 +43,7 @@ Agent Agent::copy() {
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home home, double eps) {
+int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home home) {
 	
 	//  if the agent is carrying a POI, force the agent to step toward home
 	if (this->isCarrying())

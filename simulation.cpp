@@ -26,7 +26,7 @@
 /* Calls the non-default constructors on the members with predetermined, 
  * almost arbitrary values */
 Simulation::Simulation()
-	: world(2, 1, 5, 5, 1, "")
+	: world(2, 1, 5, 5, 1)
 {
 	//std::cout << "call to default constructor" << std::endl;
 	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,4});
@@ -36,11 +36,17 @@ Simulation::Simulation()
 
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
-Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps, std::string pickupNet)
-	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.poiWeight, pickupNet)
+Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps, std::string pickupFile)
+	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.poiWeight)
 {
 	//std::cout << "Call to non default constructor" << std::endl;
 	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
+	this->pickupNet = new FANN::neural_net();
+	bool success = this->pickupNet->create_from_file(pickupFile);
+	if (!success) {
+		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
+		exit(0);
+	}
 
 	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps; 
@@ -53,7 +59,9 @@ Simulation::~Simulation()
 {
 	//std::cout << "Call to destructor" << std::endl;
 	delete this->net;
+	delete this->pickupNet;
 	this->net = NULL;
+	this->pickupNet = NULL;
 }
 
 //  copy constructor
@@ -61,6 +69,7 @@ Simulation::Simulation(const Simulation& that)
 {
 	//std::cout << "call to copy constructor" << std::endl;
 	this->net = new FANN::neural_net(*that.net);
+	this->pickupNet = new FANN::neural_net(*that.pickupNet);
 	this->reward = that.reward;
 	this->world = that.world;
 	this->timesteps = that.timesteps;
@@ -71,7 +80,9 @@ Simulation& Simulation::operator=(const Simulation& that)
 {
 	//std::cout << "Call to equal operator" << std::endl;
 	if (this->net != NULL) { delete this->net; }
+	if (this->pickupNet != NULL) { delete this->pickupNet; }
     this->net = new FANN::neural_net(*that.net);
+    this->pickupNet = new FANN::neural_net(*that.pickupNet);
 	this->reward = that.reward;
 	this->world = that.world;
 	this->timesteps = that.timesteps;
@@ -101,11 +112,11 @@ int Simulation::runEpoch()
 {
 	int prev = 0;
 	int steps = 0;
-	double eps = 0.1;
+
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
 
-		this->world.stepAgents(this->net, eps);
+		this->world.stepAgents(this->net, this->pickupNet);
 
 		int check = this->world.currentAmount();
 		if (check > prev) {
@@ -130,14 +141,14 @@ int Simulation::runEpochAndPrint()
 	int prev = 0;
 	int steps = 0;
 	int count = 0;
-	double eps = 0.1;
+
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
-		//if (count < 20) {
+		if (count < 20) {
 			this->world.printWorld();
-		//	count++;
-		//}
-		this->world.stepAgents(this->net, eps);
+			count++;
+		}
+		this->world.stepAgents(this->net, this->pickupNet);
 
 		int check = this->world.currentAmount();
 		if (check > prev) {
