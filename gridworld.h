@@ -45,6 +45,8 @@ private:
 	std::vector<POI> poi;;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
+	bool goodPicking;    //  did an agent try to pickup near a POI?
+	int richSteppingAgents;
 
 	//  initialize POI, agents, and home base
 	void initPOI();
@@ -92,6 +94,13 @@ public:
 	// Resets the POI's ready agents vectors, so agents can't build up the ready
 	// list by waiting around
 	void clearPOI();
+
+	//  return true if an agent tried to pickup a POI near a POI
+	bool goodPickup();
+
+	// return a normalized function of how well the agents are doing wrt 
+	//  moving towards POIs
+	double towardsRichness();
 
 };
 

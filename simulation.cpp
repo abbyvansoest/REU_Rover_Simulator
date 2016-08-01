@@ -115,7 +115,7 @@ int Simulation::runEpoch()
 
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
-		//while (steps < 20) this->world.printWorld();
+		//while (steps < 15) this->world.printWorld();
 
 		this->world.stepAgents(this->net, this->pickupNet);
 
@@ -124,6 +124,10 @@ int Simulation::runEpoch()
 			this->reward += 100;
 			prev = check;
 		}
+
+		if (this->world.goodPickup()) {
+			this->reward += .001;
+		}
 	
 		if (this->world.worldComplete())
 		{
@@ -131,7 +135,7 @@ int Simulation::runEpoch()
 			break;
 		}
 
-		this->reward += (-0.05);
+		this->reward += (-0.1);
 	}
 
 	return 0;
@@ -145,9 +149,9 @@ int Simulation::runEpochAndPrint()
 
 	for (steps = 0; steps < this->timesteps; ++steps)
 	{
+		count++;
 		if (count < 20) {
 			this->world.printWorld();
-			count++;
 		}
 		this->world.stepAgents(this->net, this->pickupNet);
 

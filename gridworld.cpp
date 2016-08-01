@@ -44,6 +44,8 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	initAgents();
 	initPOI();
 	this->numSteps = 0;
+	this->goodPicking = false;
+	this->richSteppingAgents = 0;
 }
 
 
@@ -229,17 +231,31 @@ void Gridworld::stepAgents(FANN::neural_net* net, FANN::neural_net* pickupNet) {
 	int index = 1;
 	int action;
 
+	this->goodPicking = false;
+	this->richSteppingAgents = 0;
+
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
 
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 
+		double max = -1.0;
+		int maxIndex = -1;
+		for (int i = 1; i <= 7; i += 2) {
+			if (state[i] > max) {
+				max = state[i];
+				maxIndex = i;
+			}
+		}
+
 		float* output = pickupNet->run( (fann_type*) state.array);
 		//std::cout << "output is " << *output << std::endl;
 		if (*output > .95) {
 			action = PICKUP;
 			//std::cout << "PICKING UP" << std::endl;
+			//  if pickup near poi, mark good pickup as true
+			if (findNearbyPOI(oldPos)) this->goodPicking = true;
 		}
 
 		else {
@@ -273,15 +289,19 @@ void Gridworld::stepAgents(FANN::neural_net* net, FANN::neural_net* pickupNet) {
 		//  set next position for all cases
 		else if (action == MOVE_RIGHT) {
 			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
+			if (maxIndex == POI_B || maxIndex == POI_D) richSteppingAgents++;
 		}
 		else if (action == MOVE_DOWN) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
+			if (maxIndex == POI_B || maxIndex == POI_A) richSteppingAgents++;
 		}
 		else if (action == MOVE_LEFT) {
 			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
+			if (maxIndex == POI_A || maxIndex == POI_C) richSteppingAgents++;
 		}
 		else if (action == MOVE_UP) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
+			if (maxIndex == POI_C || maxIndex == POI_D) richSteppingAgents++;
 		}
 
 		if (action == PICKUP) {
@@ -394,6 +414,7 @@ void Gridworld::reset() {
 	//  clear gridworld
 	clear();
 	this->numSteps = 0;
+	this->richSteppingAgents = 0;
 
 	//  reset POI and agents
 	
@@ -479,6 +500,15 @@ void Gridworld::clearPOI()
 	{
 		it->clearReadyAgents();
 	}
+}
+
+bool Gridworld::goodPickup() {
+	return this->goodPicking;
+}
+
+double Gridworld::towardsRichness() {
+
+	return (double)(this->richSteppingAgents)/(double)(this->numAgents);
 }
 
 

@@ -113,8 +113,6 @@ int main(void) {
 
 	//  for each learning epoch, we run around 10% of the set of simulations and 
 	//  then evolve the population 
-	int totalfailures = 0;
-	int something = 0;
 	std::cout << std::endl;
 	for (int i = 0; i < NUM_EPOCHS; i++) {
 
@@ -141,6 +139,7 @@ int main(void) {
 			sim.runEpoch();
 
 			simulations.push_back(sim);
+			//if (sim.getReward() > 0) exit(0);
 		}
 
 		//  remove the lowest performing simulations
@@ -166,13 +165,8 @@ int main(void) {
 		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
 		std::cout << std::endl;
 
-		if (max == -100) totalfailures++;
-		else something++;
-
 		if (MUTATION_RATE > 0) MUTATION_RATE -= 0.001;
 	}
-
-	std::cout  << "TOTAL FAILURES: " << totalfailures << "\tSOME SORT OF SUCCESS: " << something << std::endl; 
 
 	/* Cleanup configuration memory */
 	delete [] NC.layers;
