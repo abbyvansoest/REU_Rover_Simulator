@@ -25,6 +25,26 @@
 #include <cassert>
 
 
+// struct gridConfig
+// {
+// 	int numAgents;
+// 	int numPOI;
+// 	int width;
+// 	int height;
+// 	int poiWeight;
+// };
+
+// // struct representation of the neural net configuration 
+// struct netConfig
+// {
+// 	FANN::network_type_enum net_type;
+// 	unsigned int num_layers;
+// 	unsigned int *layers;
+// 	bool randWeights;
+// 	float randMin;
+// 	float randMax;
+// };
+
 //  return the fitness for the provided simulation
 int fitness(Simulation sim, int max_steps) {
 	return 2*(sim.amountReturned()*sim.amountReturned()) + (int)(max_steps/sim.getSteps());
@@ -51,11 +71,10 @@ int getIndex(int numSims, std::vector<Simulation> simulations, int max_steps) {
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
 int main(void) {
-	//  control experiment data collection
+
 	int MAX_STEPS = 800;
 	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 100000;
-	int X_TOP_PERFORMERS = 10;
 	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
 	double PERCENT = .1; 		//  percent of total simulations to mutate
 
@@ -73,6 +92,10 @@ int main(void) {
 	bool RANDOM_WEIGHTS = true;
 	double RANDOM_NET_MIN = -10.0;
 	double RANDOM_NET_MAX =  10.0;
+
+	std::string pickupFile = "Pickup.net";
+
+	srand(time(NULL));
 
 	//  set up gridworld configuration
 	struct gridConfig GC;
@@ -95,17 +118,8 @@ int main(void) {
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
 
-	srand(time(NULL));
+	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS, pickupFile));
 
-	std::string pickupNet = "Pickup.net";
-
-	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS, pickupNet));
-	//  randomize all nets
-	FANN::neural_net* net;
-	for (auto it = simulations.begin(); it != simulations.end(); ++it) {
-		net = it->getNet();
-		net->randomize_weights(RANDOM_NET_MIN, RANDOM_NET_MAX);
-	}
 	//  run each simulation to initialize rewards
 	for (int j = 0; j < NUM_SIMULATIONS; j++) {
 		simulations[j].runEpoch();

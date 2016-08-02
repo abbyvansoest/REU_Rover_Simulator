@@ -47,6 +47,8 @@ private:
 	int numSteps;               //  number of steps taken in the world
 	bool goodPicking;    //  did an agent try to pickup near a POI?
 	int richSteppingAgents;
+	FANN::neural_net* pickupNet;  //  globally shared pickup decision net
+	struct netConfig NC;
 
 	//  initialize POI, agents, and home base
 	void initPOI();
@@ -71,10 +73,12 @@ public:
 
 	// constructor
 	Gridworld();
-	Gridworld(int, int, int, int, int);
+	Gridworld(int, int, int, int, int, std::string, struct netConfig);
+	//destructor
+	~Gridworld();
 
 	// step all agents in the world
-	void stepAgents(FANN::neural_net*, FANN::neural_net*); 
+	void stepAgents(); 
 
 	//  reset the world 
 	void reset();

@@ -26,19 +26,21 @@
 //  define constants for homebase location
 int HOME_X = 1;
 int HOME_Y = 1;
+struct netConfig emptyNC;
 
 // default constructor -- bascially random values
-Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true) {}
+Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true, "", emptyNC) {}
 
 //  constructor with arguments provided
 Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, 
-	int weight) {
+	int weight, std::string pickupFile, struct netConfig NC) {
 		
 	this->numAgents = numAgents;
 	this->numPOI = numPOI;
 	this->width = width;
 	this->height = height;
 	this->poiWeight = weight;
+	this->NC = NC;
 
 	initHome();
 	initAgents();
@@ -46,9 +48,18 @@ Gridworld::Gridworld(int numAgents, int numPOI, int width, int height,
 	this->numSteps = 0;
 	this->goodPicking = false;
 	this->richSteppingAgents = 0;
+	this->pickupNet = new FANN::neural_net();
+	bool success = this->pickupNet->create_from_file(pickupFile);
+	if (!success) {
+		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
+		exit(0);
+	}
 }
 
-
+Gridworld::~Gridworld() {
+	delete this->pickupNet;
+	this->pickupNet = NULL;
+}
 
 //  initialize home base to pre-set global value
 void Gridworld::initHome() {
@@ -71,10 +82,8 @@ void Gridworld::initAgents() {
 			//std::cout << "agent pos: " << pos.toString() << std::endl;
 		}
 
-		Agent addAgent;
+		Agent addAgent = Agent(false, NULL, this->NC);
 		addAgent.setP(pos);
-		addAgent.setCarrying(false);
-		addAgent.setHoldingPOI(NULL);
 		this->agents.push_back(addAgent);
 	}
 }
@@ -224,7 +233,7 @@ double Gridworld::getDistance(Position p1, Position p2) {
 }
 
 //  step all agents in the world. Reward is not provided here
-void Gridworld::stepAgents(FANN::neural_net* net, FANN::neural_net* pickupNet) {
+void Gridworld::stepAgents() {
 
 	State state;
 	Position oldPos, nextPos;
@@ -249,7 +258,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, FANN::neural_net* pickupNet) {
 			}
 		}
 
-		float* output = pickupNet->run( (fann_type*) state.array);
+		float* output = this->pickupNet->run( (fann_type*) state.array);
 		//std::cout << "output is " << *output << std::endl;
 		if (*output > .95) {
 			action = PICKUP;
@@ -259,7 +268,7 @@ void Gridworld::stepAgents(FANN::neural_net* net, FANN::neural_net* pickupNet) {
 		}
 
 		else {
-			action = it->nextAction(state, net, oldPos, this->home); 
+			action = it->nextAction(state, oldPos, this->home); 
 			//std::cout << "action " << action << std::endl;
 		}
 

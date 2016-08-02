@@ -26,15 +26,45 @@ Agent::Agent() {
 
 	this->carrying = false;
 	this->holding = NULL;
+	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,4});
+
 }
 
-Agent::Agent(bool carrying, POI* holding) {
+Agent::Agent(bool carrying, POI* holding, struct netConfig NC) {
+
 	this->carrying = carrying;
 	this->holding = holding;
+	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
+
+	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 }
 
-Agent Agent::copy() {
-	return Agent(this->isCarrying(), this->holding);
+// destructor
+Agent::~Agent()
+{
+	//std::cout << "Call to destructor" << std::endl;
+	delete this->net;
+	this->net = NULL;
+
+}
+
+//  copy constructor
+Agent::Agent(const Agent& that)
+{
+
+	this->net = new FANN::neural_net(*that.net);
+	this->carrying = that.carrying;
+	this->holding = that.holding;
+}
+
+// copy assignment operator
+Agent& Agent::operator=(const Agent& that)
+{
+	if (this->net != NULL) { delete this->net; }
+    this->net = new FANN::neural_net(*that.net);
+	this->carrying = that.carrying;
+	this->holding = that.holding;
+    return *this;
 }
 
 /* get next action based on state and return to Gridworld
@@ -43,7 +73,7 @@ Agent Agent::copy() {
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home home) {
+int Agent::nextAction(State s, Position self_pos, Home home) {
 	
 	//  if the agent is carrying a POI, force the agent to step toward home
 	if (this->isCarrying())
@@ -74,7 +104,7 @@ int Agent::nextAction(State s, FANN::neural_net*& net, Position self_pos, Home h
 	}
 
 	/* Picks the output from the neural net */
-	fann_type* output = net->run( (fann_type*) s.array);
+	fann_type* output = this->net->run( (fann_type*) s.array);
 
 	int max_i = 0;
 	for (int i = 0; i < 6; ++i)

@@ -28,35 +28,13 @@
 #include <iostream>
 #include <fstream>
 
-// struct representation of the gridworld configuration 
-struct gridConfig
-{
-	int numAgents;
-	int numPOI;
-	int width;
-	int height;
-	int poiWeight;
-};
-
-// struct representation of the neural net configuration 
-struct netConfig
-{
-	FANN::network_type_enum net_type;
-	unsigned int num_layers;
-	unsigned int *layers;
-	bool randWeights;
-	float randMin;
-	float randMax;
-};
 
 class Simulation
 {
 	private:
 		Gridworld world;        //  the simulation's gridworld
-		FANN::neural_net* net;  //  pointer to the neural net used (on the heap)
 		int timesteps;          //  max timesteps in an epoch
 		double reward;          //  most recent reward received
-		FANN::neural_net* pickupNet;
 
 	public:
 		//  constructors, destructor, copy constructor
@@ -83,14 +61,6 @@ class Simulation
 		void reset();
 		//  in place mutation of the simulation's neural net
 		void mutate(double);
-		//  destroy the current neural net
-		void destroyNet();
-		//  recreate the neural net identical to the one given
-		void recreateNet(FANN::neural_net*);
-		// get a pointer to the neural net
-		FANN::neural_net* getNet();
-		// reset the neural net to point to a new net
-		void setNet(FANN::neural_net*);
 		//  return the current amount at the grid's home base
 		int amountReturned();
 		

@@ -13,6 +13,7 @@
 
 class POI; 
 
+#include "config.h"
 #include <deque>
 #include <iostream>
 #include <cstdlib>
@@ -40,16 +41,22 @@ class Agent {
 		bool carrying;       // is the agent carrying a poi?
 		Position p;          // current position in world
 		POI* holding;        // points to the poi an agent is carrying (or NULL)
+		FANN::neural_net* net;  //  pointer to the neural net used (on the heap)
 
 	public:	
 		//  constructors
 		Agent();
-		Agent(bool, POI*);
-		Agent copy();
+		Agent(bool, POI*, struct netConfig);
+		// destructor
+		~Agent();
+		//  copy constructor
+		Agent(const Agent&);
+		// copy assignment operator
+		Agent& operator=(const Agent&);
 
-		//  get the next action for hte agent based on the
+		//  get the next action for the agent based on the
 		//  current state and the neural net
-		int nextAction(State, FANN::neural_net*&, Position, Home);
+		int nextAction(State, Position, Home);
 
 		//  is the agent carrying anything?
 		bool isCarrying();

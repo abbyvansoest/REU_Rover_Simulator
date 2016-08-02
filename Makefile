@@ -11,7 +11,7 @@ debug-flags:
 
 debug: | debug-flags all
 
-all: agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o
+all: agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o 
 	$(CC) $(CFLAGS) agent.o poi.o gridworld.o simulation.o Home.o position.o controller.o -o $(EXE)
 
 agent.o: agent.cpp agent.h state.h

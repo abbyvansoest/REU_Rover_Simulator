@@ -23,13 +23,13 @@
 #include "simulation.h"
 #include <iostream>
 
+struct netConfig randNC;
+
 /* Calls the non-default constructors on the members with predetermined, 
  * almost arbitrary values */
 Simulation::Simulation()
-	: world(2, 1, 5, 5, 1)
+	: world(2, 1, 5, 5, 1, "", randNC)
 {
-	//std::cout << "call to default constructor" << std::endl;
-	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,4});
 	this->reward = 0;
 	this->timesteps = 250;
 }
@@ -37,18 +37,9 @@ Simulation::Simulation()
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
 Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps, std::string pickupFile)
-	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.poiWeight)
+	: world(GC.numAgents, GC.numPOI, GC.width, GC.height, GC.poiWeight, pickupFile, NC)
 {
 	//std::cout << "Call to non default constructor" << std::endl;
-	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
-	this->pickupNet = new FANN::neural_net();
-	bool success = this->pickupNet->create_from_file(pickupFile);
-	if (!success) {
-		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
-		exit(0);
-	}
-
-	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 	this->timesteps = timesteps; 
 	this->reward = 0;
 
@@ -58,18 +49,13 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps,
 Simulation::~Simulation()
 {
 	//std::cout << "Call to destructor" << std::endl;
-	delete this->net;
-	delete this->pickupNet;
-	this->net = NULL;
-	this->pickupNet = NULL;
+
 }
 
 //  copy constructor
 Simulation::Simulation(const Simulation& that)
 {
 	//std::cout << "call to copy constructor" << std::endl;
-	this->net = new FANN::neural_net(*that.net);
-	this->pickupNet = new FANN::neural_net(*that.pickupNet);
 	this->reward = that.reward;
 	this->world = that.world;
 	this->timesteps = that.timesteps;
@@ -79,10 +65,6 @@ Simulation::Simulation(const Simulation& that)
 Simulation& Simulation::operator=(const Simulation& that)
 {
 	//std::cout << "Call to equal operator" << std::endl;
-	if (this->net != NULL) { delete this->net; }
-	if (this->pickupNet != NULL) { delete this->pickupNet; }
-    this->net = new FANN::neural_net(*that.net);
-    this->pickupNet = new FANN::neural_net(*that.pickupNet);
 	this->reward = that.reward;
 	this->world = that.world;
 	this->timesteps = that.timesteps;
@@ -117,7 +99,7 @@ int Simulation::runEpoch()
 	{
 		//while (steps < 15) this->world.printWorld();
 
-		this->world.stepAgents(this->net, this->pickupNet);
+		this->world.stepAgents();
 
 		int check = this->world.currentAmount();
 		if (check > prev) {
@@ -153,7 +135,7 @@ int Simulation::runEpochAndPrint()
 		if (count < 20) {
 			this->world.printWorld();
 		}
-		this->world.stepAgents(this->net, this->pickupNet);
+		this->world.stepAgents();
 
 		int check = this->world.currentAmount();
 		if (check > prev) {
@@ -190,61 +172,26 @@ void Simulation::reset()
 	this->reward = 0;
 }
 
-//  destroy the simulation's old net (for use during evolution)
-void Simulation::destroyNet() {
-	delete this->net;
-	this->net = NULL;
-}
-
-//  give the simualtion a new neural net based on the net provided
-//  (for use during evolution)
-void Simulation::recreateNet(FANN::neural_net* net) {
-	if (this->net == NULL) {
-		this->net = new FANN::neural_net(*net);
-	}
-	else
-	{
-		std::cout << "Net not NULL in recreateNet()" << std::endl;
-	}
-}
-
-// return a pointer to the simulation's current net
-FANN::neural_net* Simulation::getNet() {
-	return this->net;
-}
-// set the simulation's current net pointer to the one provided
-void Simulation::setNet(FANN::neural_net* net)
-{
-	if (this->net == NULL)
-	{
-		this->net = net;
-	}
-	else
-	{
-		std::cout << "Net not NULL in setNet()" << std::endl;
-	}
-}
-
 /* Performs an in place mutation of a single weight in the given network */
 void Simulation::mutate(double percent)
 {
-	int length = this->net->get_total_connections();
-	int numMutations = percent*length;
+	// int length = this->net->get_total_connections();
+	// int numMutations = percent*length;
 
-	FANN::connection connections[length];
-	this->net->get_connection_array(connections);
+	// FANN::connection connections[length];
+	// this->net->get_connection_array(connections);
 
-	/* mutate a percentage of random weight */
-	for (int i = 0; i < numMutations; i++) {
-		int index = rand() % length;
-		int sign = rand() % 2 ? 1 : -1;
-		fann_type current = connections[index].weight;
-		double random = ((double)rand()/((double)RAND_MAX+1.0))/10.0;
+	// /* mutate a percentage of random weight */
+	// for (int i = 0; i < numMutations; i++) {
+	// 	int index = rand() % length;
+	// 	int sign = rand() % 2 ? 1 : -1;
+	// 	fann_type current = connections[index].weight;
+	// 	double random = ((double)rand()/((double)RAND_MAX+1.0))/10.0;
 
-		connections[index].weight += (fann_type) sign*random*current;
-	}
+	// 	connections[index].weight += (fann_type) sign*random*current;
+	// }
 
-	this->net->set_weight_array(connections, length);
+	// this->net->set_weight_array(connections, length);
 }
 
 int Simulation::amountReturned() {
