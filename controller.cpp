@@ -45,28 +45,6 @@
 // 	float randMax;
 // };
 
-//  return the fitness for the provided simulation
-int fitness(Simulation sim, int max_steps) {
-	return 2*(sim.amountReturned()*sim.amountReturned()) + (int)(max_steps/sim.getSteps());
-}
-
-//  return a semi-random index between 0 and NUM SIMULATIONS - 1
-//  more likely to return indices at the upper end of the array
-int getIndex(int numSims, std::vector<Simulation> simulations, int max_steps) {
-
-	std::vector<int> probabilities;
-
-	for (int i = 0; i < numSims; i++) {
-		int fit = fitness(simulations[i], max_steps);
-		for (int j = 0; j < fit; j++) {
-			probabilities.push_back(i);
-		}
-	}
-
-	int random = rand() % probabilities.size();
-
-	return probabilities.at(random);
-}
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
@@ -95,6 +73,7 @@ int main(void) {
 
 	std::string pickupFile = "Pickup.net";
 
+
 	srand(time(NULL));
 
 	//  set up gridworld configuration
@@ -118,12 +97,9 @@ int main(void) {
 	NC.randMin = RANDOM_NET_MIN;
 	NC.randMax = RANDOM_NET_MAX;
 
-	std::vector<Simulation> simulations(NUM_SIMULATIONS, Simulation(GC, NC, MAX_STEPS, pickupFile));
+	int K = 10;
 
-	//  run each simulation to initialize rewards
-	for (int j = 0; j < NUM_SIMULATIONS; j++) {
-		simulations[j].runEpoch();
-	}
+	Simulation sim = Simulation(GC, NC, MAX_STEPS, K, pickupFile));
 
 	//  for each learning epoch, we run around 10% of the set of simulations and 
 	//  then evolve the population 
@@ -137,50 +113,24 @@ int main(void) {
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;
 
-		//  mutate some new simulations and add them to the simulations population
-		for (int j = 0; j < (int)NUM_SIMULATIONS*PERCENT; j++) {
-
-			int index = 0;
-			if (simulations[0].getReward() == simulations[NUM_SIMULATIONS - 1].getReward()) {
-				index = rand() % NUM_SIMULATIONS;
-			}
-			else {
-				index = getIndex(NUM_SIMULATIONS, simulations, MAX_STEPS);
-			}
-			Simulation sim = Simulation(simulations[index]);
-			sim.reset();
-			sim.mutate(MUTATION_RATE);
-			sim.runEpoch();
-
-			simulations.push_back(sim);
-			//if (sim.getReward() > 0) exit(0);
-		}
-
-		//  remove the lowest performing simulations
-		std::sort(simulations.begin(), simulations.end());
-		auto loser = simulations.begin();
-		simulations.erase(loser, loser + (int)(NUM_SIMULATIONS*PERCENT));
-
-		//  track statistics
-		int track = 0;
-		for (auto sim = simulations.begin(); sim != simulations.end(); ++sim) {
-			std::cout << "REWARD " << track <<  " is " << sim->getReward() << "\tSTEPS: " << sim->getSteps() << std::endl;
-			track++;
-			if (max < sim->getReward()) {
-				max = sim->getReward();
-			}
-			avg += sim->getReward();
-			avgSteps += sim->getSteps();
-		}		
-
-		avg /= NUM_SIMULATIONS;
-		avgSteps /= NUM_SIMULATIONS;
-
-		std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
-		std::cout << std::endl;
-
-		if (MUTATION_RATE > 0) MUTATION_RATE -= 0.001;
+		sim.reset();
+		sim.evaluate();
 	}
+
+		// //  remove the lowest performing simulations
+		// std::sort(simulations.begin(), simulations.end());
+		// auto loser = simulations.begin();
+		// simulations.erase(loser, loser + (int)(NUM_SIMULATIONS*PERCENT));
+
+				
+
+		// avg /= NUM_SIMULATIONS;
+		// avgSteps /= NUM_SIMULATIONS;
+
+		// std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
+		// std::cout << std::endl;
+
+
 
 	/* Cleanup configuration memory */
 	delete [] NC.layers;

@@ -32,37 +32,34 @@
 class Simulation
 {
 	private:
-		Gridworld world;        //  the simulation's gridworld
 		int timesteps;          //  max timesteps in an epoch
 		double reward;          //  most recent reward received
+		std::vector<FANN::neural_net*> nets;
+		int K;
+		struct gridConfig GC;
+		struct netConfig NC;
 
 	public:
 		//  constructors, destructor, copy constructor
 		Simulation();
-		Simulation(struct gridConfig, struct netConfig, int timesteps, std::string pickupNet);
+		Simulation(struct gridConfig, struct netConfig, int, int);
 		~Simulation();
 		Simulation(const Simulation&);
 
-		//  override relational operator 
-		bool operator<(const Simulation &) const;
 		// copy assignment operator
 		Simulation& operator=(const Simulation&);
 
-		//  print the results and statistics from the simulation
-		void logResults();
+		void evaluate();
 		//  run the simulation in an epoch with a certain number of timesteps
-		int runEpoch();
-		int runEpochAndPrint();
-		//  how many steps the simulation took to complete in the last epoch
-		int getSteps();
-		//  return the simulation's reward from the last epoch
-		double getReward();
-		// reset the simulation
-		void reset();
+		void runEpoch(Gridworld);
 		//  in place mutation of the simulation's neural net
 		void mutate(double);
 		//  return the current amount at the grid's home base
 		int amountReturned();
+
+		void doublePopulation();
+
+		FANN::neural_net* mutate(FANN::neural_net*);
 		
 };
 

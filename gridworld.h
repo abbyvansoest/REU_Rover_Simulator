@@ -45,10 +45,8 @@ private:
 	std::vector<POI> poi;;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
-	bool goodPicking;    //  did an agent try to pickup near a POI?
-	int richSteppingAgents;
 	FANN::neural_net* pickupNet;  //  globally shared pickup decision net
-	struct netConfig NC;
+	FANN::neural_net** netTeam;   //  team of nets to be used for agents in world
 
 	//  initialize POI, agents, and home base
 	void initPOI();
@@ -73,9 +71,11 @@ public:
 
 	// constructor
 	Gridworld();
-	Gridworld(int, int, int, int, int, std::string, struct netConfig);
+	Gridworld(struct gridConfig, FANN::neural_net**);
 	//destructor
 	~Gridworld();
+
+	void evaluate();
 
 	// step all agents in the world
 	void stepAgents(); 
@@ -99,12 +99,7 @@ public:
 	// list by waiting around
 	void clearPOI();
 
-	//  return true if an agent tried to pickup a POI near a POI
-	bool goodPickup();
-
-	// return a normalized function of how well the agents are doing wrt 
-	//  moving towards POIs
-	double towardsRichness();
+	double* accumulateRewards();
 
 };
 

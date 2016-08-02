@@ -46,7 +46,7 @@ class Agent {
 	public:	
 		//  constructors
 		Agent();
-		Agent(bool, POI*, struct netConfig);
+		Agent(bool, POI*);
 		// destructor
 		~Agent();
 		//  copy constructor
@@ -56,7 +56,7 @@ class Agent {
 
 		//  get the next action for the agent based on the
 		//  current state and the neural net
-		int nextAction(State, Position, Home);
+		int nextAction(State, Position, Home, FANN::neural_net*);
 
 		//  is the agent carrying anything?
 		bool isCarrying();
@@ -70,6 +70,8 @@ class Agent {
 
 		Position getP();
 		void setP(Position);
+
+		double getReward();
 
 };
 

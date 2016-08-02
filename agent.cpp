@@ -26,25 +26,20 @@ Agent::Agent() {
 
 	this->carrying = false;
 	this->holding = NULL;
-	this->net = new FANN::neural_net(FANN::LAYER, 3, (const unsigned int[]) {13,9,4});
 
 }
 
-Agent::Agent(bool carrying, POI* holding, struct netConfig NC) {
+Agent::Agent(bool carrying, POI* holding) {
 
 	this->carrying = carrying;
 	this->holding = holding;
-	this->net = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
 
-	if (NC.randWeights) { this->net->randomize_weights(NC.randMin, NC.randMax); }
 }
 
 // destructor
 Agent::~Agent()
 {
-	//std::cout << "Call to destructor" << std::endl;
-	delete this->net;
-	this->net = NULL;
+
 
 }
 
@@ -52,7 +47,6 @@ Agent::~Agent()
 Agent::Agent(const Agent& that)
 {
 
-	this->net = new FANN::neural_net(*that.net);
 	this->carrying = that.carrying;
 	this->holding = that.holding;
 }
@@ -60,8 +54,6 @@ Agent::Agent(const Agent& that)
 // copy assignment operator
 Agent& Agent::operator=(const Agent& that)
 {
-	if (this->net != NULL) { delete this->net; }
-    this->net = new FANN::neural_net(*that.net);
 	this->carrying = that.carrying;
 	this->holding = that.holding;
     return *this;
@@ -73,7 +65,7 @@ Agent& Agent::operator=(const Agent& that)
  * values. and the highest value represents the most favorable action the
  * policy has chosen */
 
-int Agent::nextAction(State s, Position self_pos, Home home) {
+int Agent::nextAction(State s, Position self_pos, Home home, FANN::neural_net* net) {
 	
 	//  if the agent is carrying a POI, force the agent to step toward home
 	if (this->isCarrying())
@@ -104,7 +96,7 @@ int Agent::nextAction(State s, Position self_pos, Home home) {
 	}
 
 	/* Picks the output from the neural net */
-	fann_type* output = this->net->run( (fann_type*) s.array);
+	fann_type* output = net->run( (fann_type*) s.array);
 
 	int max_i = 0;
 	for (int i = 0; i < 6; ++i)
@@ -116,25 +108,19 @@ int Agent::nextAction(State s, Position self_pos, Home home) {
 }
 
 //  is the agent carrying anything?
-bool Agent::isCarrying() {
-	return this->carrying;
-}
+bool Agent::isCarrying() { return this->carrying; }
 //  set the carrying signal appropriately
-void Agent::setCarrying(bool set) {
-	this->carrying = set;
-}
+void Agent::setCarrying(bool set) { this->carrying = set; }
 
 //  return the POI the agent is holding
-POI* Agent::getHoldingPOI() {
-	return this->holding;
-}
+POI* Agent::getHoldingPOI() { return this->holding;}
 //  set the POI the agent is holding
-void Agent::setHoldingPOI(POI* poi) {
-	if (!this->isCarrying()) this->holding = poi;
-}
+void Agent::setHoldingPOI(POI* poi) { if (!this->isCarrying()) this->holding = poi; }
 
 Position Agent::getP() { return this->p; }
+void Agent::setP(Position pos) { this->p = pos; }
 
-void Agent::setP(Position pos) {
-	this->p = pos;
+//  NEED TO IMPLEMENT REWARD DISTRIBUTION
+double Agent::getReward() {
+	return 1.0;
 }

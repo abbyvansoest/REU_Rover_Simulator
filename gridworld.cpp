@@ -26,30 +26,29 @@
 //  define constants for homebase location
 int HOME_X = 1;
 int HOME_Y = 1;
-struct netConfig emptyNC;
+struct gridConfig emptyGC;
 
 // default constructor -- bascially random values
-Gridworld::Gridworld() : Gridworld(2, 1, 5, 5, true, "", emptyNC) {}
+Gridworld::Gridworld() : Gridworld(emptyGC, NULL) {}
 
 //  constructor with arguments provided
-Gridworld::Gridworld(int numAgents, int numPOI, int width, int height, 
-	int weight, std::string pickupFile, struct netConfig NC) {
+Gridworld::Gridworld(struct gridConfig GC, FANN::neural_net** netTeam) {
 		
-	this->numAgents = numAgents;
-	this->numPOI = numPOI;
-	this->width = width;
-	this->height = height;
-	this->poiWeight = weight;
-	this->NC = NC;
+	this->numAgents = GC.numAgents;
+	this->numPOI = GC.numPOI;
+	this->width = GC.width;
+	this->height = GC.height;
+	this->poiWeight = GC.poiWeight;
+	this->netTeam = netTeam;
+
+	this->numSteps = 0;
 
 	initHome();
 	initAgents();
 	initPOI();
-	this->numSteps = 0;
-	this->goodPicking = false;
-	this->richSteppingAgents = 0;
+	
 	this->pickupNet = new FANN::neural_net();
-	bool success = this->pickupNet->create_from_file(pickupFile);
+	bool success = this->pickupNet->create_from_file("Pickup.net");
 	if (!success) {
 		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
 		exit(0);
@@ -82,7 +81,7 @@ void Gridworld::initAgents() {
 			//std::cout << "agent pos: " << pos.toString() << std::endl;
 		}
 
-		Agent addAgent = Agent(false, NULL, this->NC);
+		Agent addAgent = Agent(false, NULL);
 		addAgent.setP(pos);
 		this->agents.push_back(addAgent);
 	}
@@ -237,11 +236,8 @@ void Gridworld::stepAgents() {
 
 	State state;
 	Position oldPos, nextPos;
-	int index = 1;
+	int index = 0;
 	int action;
-
-	this->goodPicking = false;
-	this->richSteppingAgents = 0;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
@@ -249,30 +245,13 @@ void Gridworld::stepAgents() {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 
-		double max = -1.0;
-		int maxIndex = -1;
-		for (int i = 1; i <= 7; i += 2) {
-			if (state[i] > max) {
-				max = state[i];
-				maxIndex = i;
-			}
-		}
-
 		float* output = this->pickupNet->run( (fann_type*) state.array);
-		//std::cout << "output is " << *output << std::endl;
 		if (*output > .95) {
 			action = PICKUP;
-			//std::cout << "PICKING UP" << std::endl;
-			//  if pickup near poi, mark good pickup as true
-			if (findNearbyPOI(oldPos)) this->goodPicking = true;
 		}
-
 		else {
-			action = it->nextAction(state, oldPos, this->home); 
-			//std::cout << "action " << action << std::endl;
+			action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
 		}
-
-		//std::cout << "action " << action << std::endl;
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
@@ -280,7 +259,6 @@ void Gridworld::stepAgents() {
 			//  find all agents carrying a given POI
 			POI* poi = it->getHoldingPOI();
 			std::vector<Agent*> carriers = poi->getCarriers();
-			int amt = poi->getWeight();
 
 			//  set all their carrying values to false
 			//std::cout << "carriers len: " << carriers.size() << std::endl;
@@ -298,19 +276,15 @@ void Gridworld::stepAgents() {
 		//  set next position for all cases
 		else if (action == MOVE_RIGHT) {
 			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
-			if (maxIndex == POI_B || maxIndex == POI_D) richSteppingAgents++;
 		}
 		else if (action == MOVE_DOWN) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
-			if (maxIndex == POI_B || maxIndex == POI_A) richSteppingAgents++;
 		}
 		else if (action == MOVE_LEFT) {
 			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
-			if (maxIndex == POI_A || maxIndex == POI_C) richSteppingAgents++;
 		}
 		else if (action == MOVE_UP) {
 			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
-			if (maxIndex == POI_C || maxIndex == POI_D) richSteppingAgents++;
 		}
 
 		if (action == PICKUP) {
@@ -336,6 +310,7 @@ void Gridworld::stepAgents() {
 		}
 
 		it->setP(nextPos);
+		index++;
 	}
 
 	//  iterate through poi to see if any new poi have been fully picked up
@@ -423,10 +398,8 @@ void Gridworld::reset() {
 	//  clear gridworld
 	clear();
 	this->numSteps = 0;
-	this->richSteppingAgents = 0;
 
 	//  reset POI and agents
-	
 	initAgents();
 	initPOI();
 	initHome();
@@ -511,13 +484,16 @@ void Gridworld::clearPOI()
 	}
 }
 
-bool Gridworld::goodPickup() {
-	return this->goodPicking;
-}
+double* Gridworld::accumulateRewards() {
 
-double Gridworld::towardsRichness() {
+	double rewards[numAgents];
+	int index = 0;
+	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
+	{
+		rewards[index] = it->getReward();
+	}
 
-	return (double)(this->richSteppingAgents)/(double)(this->numAgents);
+	return rewards;
 }
 
 
