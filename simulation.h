@@ -60,6 +60,9 @@ class Simulation
 		void doublePopulation();
 
 		FANN::neural_net* mutate(FANN::neural_net*);
+
+		//  reset simulation for next epoch
+		void reset();
 		
 };
 

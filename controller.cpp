@@ -51,10 +51,10 @@
 int main(void) {
 
 	int MAX_STEPS = 800;
-	int NUM_SIMULATIONS = 50;
+//	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 100000;
-	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
-	double PERCENT = .1; 		//  percent of total simulations to mutate
+//	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
+//	double PERCENT = .1; 		//  percent of total simulations to mutate
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 2;
@@ -99,16 +99,12 @@ int main(void) {
 
 	int K = 10;
 
-	Simulation sim = Simulation(GC, NC, MAX_STEPS, K, pickupFile));
+	Simulation sim = Simulation(GC, NC, MAX_STEPS, K);
 
 	//  for each learning epoch, we run around 10% of the set of simulations and 
 	//  then evolve the population 
 	std::cout << std::endl;
 	for (int i = 0; i < NUM_EPOCHS; i++) {
-
-		double avg = 0.0;
-		double max = -100000.0;
-		double avgSteps = 0.0;
 
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;

@@ -39,12 +39,13 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps,
 {
 
 	this->K = K;
-	FANN::neural_net* newNet;
 	//std::cout << "Call to non default constructor" << std::endl;
+	std::cout << "OG nets " << GC.numAgents*K << std::endl;
 	for (int i = 0; i < GC.numAgents*K; i++) {
-		newNet = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
+		FANN::neural_net* newNet = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
 		if (NC.randWeights) { newNet->randomize_weights(NC.randMin, NC.randMax); }
 		this->nets.push_back(newNet);
+		std::cout << newNet << std::endl;
 	}
 
 	this->timesteps = timesteps; 
@@ -107,26 +108,37 @@ Simulation& Simulation::operator=(const Simulation& that)
 void Simulation::doublePopulation() {
 
 	FANN::neural_net* mutateNet;
-	for (auto it = this->nets.end(); it >= this->nets.begin(); --it) {
+	std::vector<FANN::neural_net*> doubleNets;
+	std::cout << "mutate nets" << std::endl;
+	doubleNets = this->nets;
+	//int index = 1;
+
+	for (auto it = this->nets.begin(); it != this->nets.end(); ++it) {
+		//std::cout << "it " << *it << "\t" << index << std::endl;
 		mutateNet = this->mutate(*it);
-		this->nets.push_back(mutateNet);
+		std::cout << mutateNet << std::endl;
+		doubleNets.push_back(mutateNet);
+		//index++;
 	}
+
+	this->nets = doubleNets;
 }
 
 void Simulation::evaluate() {
 
-	std::map<double, int> rewardMap;
+	std::vector<std::pair<double, int>> rewardVector;
 
 	this->doublePopulation();
 	std::random_shuffle(this->nets.begin(), this->nets.end());
 
 	for (int i = 0; i < 2*K; i += GC.numAgents) {
 
-		double rewards[];
-		int index;
-		FANN::neural_net** netTeam;
+		double* rewards;
+		FANN::neural_net* netTeam[GC.numAgents];
 
-		for (int j = 0; j < numAgents; j++) {
+		for (int j = 0; j < GC.numAgents; j++) {
+			// the jth pointer points to the address of the net at i+j
+			std::cout << "net:" << j+1 << " " << this->nets.at(i + j) << std::endl;
 			netTeam[j] = this->nets.at(i + j);
 		}
 
@@ -135,28 +147,21 @@ void Simulation::evaluate() {
 		this->runEpoch(world);
 		rewards = world.accumulateRewards();   //  rewards 0 - numagents-1 reward 0 corresponds with net i+k
 
-		for (int track = 0; track < numAgents; track++) {
+		for (int track = 0; track < GC.numAgents; track++) {
 			//  map associates net reward with net index in vector
-			rewardMap.push_back(rewards[track], i + track);
+			rewardVector.push_back(std::pair<double, int>(rewards[track], i + track));
 		}
 	}
 
-	// sort using a custom function object
-    struct {
-        bool operator()(double a, double b)
-        {   
-            return a < b;
-        }   
-    } customComp;
-
-	std::sort(rewardMap.begin(), rewardMap.end(), customComp);
+	std::sort(rewardVector.begin(), rewardVector.end());
+	
 	int index;
-	for (auto it = rewardMap.begin(); it != rewardMap.end(); ++it) {
+	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
 		while (this->nets.size() > K*GC.numAgents) {
 			index = it->second;
-			delete *this->nets.at(index);
+			delete this->nets.at(index);
 			*this->nets.at(index) = NULL;
-			this->nets.erase(index);
+			this->nets.erase(this->nets.begin() + index);
 		}
 	}
 
@@ -210,6 +215,13 @@ FANN::neural_net* Simulation::mutate(FANN::neural_net* net)
 	copy->set_weight_array(connections, length);
 
 	return copy;
+}
+
+//  reset simulation for next epoch
+void Simulation::reset() {
+
+	this->reward = 0;
+
 }
 
 
