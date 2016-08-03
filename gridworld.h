@@ -45,7 +45,6 @@ private:
 	std::vector<POI> poi;;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
-	FANN::neural_net* pickupNet;  //  globally shared pickup decision net
 	FANN::neural_net** netTeam;   //  team of nets to be used for agents in world
 
 	//  initialize POI, agents, and home base
@@ -78,7 +77,7 @@ public:
 	void evaluate();
 
 	// step all agents in the world
-	void stepAgents(); 
+	void stepAgents(FANN::neural_net*); 
 
 	//  reset the world 
 	void reset();
@@ -99,7 +98,7 @@ public:
 	// list by waiting around
 	void clearPOI();
 
-	double* accumulateRewards();
+	std::vector<double> accumulateRewards();
 
 };
 

@@ -46,18 +46,13 @@ Gridworld::Gridworld(struct gridConfig GC, FANN::neural_net** netTeam) {
 	initHome();
 	initAgents();
 	initPOI();
+
+	this->printWorld();
 	
-	this->pickupNet = new FANN::neural_net();
-	bool success = this->pickupNet->create_from_file("Pickup.net");
-	if (!success) {
-		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
-		exit(0);
-	}
 }
 
 Gridworld::~Gridworld() {
-	delete this->pickupNet;
-	this->pickupNet = NULL;
+	// destructor
 }
 
 //  initialize home base to pre-set global value
@@ -68,12 +63,13 @@ void Gridworld::initHome() {
 
 //  randomly initalize agents in the grid
 void Gridworld::initAgents() {
-	int x = 0, y = 0;
+	int x = rand() % width;
+	int y = rand() % height;
 	string str;
 
 	// for each agent, find open position on the board
 	for (int i = 0; i < this->numAgents; i++) {
-		Position pos = Position(rand() % width, rand() % height);
+		Position pos = Position(x, y);
 		while (!positionAvailable(pos)) {
 			x = rand() % width;
 			y = rand() % height;
@@ -81,8 +77,8 @@ void Gridworld::initAgents() {
 			//std::cout << "agent pos: " << pos.toString() << std::endl;
 		}
 
-		Agent addAgent = Agent(false, NULL);
-		addAgent.setP(pos);
+		Agent addAgent = Agent(false, NULL, pos);
+		std::cout << "agent pos " << addAgent.getP().toString() << std::endl;
 		this->agents.push_back(addAgent);
 	}
 }
@@ -232,7 +228,7 @@ double Gridworld::getDistance(Position p1, Position p2) {
 }
 
 //  step all agents in the world. Reward is not provided here
-void Gridworld::stepAgents() {
+void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 
 	State state;
 	Position oldPos, nextPos;
@@ -245,7 +241,7 @@ void Gridworld::stepAgents() {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 
-		float* output = this->pickupNet->run( (fann_type*) state.array);
+		float* output = pickupNet->run( (fann_type*) state.array);
 		if (*output > .95) {
 			action = PICKUP;
 		}
@@ -430,6 +426,14 @@ void Gridworld::printWorld() {
 	bool print;
 	bool homePrint = false;
 
+	for (auto it = agents.begin(); it != agents.end(); ++it) {
+		std::cout << "agent " << it->getP().toString() << std::endl;
+	}
+
+	for (auto it = poi.begin(); it != poi.end(); ++it) {
+		std::cout << "poi " << it->getP().toString() << std::endl;
+	}
+
 	for (int i = 0; i < this->height; i++) {
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(j, i);
@@ -484,13 +488,16 @@ void Gridworld::clearPOI()
 	}
 }
 
-double* Gridworld::accumulateRewards() {
+std::vector<double> Gridworld::accumulateRewards() {
 
-	double rewards[numAgents];
+	//std::cout << "getting rewards" << std::endl;
+
+	std::vector<double> rewards;
 	int index = 0;
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
-		rewards[index] = it->getReward();
+		rewards.push_back(it->getReward());
+		std::cout << "reward is " << it->getReward() << std::endl;
 	}
 
 	return rewards;

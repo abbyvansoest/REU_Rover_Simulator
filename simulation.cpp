@@ -31,6 +31,7 @@ Simulation::Simulation()
 {
 	this->reward = 0;
 	this->timesteps = 250;
+	this->avg = 0;
 }
 
 /* This non default constructor uses the information provided by the configuration structs 
@@ -39,13 +40,23 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps,
 {
 
 	this->K = K;
+	this->avg = 0;
 	//std::cout << "Call to non default constructor" << std::endl;
-	std::cout << "OG nets " << GC.numAgents*K << std::endl;
+	//std::cout << "OG nets " << GC.numAgents*K << std::endl;
 	for (int i = 0; i < GC.numAgents*K; i++) {
 		FANN::neural_net* newNet = new FANN::neural_net(NC.net_type, NC.num_layers, NC.layers);
 		if (NC.randWeights) { newNet->randomize_weights(NC.randMin, NC.randMax); }
 		this->nets.push_back(newNet);
-		std::cout << newNet << std::endl;
+		//std::cout << newNet << std::endl;
+	}
+
+//	std::cout << "net size " << this->nets.size() << std::endl;
+
+	this->pickupNet = new FANN::neural_net();
+	bool success = this->pickupNet->create_from_file("Pickup.net");
+	if (!success) {
+		std::cout << "ERROR BUILDING PICKUP NET" << std::endl;
+		exit(0);
 	}
 
 	this->timesteps = timesteps; 
@@ -62,6 +73,8 @@ Simulation::~Simulation()
 		delete *(it);
 		*(it) = NULL;
 	}
+	delete this->pickupNet;
+	this->pickupNet = NULL;
 }
 
 //  copy constructor
@@ -70,6 +83,7 @@ Simulation::Simulation(const Simulation& that)
 	//std::cout << "call to copy constructor" << std::endl;
 	this->reward = that.reward;
 	this->timesteps = that.timesteps;
+	this->avg = that.avg;
 
 	for (auto it = this->nets.begin(); it != this->nets.end(); ++it) {
 		if (*(it) != NULL) delete *(it);
@@ -90,15 +104,15 @@ Simulation& Simulation::operator=(const Simulation& that)
 	//std::cout << "Call to equal operator" << std::endl;
 	this->reward = that.reward;
 	this->timesteps = that.timesteps;
+	this->avg = that.avg;
 
 	for (auto it = this->nets.begin(); it != this->nets.end(); ++it) {
 		if (*it != NULL) delete *(it);
 	}
 
-	FANN::neural_net* copyNet;
 	//  it is a pointer to a pointer
 	for (auto it = this->nets.begin(); it != this->nets.end(); ++it) {
-		copyNet = new FANN::neural_net( (struct fann*) *it);
+		FANN::neural_net* copyNet = new FANN::neural_net( (struct fann*) *it);
 		this->nets.push_back(copyNet);
 	}
 
@@ -108,17 +122,13 @@ Simulation& Simulation::operator=(const Simulation& that)
 void Simulation::doublePopulation() {
 
 	FANN::neural_net* mutateNet;
-	std::vector<FANN::neural_net*> doubleNets;
-	std::cout << "mutate nets" << std::endl;
-	doubleNets = this->nets;
-	//int index = 1;
+	std::vector<FANN::neural_net*> doubleNets (this->nets);
+	//std::cout << "mutate nets" << std::endl;
 
 	for (auto it = this->nets.begin(); it != this->nets.end(); ++it) {
-		//std::cout << "it " << *it << "\t" << index << std::endl;
 		mutateNet = this->mutate(*it);
-		std::cout << mutateNet << std::endl;
+		//std::cout << mutateNet << std::endl;
 		doubleNets.push_back(mutateNet);
-		//index++;
 	}
 
 	this->nets = doubleNets;
@@ -133,12 +143,12 @@ void Simulation::evaluate() {
 
 	for (int i = 0; i < 2*K; i += GC.numAgents) {
 
-		double* rewards;
+		std::vector<double> rewards;
 		FANN::neural_net* netTeam[GC.numAgents];
 
 		for (int j = 0; j < GC.numAgents; j++) {
 			// the jth pointer points to the address of the net at i+j
-			std::cout << "net:" << j+1 << " " << this->nets.at(i + j) << std::endl;
+			//std::cout << "net:" << j+1 << " " << this->nets.at(i + j) << std::endl;
 			netTeam[j] = this->nets.at(i + j);
 		}
 
@@ -149,7 +159,7 @@ void Simulation::evaluate() {
 
 		for (int track = 0; track < GC.numAgents; track++) {
 			//  map associates net reward with net index in vector
-			rewardVector.push_back(std::pair<double, int>(rewards[track], i + track));
+			rewardVector.push_back(std::pair<double, int>(rewards.at(track), i + track));
 		}
 	}
 
@@ -157,16 +167,18 @@ void Simulation::evaluate() {
 	
 	int index;
 	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
+		//std::cout << "reward " << it->first << std::endl;
 		while (this->nets.size() > K*GC.numAgents) {
 			index = it->second;
-			delete this->nets.at(index);
-			*this->nets.at(index) = NULL;
 			this->nets.erase(this->nets.begin() + index);
 		}
 	}
 
+	this->avg /= (2*K*GC.numAgents);
 	assert(this->nets.size() == K*GC.numAgents);
 }
+
+double Simulation::getAvg() { return this->avg; }
 
 /* Runs a single epoch, which runs for a given number of timesteps */
 // runs the simulation until the time runs out or the simulation ends prematurely
@@ -178,7 +190,7 @@ void Simulation::runEpoch(Gridworld world)
 	{
 		//while (steps < 15) this->world.printWorld();
 
-		world.stepAgents();
+		world.stepAgents(this->pickupNet);
 
 		if (world.worldComplete())
 		{
@@ -190,14 +202,14 @@ void Simulation::runEpoch(Gridworld world)
 
 }
 
-/* Performs an in place mutation of a single weight in the given network */
+/* Performs an in place mutation of 10% of the weights in the network */
 FANN::neural_net* Simulation::mutate(FANN::neural_net* net)
 {
 	double percent = .1;
 	int length = net->get_total_connections();
 	int numMutations = percent*length;
 
-	FANN::neural_net* copy = new FANN::neural_net();
+	FANN::neural_net* copy = new FANN::neural_net(*net);
 
 	FANN::connection connections[length];
 	net->get_connection_array(connections);

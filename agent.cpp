@@ -25,22 +25,18 @@
 Agent::Agent() {
 
 	this->carrying = false;
+	this->hasCarried = false;
 	this->holding = NULL;
+	this->p = Position(0, 0);
 
 }
 
-Agent::Agent(bool carrying, POI* holding) {
+Agent::Agent(bool carrying, POI* holding, Position p) {
 
 	this->carrying = carrying;
 	this->holding = holding;
-
-}
-
-// destructor
-Agent::~Agent()
-{
-
-
+	this->hasCarried = false;
+	this->p = p;
 }
 
 //  copy constructor
@@ -49,6 +45,7 @@ Agent::Agent(const Agent& that)
 
 	this->carrying = that.carrying;
 	this->holding = that.holding;
+	this->hasCarried = that.hasCarried;
 }
 
 // copy assignment operator
@@ -56,6 +53,7 @@ Agent& Agent::operator=(const Agent& that)
 {
 	this->carrying = that.carrying;
 	this->holding = that.holding;
+	this->hasCarried = that.hasCarried;
     return *this;
 }
 
@@ -110,7 +108,10 @@ int Agent::nextAction(State s, Position self_pos, Home home, FANN::neural_net* n
 //  is the agent carrying anything?
 bool Agent::isCarrying() { return this->carrying; }
 //  set the carrying signal appropriately
-void Agent::setCarrying(bool set) { this->carrying = set; }
+void Agent::setCarrying(bool set) { 
+	this->carrying = set; 
+	if (set) this->hasCarried = true;
+}
 
 //  return the POI the agent is holding
 POI* Agent::getHoldingPOI() { return this->holding;}
@@ -118,9 +119,14 @@ POI* Agent::getHoldingPOI() { return this->holding;}
 void Agent::setHoldingPOI(POI* poi) { if (!this->isCarrying()) this->holding = poi; }
 
 Position Agent::getP() { return this->p; }
+
 void Agent::setP(Position pos) { this->p = pos; }
 
 //  NEED TO IMPLEMENT REWARD DISTRIBUTION
 double Agent::getReward() {
-	return 1.0;
+	if (this->hasCarried) {
+		std::cout << "reward is ONE" << std::endl; 
+		return 1.0;
+	}
+	return 0;
 }

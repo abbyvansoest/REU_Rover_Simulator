@@ -39,16 +39,14 @@ class Agent {
 
 	private:
 		bool carrying;       // is the agent carrying a poi?
+		bool hasCarried;     //  has the agent ever carried a poi?
 		Position p;          // current position in world
 		POI* holding;        // points to the poi an agent is carrying (or NULL)
-		FANN::neural_net* net;  //  pointer to the neural net used (on the heap)
 
 	public:	
 		//  constructors
 		Agent();
-		Agent(bool, POI*);
-		// destructor
-		~Agent();
+		Agent(bool, POI*, Position);
 		//  copy constructor
 		Agent(const Agent&);
 		// copy assignment operator

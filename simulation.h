@@ -35,9 +35,11 @@ class Simulation
 		int timesteps;          //  max timesteps in an epoch
 		double reward;          //  most recent reward received
 		std::vector<FANN::neural_net*> nets;
+		FANN::neural_net* pickupNet;  //  globally shared pickup decision net
 		int K;
 		struct gridConfig GC;
 		struct netConfig NC;
+		double avg;
 
 	public:
 		//  constructors, destructor, copy constructor
@@ -63,6 +65,8 @@ class Simulation
 
 		//  reset simulation for next epoch
 		void reset();
+
+		double getAvg();
 		
 };
 

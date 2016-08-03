@@ -50,7 +50,7 @@
    techniques between each epoch */ 
 int main(void) {
 
-	int MAX_STEPS = 800;
+	int MAX_STEPS = 200;
 //	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 100000;
 //	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
@@ -109,8 +109,9 @@ int main(void) {
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;
 
-		sim.reset();
 		sim.evaluate();
+		//std::cout << "AVERAGE " << sim.getAvg() << std::endl;
+		sim.reset();
 	}
 
 		// //  remove the lowest performing simulations
