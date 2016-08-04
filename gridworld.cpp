@@ -250,6 +250,17 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 			action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
 		}
 
+		// if (this->numSteps == 0) {
+
+		// 	std::cout << "connections in GW are:" << std::endl;
+		// 	int length = this->netTeam[index]->get_total_connections();
+		// 	FANN::connection connections[length];
+		// 	this->netTeam[index]->get_connection_array(connections);
+		// 	for (int k = 0; k < length; k++) {
+		// 		std::cout << connections[k].weight << std::endl;
+		// 	}
+		// }
+
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
 
@@ -286,6 +297,8 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 
 		if (action == PICKUP) {
 
+			//std::cout << "attempted pickup" << std::endl;
+
 			nextPos = oldPos;
 
 			//  if it has a POI within one block of it and it's action is to pickup,
@@ -296,6 +309,7 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 				if (!found->isComplete()) {
 					//  increment until adequate # agents
 					found->addAvailableAgent(&(*it));
+					//std::cout << "partial pickup" << std::endl;
 				}
 			}
 		}
@@ -325,6 +339,7 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 			}
 			//  'remove' from POI table
 			POIit->remove();
+			std::cout << "FULL PICKUP" << std::endl;
 		}
 
 		else if (!POIit->isRemoved())

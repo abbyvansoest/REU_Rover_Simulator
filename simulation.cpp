@@ -150,6 +150,15 @@ void Simulation::evaluate() {
 			// the jth pointer points to the address of the net at i+j
 			//std::cout << "net:" << j+1 << " " << this->nets.at(i + j) << std::endl;
 			netTeam[j] = this->nets.at(i + j);
+
+			// int length = netTeam[j]->get_total_connections();
+			// FANN::connection connections[length];
+			// netTeam[j]->get_connection_array(connections);
+			// std::cout << "connections are:" << std::endl; 
+			// for (int k = 0; k < length; k++) {
+			// 	std::cout << connections[k].weight << std::endl;
+			// }
+			// std::cout << "------------" << std::endl;
 		}
 
 		//  run 2k epochs and collect rewards from each agent/net
