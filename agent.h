@@ -39,7 +39,7 @@ class Agent {
 
 	private:
 		bool carrying;       // is the agent carrying a poi?
-		bool hasCarried;     //  has the agent ever carried a poi?
+		int numCarried;     //  has the agent ever carried a poi?
 		Position p;          // current position in world
 		POI* holding;        // points to the poi an agent is carrying (or NULL)
 
@@ -70,6 +70,8 @@ class Agent {
 		void setP(Position);
 
 		double getReward();
+
+		void hasCarried();
 
 };
 

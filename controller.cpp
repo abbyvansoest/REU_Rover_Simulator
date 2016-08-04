@@ -114,21 +114,6 @@ int main(void) {
 		sim.reset();
 	}
 
-		// //  remove the lowest performing simulations
-		// std::sort(simulations.begin(), simulations.end());
-		// auto loser = simulations.begin();
-		// simulations.erase(loser, loser + (int)(NUM_SIMULATIONS*PERCENT));
-
-				
-
-		// avg /= NUM_SIMULATIONS;
-		// avgSteps /= NUM_SIMULATIONS;
-
-		// std::cout << "EPOCH AVERAGE " << avg << "\tMAX: " << max << " Avg steps: " << avgSteps << std::endl;//"\tat: " << max_i << std::endl;
-		// std::cout << std::endl;
-
-
-
 	/* Cleanup configuration memory */
 	delete [] NC.layers;
 

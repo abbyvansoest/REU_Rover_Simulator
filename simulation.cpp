@@ -137,34 +137,25 @@ void Simulation::doublePopulation() {
 void Simulation::evaluate() {
 
 	std::vector<std::pair<double, int>> rewardVector;
+	Gridworld world = Gridworld(GC, NULL);
 
 	this->doublePopulation();
 	std::random_shuffle(this->nets.begin(), this->nets.end());
 
 	for (int i = 0; i < 2*K; i += GC.numAgents) {
 
-		std::vector<double> rewards;
 		FANN::neural_net* netTeam[GC.numAgents];
-
 		for (int j = 0; j < GC.numAgents; j++) {
 			// the jth pointer points to the address of the net at i+j
 			//std::cout << "net:" << j+1 << " " << this->nets.at(i + j) << std::endl;
 			netTeam[j] = this->nets.at(i + j);
-
-			// int length = netTeam[j]->get_total_connections();
-			// FANN::connection connections[length];
-			// netTeam[j]->get_connection_array(connections);
-			// std::cout << "connections are:" << std::endl; 
-			// for (int k = 0; k < length; k++) {
-			// 	std::cout << connections[k].weight << std::endl;
-			// }
-			// std::cout << "------------" << std::endl;
 		}
 
 		//  run 2k epochs and collect rewards from each agent/net
-		Gridworld world = Gridworld(GC, netTeam);
+		world = Gridworld(GC, netTeam);
 		this->runEpoch(world);
-		rewards = world.accumulateRewards();   //  rewards 0 - numagents-1 reward 0 corresponds with net i+k
+		std::vector<double> rewards = world.accumulateRewards();   
+		 //rewards 0 thru numagents-1 reward 0 corresponds with net i+k
 
 		for (int track = 0; track < GC.numAgents; track++) {
 			//  map associates net reward with net index in vector
@@ -172,19 +163,20 @@ void Simulation::evaluate() {
 		}
 	}
 
-	std::sort(rewardVector.begin(), rewardVector.end());
+	//  sort by reward (smallest in front)
+	//std::sort(rewardVector.begin(), rewardVector.end());
 	
-	int index;
-	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
-		std::cout << "reward " << it->first << std::endl;
-		if (it->first > 0) { 
-			std::cout << "RETURNED SOMETHING" << std::endl;
-		}
-		while (this->nets.size() > K*GC.numAgents) {
-			index = it->second;
-			this->nets.erase(this->nets.begin() + index);
-		}
-	}
+	// int index;
+	// for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
+	// 	std::cout << "reward " << it->first << std::endl;
+	// 	if (it->first > 0) { 
+	// 		std::cout << "RETURNED SOMETHING" << std::endl;
+	// 	}
+	// 	while (this->nets.size() > K*GC.numAgents) {
+	// 		index = it->second;
+	// 		this->nets.erase(this->nets.begin() + index);
+	// 	}
+	// }
 
 	this->avg /= (2*K*GC.numAgents);
 	assert(this->nets.size() == K*GC.numAgents);
@@ -200,7 +192,7 @@ void Simulation::runEpoch(Gridworld world)
 
 	for (steps = 0; steps < this->timesteps; ++steps) {
 	//while (!world.worldComplete()){
-		//while (steps < 15) this->world.printWorld();
+
 		//world.printWorld();
 		world.stepAgents(this->pickupNet);
 

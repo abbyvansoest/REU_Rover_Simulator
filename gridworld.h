@@ -42,7 +42,7 @@ private:
 	int height;      //  height dimension
 	int poiWeight;   //  weight of all POIs
 	std::vector<Agent> agents;  //  vector to store all agents
-	std::vector<POI> poi;;      //  vector to store all POI
+	std::vector<POI> poi;      //  vector to store all POI
 	Home home;                  //  world's home base
 	int numSteps;               //  number of steps taken in the world
 	FANN::neural_net** netTeam;   //  team of nets to be used for agents in world
@@ -73,6 +73,8 @@ public:
 	Gridworld(struct gridConfig, FANN::neural_net**);
 	//destructor
 	~Gridworld();
+	Gridworld(const Gridworld&);
+	Gridworld& operator=(const Gridworld&);
 
 	void evaluate();
 

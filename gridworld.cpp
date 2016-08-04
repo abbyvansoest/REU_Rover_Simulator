@@ -55,6 +55,55 @@ Gridworld::~Gridworld() {
 	// destructor
 }
 
+//  copy constructor
+Gridworld::Gridworld(const Gridworld& that)
+{
+	this->numAgents = that.numAgents;
+	this->numPOI = that.numPOI;
+	this->width = that.width;   
+	this->height = that.height;
+	this->poiWeight = that.poiWeight;
+    
+	this->home = that.home;              
+	this->numSteps = that.numSteps;   
+
+	this->agents.clear(); 
+	this->agents = that.agents;
+
+	this->poi.clear();
+	this->poi = that.poi;
+
+	this->netTeam = that.netTeam;
+
+}
+
+// copy assignment operator
+Gridworld& Gridworld::operator=(const Gridworld& that)
+{
+
+	this->numAgents = that.numAgents;
+	this->numPOI = that.numPOI;
+	this->width = that.width;   
+	this->height = that.height;
+	this->poiWeight = that.poiWeight;
+    
+	this->home = that.home;              
+	this->numSteps = that.numSteps;   
+
+	this->agents.clear(); 
+	for (auto it = that.agents.begin(); it != that.agents.end(); ++it) {
+		this->agents.push_back(*it);
+	}
+
+	this->poi.clear(); 
+	for (auto it = that.poi.begin(); it != that.poi.end(); ++it) {
+		this->poi.push_back(*it);
+	}
+
+	this->netTeam = that.netTeam;
+
+}
+
 //  initialize home base to pre-set global value
 void Gridworld::initHome() {
 	Position p = Position(HOME_X, HOME_Y);
@@ -236,8 +285,12 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 	int index = 0;
 	int action;
 
+	if (this->numSteps == 0) std::cout << "stepping agents" << std::endl;
+
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
+
+		if (this->numSteps == 0) std::cout << "Agent " << &(*it) << std::endl;
 
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
@@ -250,17 +303,6 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 		else {
 			action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
 		}
-
-		// if (this->numSteps == 0) {
-
-		// 	std::cout << "connections in GW are:" << std::endl;
-		// 	int length = this->netTeam[index]->get_total_connections();
-		// 	FANN::connection connections[length];
-		// 	this->netTeam[index]->get_connection_array(connections);
-		// 	for (int k = 0; k < length; k++) {
-		// 		std::cout << connections[k].weight << std::endl;
-		// 	}
-		// }
 
 		//  set down the POI a group of agents is holding
 		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
@@ -336,7 +378,7 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 				POI* poi = &(*POIit);
 				agent->setHoldingPOI(poi);
 				agent->setCarrying(true);
-
+				agent->hasCarried();
 			}
 			//  'remove' from POI table
 			POIit->remove();
@@ -502,11 +544,12 @@ std::vector<double> Gridworld::accumulateRewards() {
 	//std::cout << "getting rewards" << std::endl;
 
 	std::vector<double> rewards;
-	int index = 0;
+	std::cout << "getting rewards"  << std::endl;
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
+		std::cout << "Agent " << &(*it) << std::endl;
 		rewards.push_back(it->getReward());
-		//std::cout << "reward is " << it->getReward() << std::endl;
+		//std::cout << "adding " << it->getReward() << std::endl;
 	}
 
 	return rewards;

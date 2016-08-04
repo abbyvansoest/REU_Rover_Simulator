@@ -25,7 +25,7 @@
 Agent::Agent() {
 
 	this->carrying = false;
-	this->hasCarried = false;
+	this->numCarried = 0;
 	this->holding = NULL;
 	this->p = Position(0, 0);
 
@@ -35,7 +35,7 @@ Agent::Agent(bool carrying, POI* holding, Position pos) {
 
 	this->carrying = carrying;
 	this->holding = holding;
-	this->hasCarried = false;
+	this->numCarried = 0;
 	this->p = pos.copy();
 }
 
@@ -45,7 +45,7 @@ Agent::Agent(const Agent& that)
 
 	this->carrying = that.carrying;
 	this->holding = that.holding;
-	this->hasCarried = that.hasCarried;
+	this->numCarried = that.numCarried;
 	this->p = that.p;
 }
 
@@ -54,7 +54,7 @@ Agent& Agent::operator=(const Agent& that)
 {
 	this->carrying = that.carrying;
 	this->holding = that.holding;
-	this->hasCarried = that.hasCarried;
+	this->numCarried = that.numCarried;
 	this->p = that.p;
     return *this;
 }
@@ -112,10 +112,6 @@ bool Agent::isCarrying() { return this->carrying; }
 //  set the carrying signal appropriately
 void Agent::setCarrying(bool set) { 
 	this->carrying = set; 
-	if (set)  {
-		this->hasCarried = true;
-		std::cout << "SET CARRYING " << this->hasCarried << std::endl;
-	}
 }
 
 //  return the POI the agent is holding
@@ -127,11 +123,11 @@ Position Agent::getP() { return this->p; }
 
 void Agent::setP(Position pos) { this->p = pos; }
 
+void Agent::hasCarried() {
+	this->numCarried++;
+}
+
 //  NEED TO IMPLEMENT REWARD DISTRIBUTION
 double Agent::getReward() {
-	if (this->hasCarried) {
-		std::cout << "reward is ONE" << std::endl; 
-		return 1.0;
-	}
-	return 0;
+	return (double)this->numCarried;
 }
