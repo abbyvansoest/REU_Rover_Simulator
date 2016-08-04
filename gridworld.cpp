@@ -47,7 +47,7 @@ Gridworld::Gridworld(struct gridConfig GC, FANN::neural_net** netTeam) {
 	initAgents();
 	initPOI();
 
-	this->printWorld();
+	//this->printWorld();
 	
 }
 
@@ -242,8 +242,9 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 
-		float* output = pickupNet->run( (fann_type*) state.array);
-		if (*output > .95) {
+		//float* output = pickupNet->run( (fann_type*) state.array);
+		//if (*output > .95) {
+		if (findNearbyPOI(oldPos)) {
 			action = PICKUP;
 		}
 		else {

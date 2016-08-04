@@ -52,7 +52,7 @@ int main(void) {
 
 	int MAX_STEPS = 200;
 //	int NUM_SIMULATIONS = 50;
-	int NUM_EPOCHS = 1;
+	int NUM_EPOCHS = 10000;
 //	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
 //	double PERCENT = .1; 		//  percent of total simulations to mutate
 

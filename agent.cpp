@@ -112,7 +112,10 @@ bool Agent::isCarrying() { return this->carrying; }
 //  set the carrying signal appropriately
 void Agent::setCarrying(bool set) { 
 	this->carrying = set; 
-	if (set) this->hasCarried = true;
+	if (set)  {
+		this->hasCarried = true;
+		std::cout << "SET CARRYING " << this->hasCarried << std::endl;
+	}
 }
 
 //  return the POI the agent is holding

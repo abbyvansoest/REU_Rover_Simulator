@@ -179,7 +179,6 @@ void Simulation::evaluate() {
 		std::cout << "reward " << it->first << std::endl;
 		if (it->first > 0) { 
 			std::cout << "RETURNED SOMETHING" << std::endl;
-			exit(0);
 		}
 		while (this->nets.size() > K*GC.numAgents) {
 			index = it->second;
@@ -199,17 +198,17 @@ void Simulation::runEpoch(Gridworld world)
 {
 	int steps = 0;
 
-	for (steps = 0; steps < this->timesteps; ++steps)
-	{
+	for (steps = 0; steps < this->timesteps; ++steps) {
+	//while (!world.worldComplete()){
 		//while (steps < 15) this->world.printWorld();
-
+		//world.printWorld();
 		world.stepAgents(this->pickupNet);
 
-		if (world.worldComplete())
-		{
-			world.printWorld();
-			break;
-		}
+		 if (world.worldComplete())
+		 {
+		 	world.printWorld();
+		 	break;
+		 }
 
 	}
 
