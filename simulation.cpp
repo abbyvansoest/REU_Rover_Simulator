@@ -167,7 +167,11 @@ void Simulation::evaluate() {
 	
 	int index;
 	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
-		//std::cout << "reward " << it->first << std::endl;
+		std::cout << "reward " << it->first << std::endl;
+		if (it->first > 0) { 
+			std::cout << "RETURNED SOMETHING" << std::endl;
+			exit(0);
+		}
 		while (this->nets.size() > K*GC.numAgents) {
 			index = it->second;
 			this->nets.erase(this->nets.begin() + index);

@@ -63,12 +63,14 @@ void Gridworld::initHome() {
 
 //  randomly initalize agents in the grid
 void Gridworld::initAgents() {
-	int x = rand() % width;
-	int y = rand() % height;
+	
+	int x, y;
 	string str;
 
 	// for each agent, find open position on the board
 	for (int i = 0; i < this->numAgents; i++) {
+		x = rand() % width;
+		y = rand() % height;
 		Position pos = Position(x, y);
 		while (!positionAvailable(pos)) {
 			x = rand() % width;
@@ -78,7 +80,6 @@ void Gridworld::initAgents() {
 		}
 
 		Agent addAgent = Agent(false, NULL, pos);
-		std::cout << "agent pos " << addAgent.getP().toString() << std::endl;
 		this->agents.push_back(addAgent);
 	}
 }
@@ -426,14 +427,6 @@ void Gridworld::printWorld() {
 	bool print;
 	bool homePrint = false;
 
-	for (auto it = agents.begin(); it != agents.end(); ++it) {
-		std::cout << "agent " << it->getP().toString() << std::endl;
-	}
-
-	for (auto it = poi.begin(); it != poi.end(); ++it) {
-		std::cout << "poi " << it->getP().toString() << std::endl;
-	}
-
 	for (int i = 0; i < this->height; i++) {
 		for (int j = 0; j < this->width; j++) {
 			Position p = Position(j, i);
@@ -497,7 +490,7 @@ std::vector<double> Gridworld::accumulateRewards() {
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
 		rewards.push_back(it->getReward());
-		std::cout << "reward is " << it->getReward() << std::endl;
+		//std::cout << "reward is " << it->getReward() << std::endl;
 	}
 
 	return rewards;

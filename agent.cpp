@@ -31,12 +31,12 @@ Agent::Agent() {
 
 }
 
-Agent::Agent(bool carrying, POI* holding, Position p) {
+Agent::Agent(bool carrying, POI* holding, Position pos) {
 
 	this->carrying = carrying;
 	this->holding = holding;
 	this->hasCarried = false;
-	this->p = p;
+	this->p = pos.copy();
 }
 
 //  copy constructor
@@ -46,6 +46,7 @@ Agent::Agent(const Agent& that)
 	this->carrying = that.carrying;
 	this->holding = that.holding;
 	this->hasCarried = that.hasCarried;
+	this->p = that.p;
 }
 
 // copy assignment operator
@@ -54,6 +55,7 @@ Agent& Agent::operator=(const Agent& that)
 	this->carrying = that.carrying;
 	this->holding = that.holding;
 	this->hasCarried = that.hasCarried;
+	this->p = that.p;
     return *this;
 }
 
