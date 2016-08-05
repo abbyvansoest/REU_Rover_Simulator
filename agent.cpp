@@ -28,6 +28,7 @@ Agent::Agent() {
 	this->numCarried = 0;
 	this->holding = NULL;
 	this->p = Position(0, 0);
+	this->reward = 0;
 
 }
 
@@ -37,6 +38,7 @@ Agent::Agent(bool carrying, POI* holding, Position pos) {
 	this->holding = holding;
 	this->numCarried = 0;
 	this->p = pos.copy();
+	this->reward = 0;
 }
 
 //  copy constructor
@@ -47,6 +49,7 @@ Agent::Agent(const Agent& that)
 	this->holding = that.holding;
 	this->numCarried = that.numCarried;
 	this->p = that.p;
+	this->reward = that.reward;
 }
 
 // copy assignment operator
@@ -56,6 +59,7 @@ Agent& Agent::operator=(const Agent& that)
 	this->holding = that.holding;
 	this->numCarried = that.numCarried;
 	this->p = that.p;
+	this->reward = that.reward;
     return *this;
 }
 
@@ -131,7 +135,16 @@ int Agent::numberCarried() {
 	return this->numCarried;
 }
 
-//  NEED TO IMPLEMENT REWARD DISTRIBUTION
-double Agent::getReward() {
-	return (double)this->numCarried;
+double Agent::getReward()
+{
+	/* This calculates a quick and dirty form of D.
+	 * It returns the scaled reward based on how many
+	 * POI the agent carried in its lifetime.
+	 * This is the same as G(v)-G(v-i). */
+	return (double)(this->numCarried * 5)/2.0 + this->reward;
+}
+
+void Agent::incReward(double inc)
+{
+	this->reward += inc;
 }

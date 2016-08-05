@@ -42,6 +42,7 @@ class Agent {
 		int numCarried;     //  has the agent ever carried a poi?
 		Position p;          // current position in world
 		POI* holding;        // points to the poi an agent is carrying (or NULL)
+		double reward;
 
 	public:	
 		//  constructors
@@ -74,6 +75,8 @@ class Agent {
 		void hasCarried();
 
 		int numberCarried();
+
+		void incReward(double);
 
 };
 

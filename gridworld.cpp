@@ -298,9 +298,15 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
 
+		/* Step penalty unless carrying, just for curiousities*/
+		if (!it->isCarrying()) {
+			it->incReward(-.1);
+		}
 		//float* output = pickupNet->run( (fann_type*) state.array);
 		//if (*output > .95) {
 		if (findNearbyPOI(oldPos)) {
+			/* Reward for being near a poi to coutneract step penalty */
+			it->incReward(.1);
 			action = PICKUP;
 		}
 		else {
@@ -385,7 +391,7 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 			}
 			//  'remove' from POI table
 			POIit->remove();
-			std::cout << "FULL PICKUP" << std::endl;
+			//std::cout << "FULL PICKUP" << std::endl;
 		}
 
 		else if (!POIit->isRemoved())
@@ -542,22 +548,25 @@ void Gridworld::clearPOI()
 	}
 }
 
-std::vector<double> Gridworld::accumulateRewards() {
-
-	//std::cout << "getting rewards" << std::endl;
-
+/* Calculate the reward vector for all agents.
+ * This is kept modular, so new reward functions can be 
+ * dropped in for the agents in the future */
+std::vector<double> Gridworld::accumulateRewards()
+{
 	std::vector<double> rewards;
-	//std::cout << "getting rewards"  << std::endl;
+	double G_value = this->G();
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
-		//std::cout << "Agent " << &(*it) << std::endl;
-		//std::cout << "position: " << it->getP().toString() << "\tcarried: " << it->numberCarried() << std::endl;
-
 		rewards.push_back(it->getReward());
-		//std::cout << "adding " << it->getReward() << std::endl;
 	}
-
 	return rewards;
 }
 
+/* Calculates D for a single agent, depends on the known value of G */
 
+/* Calculates the global reward G, currently based only on ammounts returned.
+ * Multiplied by a scaling factor of 5, ie each POI is worth 5 */
+double Gridworld::G()
+{
+	return this->home.currentAmount() * 5;
+}

@@ -27,6 +27,7 @@
 /* Neural Net */
 #include <fann.h>
 #include <fann_cpp.h>
+#include <algorithm>
 
 using std::unordered_map;
 using std::string;
@@ -65,6 +66,8 @@ private:
 	void clear();
 	//  normalize the state vector 
 	State normalize(State); 
+	// Global reward G
+	double G();
 
 public:
 
