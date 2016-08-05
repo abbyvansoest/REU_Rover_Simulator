@@ -122,16 +122,16 @@ Simulation& Simulation::operator=(const Simulation& that)
 void Simulation::doublePopulation() {
 
 	FANN::neural_net* mutateNet;
-	std::vector<FANN::neural_net*> doubleNets (this->nets);
 	//std::cout << "mutate nets" << std::endl;
 
-	for (auto it = this->nets.begin(); it != this->nets.end(); ++it) {
+	this->nets.reserve((this->nets.size() * 2) + 1);
+	auto it = this->nets.begin();
+	int size = this->nets.size();
+	for (int i = 0; i < size; ++i) {
 		mutateNet = this->mutate(*it);
-		//std::cout << mutateNet << std::endl;
-		doubleNets.push_back(mutateNet);
+		this->nets.push_back(mutateNet);
+		++it;
 	}
-
-	this->nets = doubleNets;
 }
 
 void Simulation::evaluate() {
@@ -142,43 +142,65 @@ void Simulation::evaluate() {
 	this->doublePopulation();
 	std::random_shuffle(this->nets.begin(), this->nets.end());
 
-	for (int i = 0; i < 2*K; i += GC.numAgents) {
+	for (int i = 0; i < 2*K*GC.numAgents; i += GC.numAgents) {
 
 		FANN::neural_net* netTeam[GC.numAgents];
 		for (int j = 0; j < GC.numAgents; j++) {
 			// the jth pointer points to the address of the net at i+j
-			//std::cout << "net:" << j+1 << " " << this->nets.at(i + j) << std::endl;
 			netTeam[j] = this->nets.at(i + j);
 		}
 
-		//  run 2k epochs and collect rewards from each agent/net
+		// run 2k epochs and collect rewards from each agent/net
 		world = Gridworld(GC, netTeam);
 		this->runEpoch(&world);
 		std::vector<double> rewards = world.accumulateRewards();   
-		 //rewards 0 thru numagents-1 reward 0 corresponds with net i+k
+		// rewards 0 thru numagents-1 reward 0 corresponds with net i+k
 
 		for (int track = 0; track < GC.numAgents; track++) {
-			//  map associates net reward with net index in vector
+			// map associates net reward with net index in vector
 			rewardVector.push_back(std::pair<double, int>(rewards.at(track), i + track));
 		}
 	}
 
 	// sort by reward (smallest in front)
 	std::sort(rewardVector.begin(), rewardVector.end());
-	
+
 	int index;
+	int count = 0;
+	this->avg = 0;
+	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents  << " VS " << rewardVector.size()<< std::endl;
 	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
 		std::cout << "reward " << it->first << std::endl;
-		if (it->first > 0) { 
-		//	std::cout << "RETURNED SOMETHING" << std::endl;
-		}
-		while (this->nets.size() > K*GC.numAgents) {
+		this->avg += it->first;
+		// free the memory first
+		if (count < rewardVector.size()/2) {
 			index = it->second;
-			this->nets.erase(this->nets.begin() + index);
+			delete this->nets[index];
+			this->nets[index] = NULL;
+			++count;
 		}
 	}
 
+	//then loop through and remove the isntances in a safe manner, so indexes dont get corrupted
+	std::cout << count << std::endl;
+	count = 0;
+	for (auto it = this->nets.begin(); it != this->nets.end(); )
+	{
+		if (*it == NULL)
+		{
+			++count;
+			it = this->nets.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	std::cout << count << std::endl;
 	this->avg /= (2*K*GC.numAgents);
+	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << std::endl;
+	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
 	assert(this->nets.size() == K*GC.numAgents);
 }
 
@@ -206,7 +228,10 @@ void Simulation::runEpoch(Gridworld* world)
 
 }
 
-/* Performs an in place mutation of 10% of the weights in the network */
+/* Performs a mutation of 10% of the weights in the network, 
+ * and returns a new, mutated version of the net parameter.
+ * The origional is not changed.*/
+
 FANN::neural_net* Simulation::mutate(FANN::neural_net* net)
 {
 	double percent = .1;
