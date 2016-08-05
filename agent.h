@@ -73,6 +73,8 @@ class Agent {
 
 		void hasCarried();
 
+		int numberCarried();
+
 };
 
 #endif

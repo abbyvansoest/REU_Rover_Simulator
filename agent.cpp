@@ -127,6 +127,10 @@ void Agent::hasCarried() {
 	this->numCarried++;
 }
 
+int Agent::numberCarried() {
+	return this->numCarried;
+}
+
 //  NEED TO IMPLEMENT REWARD DISTRIBUTION
 double Agent::getReward() {
 	return (double)this->numCarried;

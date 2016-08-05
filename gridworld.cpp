@@ -285,12 +285,15 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 	int index = 0;
 	int action;
 
-	if (this->numSteps == 0) std::cout << "stepping agents" << std::endl;
+	//if (this->numSteps == 0) std::cout << "stepping agents" << std::endl;
 
 	//  iterate through all agents
 	for (auto it = agents.begin(); it != agents.end(); ++it) {
 
-		if (this->numSteps == 0) std::cout << "Agent " << &(*it) << std::endl;
+		if (this->numSteps == 0) {
+			//std::cout << "Agent " << &(*it) << std::endl;
+			//std::cout << "position: " << it->getP().toString() << "\tcarried: " << it->numberCarried() << std::endl;
+		}
 
 		oldPos = Position(it->getP());
 		state = getState(oldPos, *it);
@@ -544,10 +547,12 @@ std::vector<double> Gridworld::accumulateRewards() {
 	//std::cout << "getting rewards" << std::endl;
 
 	std::vector<double> rewards;
-	std::cout << "getting rewards"  << std::endl;
+	//std::cout << "getting rewards"  << std::endl;
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
-		std::cout << "Agent " << &(*it) << std::endl;
+		//std::cout << "Agent " << &(*it) << std::endl;
+		//std::cout << "position: " << it->getP().toString() << "\tcarried: " << it->numberCarried() << std::endl;
+
 		rewards.push_back(it->getReward());
 		//std::cout << "adding " << it->getReward() << std::endl;
 	}

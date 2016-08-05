@@ -153,7 +153,7 @@ void Simulation::evaluate() {
 
 		//  run 2k epochs and collect rewards from each agent/net
 		world = Gridworld(GC, netTeam);
-		this->runEpoch(world);
+		this->runEpoch(&world);
 		std::vector<double> rewards = world.accumulateRewards();   
 		 //rewards 0 thru numagents-1 reward 0 corresponds with net i+k
 
@@ -163,20 +163,20 @@ void Simulation::evaluate() {
 		}
 	}
 
-	//  sort by reward (smallest in front)
-	//std::sort(rewardVector.begin(), rewardVector.end());
+	// sort by reward (smallest in front)
+	std::sort(rewardVector.begin(), rewardVector.end());
 	
-	// int index;
-	// for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
-	// 	std::cout << "reward " << it->first << std::endl;
-	// 	if (it->first > 0) { 
-	// 		std::cout << "RETURNED SOMETHING" << std::endl;
-	// 	}
-	// 	while (this->nets.size() > K*GC.numAgents) {
-	// 		index = it->second;
-	// 		this->nets.erase(this->nets.begin() + index);
-	// 	}
-	// }
+	int index;
+	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
+		std::cout << "reward " << it->first << std::endl;
+		if (it->first > 0) { 
+		//	std::cout << "RETURNED SOMETHING" << std::endl;
+		}
+		while (this->nets.size() > K*GC.numAgents) {
+			index = it->second;
+			this->nets.erase(this->nets.begin() + index);
+		}
+	}
 
 	this->avg /= (2*K*GC.numAgents);
 	assert(this->nets.size() == K*GC.numAgents);
@@ -186,7 +186,7 @@ double Simulation::getAvg() { return this->avg; }
 
 /* Runs a single epoch, which runs for a given number of timesteps */
 // runs the simulation until the time runs out or the simulation ends prematurely
-void Simulation::runEpoch(Gridworld world)
+void Simulation::runEpoch(Gridworld* world)
 {
 	int steps = 0;
 
@@ -194,11 +194,11 @@ void Simulation::runEpoch(Gridworld world)
 	//while (!world.worldComplete()){
 
 		//world.printWorld();
-		world.stepAgents(this->pickupNet);
+		world->stepAgents(this->pickupNet);
 
-		 if (world.worldComplete())
+		 if (world->worldComplete())
 		 {
-		 	world.printWorld();
+		 	world->printWorld();
 		 	break;
 		 }
 

@@ -53,7 +53,7 @@ class Simulation
 
 		void evaluate();
 		//  run the simulation in an epoch with a certain number of timesteps
-		void runEpoch(Gridworld);
+		void runEpoch(Gridworld*);
 		//  in place mutation of the simulation's neural net
 		void mutate(double);
 		//  return the current amount at the grid's home base
