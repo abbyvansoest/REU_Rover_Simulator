@@ -181,7 +181,7 @@ void Simulation::evaluate() {
 		}
 	}
 
-	//then loop through and remove the isntances in a safe manner, so indexes dont get corrupted
+	//then loop through and remove the instances in a safe manner, so indexes dont get corrupted
 	std::cout << count << std::endl;
 	count = 0;
 	for (auto it = this->nets.begin(); it != this->nets.end(); )
