@@ -70,6 +70,7 @@ Agent& Agent::operator=(const Agent& that)
  * policy has chosen */
 
 int Agent::nextAction(State s, Position self_pos, Home home, FANN::neural_net* net) {
+
 	
 	//  if the agent is carrying a POI, force the agent to step toward home
 	if (this->isCarrying())
@@ -98,6 +99,10 @@ int Agent::nextAction(State s, Position self_pos, Home home, FANN::neural_net* n
 				return MOVE_DOWN; }
 		}
 	}
+
+	/* random baseline */
+	return rand() % SET_DOWN;
+
 
 	/* Picks the output from the neural net */
 	fann_type* output = net->run( (fann_type*) s.array);

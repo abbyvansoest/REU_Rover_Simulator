@@ -32,6 +32,8 @@ Simulation::Simulation()
 	this->reward = 0;
 	this->timesteps = 250;
 	this->avg = 0;
+	this->completed = 0;
+	this->comp_total = 0;
 }
 
 /* This non default constructor uses the information provided by the configuration structs 
@@ -134,10 +136,11 @@ void Simulation::doublePopulation() {
 	}
 }
 
-void Simulation::evaluate() {
+void Simulation::evaluate(std::ofstream &reward_file, std::ofstream &complete_file) {
 
 	std::vector<std::pair<double, int>> rewardVector;
 	Gridworld world = Gridworld(GC, NULL);
+	this->completed = 0;
 
 	this->doublePopulation();
 	std::random_shuffle(this->nets.begin(), this->nets.end());
@@ -199,9 +202,11 @@ void Simulation::evaluate() {
 
 	std::cout << count << std::endl;
 	this->avg /= (2*K*GC.numAgents);
-	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << std::endl;
+	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << "\tCompleted/total: " << this->completed << "/" << this->comp_total << std::endl;
 	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
 	assert(this->nets.size() == K*GC.numAgents);
+	complete_file << this->completed << std::endl;
+	reward_file << (--rewardVector.end())->first << std::endl;
 }
 
 double Simulation::getAvg() { return this->avg; }
@@ -220,7 +225,9 @@ void Simulation::runEpoch(Gridworld* world)
 
 		 if (world->worldComplete())
 		 {
-		 	world->printWorld();
+		 	//world->printWorld();
+			++this->completed;
+			++this->comp_total;
 		 	break;
 		 }
 

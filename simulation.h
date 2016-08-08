@@ -40,6 +40,8 @@ class Simulation
 		struct gridConfig GC;
 		struct netConfig NC;
 		double avg;
+		int completed;
+		int comp_total;
 
 	public:
 		//  constructors, destructor, copy constructor
@@ -51,7 +53,7 @@ class Simulation
 		// copy assignment operator
 		Simulation& operator=(const Simulation&);
 
-		void evaluate();
+		void evaluate(std::ofstream&, std::ofstream&);
 		//  run the simulation in an epoch with a certain number of timesteps
 		void runEpoch(Gridworld*);
 		//  in place mutation of the simulation's neural net

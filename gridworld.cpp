@@ -44,8 +44,8 @@ Gridworld::Gridworld(struct gridConfig GC, FANN::neural_net** netTeam) {
 	this->numSteps = 0;
 
 	initHome();
-	initAgents();
 	initPOI();
+	initAgents();
 
 	//this->printWorld();
 	
@@ -135,6 +135,7 @@ void Gridworld::initAgents() {
 
 //  randomly initialize POI positions in the grid
 void Gridworld::initPOI() {
+	/*
 	int x = rand() % width;
 	int y = rand() % height;
 	string str;
@@ -150,6 +151,15 @@ void Gridworld::initPOI() {
 
 		// add a POI to the open position
 		POI addPOI = POI(this->poiWeight, x, y);
+		this->poi.push_back(addPOI);
+	}
+	*/
+
+	int x[] = {3, 3, 12, 12};
+	int y[] = {3, 12, 3, 12};
+	for (int i = 0; i < 4; ++i)
+	{
+		POI addPOI = POI(this->poiWeight, x[i], y[i]);
 		this->poi.push_back(addPOI);
 	}
 }
@@ -474,8 +484,8 @@ bool Gridworld::worldComplete()
 {
 	if (this->home.currentAmount() == this->numPOI)
 	{
-		std::cout << "worldComplete: " << this->home.currentAmount() << std::endl;
-		this->printWorld();
+		//std::cout << "worldComplete: " << this->home.currentAmount() << std::endl;
+		//this->printWorld();
 		return true;
 	}
 

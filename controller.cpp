@@ -50,18 +50,18 @@
    techniques between each epoch */ 
 int main(void) {
 
-	int MAX_STEPS = 200;
+	int MAX_STEPS = 250;
 //	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 10000;
 //	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
 //	double PERCENT = .1; 		//  percent of total simulations to mutate
 
 	//  control gridworld
-	int NUMBER_OF_AGENTS = 2;
-	int NUMBER_OF_POI = 3;
+	int NUMBER_OF_AGENTS = 6;
+	int NUMBER_OF_POI = 4;
 
-	int WORLD_WIDTH = 10;
-	int WORLD_HEIGHT = 10;
+	int WORLD_WIDTH = 15;
+	int WORLD_HEIGHT = 15;
 
 	int POI_WEIGHT = 2;
 
@@ -100,6 +100,13 @@ int main(void) {
 	int K = 10;
 
 	Simulation sim = Simulation(GC, NC, MAX_STEPS, K);
+	std::ofstream max_reward_out;
+	std::ofstream world_complete_out;
+	std::string reward_type = "data/random/1";
+	std::string filename = reward_type + "_max_reward.csv";
+	max_reward_out.open(filename);
+	filename = reward_type + "_world_complete.csv";
+	world_complete_out.open(filename);
 
 	//  for each learning epoch, we run around 10% of the set of simulations and 
 	//  then evolve the population 
@@ -109,11 +116,13 @@ int main(void) {
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;
 
-		sim.evaluate();
+		sim.evaluate(max_reward_out, world_complete_out);
 		//std::cout << "AVERAGE " << sim.getAvg() << std::endl;
 		sim.reset();
 	}
 
+	max_reward_out.close();
+	world_complete_out.close();
 	/* Cleanup configuration memory */
 	delete [] NC.layers;
 
