@@ -22,7 +22,6 @@
 
 #include "simulation.h"
 #include <iostream>
-#include <cassert>
 #include <map>
 
 /* Calls the non-default constructors on the members with predetermined, 
@@ -32,6 +31,7 @@ Simulation::Simulation()
 	this->reward = 0;
 	this->timesteps = 250;
 	this->avg = 0;
+	this->globalAvg = 0;
 }
 
 /* This non default constructor uses the information provided by the configuration structs 
@@ -41,6 +41,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps,
 
 	this->K = K;
 	this->avg = 0;
+	this->globalAvg = 0;
 	//std::cout << "Call to non default constructor" << std::endl;
 	//std::cout << "OG nets " << GC.numAgents*K << std::endl;
 	for (int i = 0; i < GC.numAgents*K; i++) {
@@ -199,33 +200,37 @@ void Simulation::evaluate() {
 
 	std::cout << count << std::endl;
 	this->avg /= (2*K*GC.numAgents);
+	globalAvg += this->avg;
 	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << std::endl;
 	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
-	assert(this->nets.size() == K*GC.numAgents);
+	
 }
 
-double Simulation::getAvg() { return this->avg; }
+double Simulation::getAvg(int num_epochs) { return this->globalAvg/(double)num_epochs; }
 
 /* Runs a single epoch, which runs for a given number of timesteps */
 // runs the simulation until the time runs out or the simulation ends prematurely
-void Simulation::runEpoch(Gridworld* world)
-{
+void Simulation::runEpoch(Gridworld* world) {
+
 	int steps = 0;
+	std::vector<double> sValues;
 
 	for (steps = 0; steps < this->timesteps; ++steps) {
-	//while (!world.worldComplete()){
 
-		//world.printWorld();
-		world->stepAgents(this->pickupNet);
+		//std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+		//std::cout << "timestep " << steps << std::endl;
+		//  cacluate set of S values (contains info on distance to closest POI)
+			// based on expected locations of agents in next timestep
+		sValues = world->calculateS();
+		world->stepAgents(this->pickupNet, sValues);
 
-		 if (world->worldComplete())
-		 {
+		 if (world->worldComplete()) {
+
 		 	world->printWorld();
 		 	break;
+
 		 }
-
 	}
-
 }
 
 /* Performs a mutation of 10% of the weights in the network, 

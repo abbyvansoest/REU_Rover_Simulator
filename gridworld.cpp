@@ -102,6 +102,8 @@ Gridworld& Gridworld::operator=(const Gridworld& that)
 
 	this->netTeam = that.netTeam;
 
+	return *this;
+
 }
 
 //  initialize home base to pre-set global value
@@ -182,7 +184,100 @@ bool Gridworld::positionAvailable(Position p) {
 }
 
 //  return the 13-dim state representation for ag
-State Gridworld::getState(Position pos, Agent ag) {
+//  scale properly by provided sValues
+State Gridworld::getState(Position pos, Agent ag, std::vector<double> sValues) {
+
+	double agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
+	double poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
+
+	// for the given agent, get count of agents in each quadrant
+	for (auto it = agents.begin(); it != agents.end(); ++it) {  
+		//  values for the comparing agent
+		Position p = Position(it->getP());
+
+		if (p.getX() < pos.getX() && p.getY() >= pos.getY()) {
+			agentsA += 1.0/getDistance(p, pos);
+		}
+		if (p.getX() >= pos.getX() && p.getY() > pos.getY()) {
+			agentsB += 1.0/getDistance(p, pos);
+		}
+		if (p.getX() <= pos.getX() && p.getY() < pos.getY()) {
+			agentsC += 1.0/getDistance(p, pos);
+		}
+		if (p.getX() > pos.getX() && p.getY() <= pos.getY()) {
+			agentsD += 1.0/getDistance(p, pos);
+		}
+	}
+
+
+	double I;
+	int index = 0;
+	POI* closestPOI = NULL;
+	double minDist = 10000000.0;
+
+	//  find closest POI to agent in question
+	for (auto it = poi.begin(); it != poi.end(); ++it) { 
+
+		double dist = getDistance(it->getP(), pos);
+		if (dist < minDist) {
+			minDist = dist;
+			closestPOI = &(*it);
+		} 
+		closestPOI->setAsClosest(true);
+	}		
+
+	//  get count of POI in each quadrant
+	for (auto it = poi.begin(); it != poi.end(); ++it) { 
+
+		Position p = Position(it->getP());
+
+		if (it->isClosest()) I = 1.0;	
+		else I = sValues.at(index);		
+
+		if (p.getX() <  pos.getX() && p.getY() >= pos.getY()) { 
+			poiA += I/getDistance(p, pos);
+		}
+		if (p.getX() >= pos.getX() && p.getY() >  pos.getY()) { 
+			poiB += I/getDistance(p, pos);
+		}
+		if (p.getX() <= pos.getX() && p.getY() <  pos.getY()) { 
+			poiC += I/getDistance(p, pos);
+		}
+		if (p.getX() >  pos.getX() && p.getY() <= pos.getY()) {
+			poiD += I/getDistance(p, pos);
+		}
+		if (it->isClosest()) it->setAsClosest(false);
+	}
+
+	State state;
+
+	//  information on quadrant 1 
+	state[AGENTS_A] = agentsA;
+	state[POI_A] = poiA;
+
+	//  information on quadrant 2
+	state[AGENTS_B] = agentsB;
+	state[POI_B] = poiB;
+
+	//  information on quadrant 3
+	state[AGENTS_C] = agentsC;
+	state[POI_C] = poiC;
+
+	//  information on quadrant 4
+	state[AGENTS_D] = agentsD;
+	state[POI_D] = poiD;
+
+	// agent carrying information
+	state[CARRYING] = (int)ag.isCarrying();
+
+	state = normalize(state);
+
+	return state;
+}
+
+//  return the 13-dim state representation for ag
+//  scale properly by provided sValues
+State Gridworld::getStateWithoutIntent(Position pos, Agent ag) {
 
 	double agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
 	double poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
@@ -207,7 +302,7 @@ State Gridworld::getState(Position pos, Agent ag) {
 	}
 
 	//  get count of POI in each quadrant
-	for (auto it = poi.begin(); it != poi.end(); ++it) {  			
+	for (auto it = poi.begin(); it != poi.end(); ++it) {  	
 
 		Position p = Position(it->getP());
 
@@ -278,7 +373,7 @@ double Gridworld::getDistance(Position p1, Position p2) {
 }
 
 //  step all agents in the world. Reward is not provided here
-void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
+void Gridworld::stepAgents(FANN::neural_net* pickupNet, std::vector<double> sValues) {
 
 	State state;
 	Position oldPos, nextPos;
@@ -296,7 +391,7 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 		}
 
 		oldPos = Position(it->getP());
-		state = getState(oldPos, *it);
+		state = getState(oldPos, *it, sValues);
 
 		/* Step penalty unless carrying, just for curiousities*/
 		if (!it->isCarrying()) {
@@ -402,6 +497,118 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet) {
 
 	//if (this->numSteps < 10) std::cout << std::endl;
 	this->numSteps++;
+}
+
+//  step all agents in the world. Reward is not provided here
+std::vector<Position> Gridworld::discoverIntent() {
+
+	State state;
+	Position oldPos, nextPos;
+	int index = 0;
+	int action;
+	std::vector<Position> intentions;
+
+	//if (this->numSteps == 0) std::cout << "stepping agents" << std::endl;
+
+	//  iterate through all agents
+	for (auto it = agents.begin(); it != agents.end(); ++it) {
+
+		if (this->numSteps == 0) {
+			//std::cout << "Agent " << &(*it) << std::endl;
+			//std::cout << "position: " << it->getP().toString() << "\tcarried: " << it->numberCarried() << std::endl;
+		}
+
+		oldPos = Position(it->getP());
+		state = getStateWithoutIntent(oldPos, *it);
+
+		//float* output = pickupNet->run( (fann_type*) state.array);
+		//if (*output > .95) {
+		if (findNearbyPOI(oldPos)) {
+			action = PICKUP;
+		}
+		else {
+			action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
+		}
+
+		//  set down the POI a group of agents is holding
+		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
+			nextPos = oldPos;
+		}
+
+		//  set next position for all cases
+		else if (action == MOVE_RIGHT) {
+			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
+		}
+		else if (action == MOVE_DOWN) {
+			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
+		}
+		else if (action == MOVE_LEFT) {
+			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
+		}
+		else if (action == MOVE_UP) {
+			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
+		}
+
+		if (action == PICKUP) {
+			nextPos = oldPos;
+		}
+
+		//  check for collisions in new map -- change agent's position if unoccupied
+		//  insert agent to newAgents vector 
+		if (!positionAvailable(nextPos)) {
+			nextPos = oldPos;
+		}
+
+		intentions.push_back(nextPos);
+		//std::cout << "next pos: " << nextPos.toString() << std::endl;
+	}
+
+	return intentions;
+
+}
+
+//  calculate the set of S values in the system
+std::vector<double> Gridworld::calculateS() {
+
+	std::vector<Position> intentions = this->discoverIntent();
+	std::vector<double> sValues;
+	POI* poiAim = NULL;
+	int index = 0;
+
+	for (auto AGit = this->agents.begin(); AGit != this->agents.end(); ++AGit) {
+		double minDist = 1000000;
+		//  find minimum distance from each agent to a POI
+		for (auto POIit = this->poi.begin(); POIit != this->poi.end(); ++POIit) {
+			double dist = eucNorm(AGit->getP(), POIit->getP());
+			if (dist < minDist) {
+				minDist = dist;
+				poiAim = &(*POIit);
+			}
+
+		}
+		//  V = value of POI (equal to POI weight in homogenous POI environment)
+		double V = 2.0;
+		//  euc = euclidean norm between location of closest POI to rover in question
+				//  and predicted location of rover in question at next timestep
+		Position next = intentions.at(index);
+		double euc = eucNorm(poiAim->getP(), next);
+		double result = V/euc;
+	//	std::cout << "s val: " << result <<std::endl;
+	//	this->printWorld();
+		sValues.push_back(result);
+
+		index++;
+	}
+
+	return sValues;
+}
+
+double Gridworld::eucNorm(Position p1, Position p2) {
+
+	double diff = (p1.getX() - p2.getX())*(p1.getX() - p2.getX()) 
+	+ (p1.getY() - p2.getY())*(p1.getY() - p2.getY());
+
+	return std::sqrt(diff);
 }
 
 //  do any POI border the given position?

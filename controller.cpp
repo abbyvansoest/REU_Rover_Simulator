@@ -110,9 +110,10 @@ int main(void) {
 		std::cout << "EPOCH " << i << std::endl;
 
 		sim.evaluate();
-		//std::cout << "AVERAGE " << sim.getAvg() << std::endl;
 		sim.reset();
 	}
+
+	std::cout << "GLOBAL AVERAGE " << sim.getAvg(NUM_EPOCHS) << std::endl;
 
 	/* Cleanup configuration memory */
 	delete [] NC.layers;

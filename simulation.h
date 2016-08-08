@@ -40,6 +40,7 @@ class Simulation
 		struct gridConfig GC;
 		struct netConfig NC;
 		double avg;
+		double globalAvg;
 
 	public:
 		//  constructors, destructor, copy constructor
@@ -66,7 +67,7 @@ class Simulation
 		//  reset simulation for next epoch
 		void reset();
 
-		double getAvg();
+		double getAvg(int);
 		
 };
 

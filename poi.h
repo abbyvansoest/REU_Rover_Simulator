@@ -31,6 +31,7 @@ class POI {
 		std::vector<Agent*> agentsReady;   //  pointers to the agents available to carry the poi
 		bool complete;   // true if the poi has enough agents to be picked up
 		bool removed;    // true if the agent has been picked up
+		bool closest; 
 
 	public:
 
@@ -65,6 +66,9 @@ class POI {
 
 		// Clears the ready agents vector
 		void clearReadyAgents();
+
+		bool isClosest();
+		void setAsClosest(bool);
 };
 
 #endif

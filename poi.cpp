@@ -28,6 +28,7 @@ POI::POI()
 	this->complete = false;
 	this->weight = 1;
 	this->removed = false;
+	this->closest = false;
 }
 
 
@@ -39,6 +40,7 @@ POI::POI(int weight, int x, int y)
 	this->p = Position(x, y);
 	this->removed = false;
 	this->complete = false;
+	this->closest = false;
 }
 
 //  return the weight of the poi
@@ -91,3 +93,15 @@ void POI::clearReadyAgents()
 {
 	this->agentsReady.clear();
 }
+
+bool POI::isClosest() {
+	return this->closest;
+}
+
+void POI::setAsClosest(bool set) {
+	this->closest = set;
+}
+
+
+
+

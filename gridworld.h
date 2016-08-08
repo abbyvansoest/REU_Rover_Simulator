@@ -55,7 +55,8 @@ private:
 	//  check if a location in the grid is occupied
 	bool positionAvailable(Position);
 	//  return the state of the agent in the given position
-	State getState(Position, Agent);
+	State getState(Position, Agent, std::vector<double>);
+	State getStateWithoutIntent(Position pos, Agent ag);
 	//  find the distance between two (x, y) locations
 	double getDistance(Position, Position);
 	// is there a poi within one step?
@@ -68,6 +69,10 @@ private:
 	State normalize(State); 
 	// Global reward G
 	double G();
+	//  return vector of next positions of the system
+	std::vector<Position> discoverIntent();
+	// calcualte eucliden norm between 2 positions
+	double eucNorm(Position, Position);
 
 public:
 
@@ -82,7 +87,7 @@ public:
 	void evaluate();
 
 	// step all agents in the world
-	void stepAgents(FANN::neural_net*); 
+	void stepAgents(FANN::neural_net*, std::vector<double>); 
 
 	//  reset the world 
 	void reset();
@@ -104,6 +109,9 @@ public:
 	void clearPOI();
 
 	std::vector<double> accumulateRewards();
+
+	// calculate set of S values based on intened next steps
+	std::vector<double> calculateS();
 
 };
 
