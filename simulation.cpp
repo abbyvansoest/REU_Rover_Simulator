@@ -32,6 +32,8 @@ Simulation::Simulation()
 	this->timesteps = 250;
 	this->avg = 0;
 	this->globalAvg = 0;
+	this->completed = 0;
+	this->comp_total = 0;
 }
 
 /* This non default constructor uses the information provided by the configuration structs 
@@ -42,6 +44,8 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps,
 	this->K = K;
 	this->avg = 0;
 	this->globalAvg = 0;
+	this->completed = 0;
+	this->comp_total = 0;
 	//std::cout << "Call to non default constructor" << std::endl;
 	//std::cout << "OG nets " << GC.numAgents*K << std::endl;
 	for (int i = 0; i < GC.numAgents*K; i++) {
@@ -135,10 +139,12 @@ void Simulation::doublePopulation() {
 	}
 }
 
-void Simulation::evaluate() {
+void Simulation::evaluate(std::ofstream &reward_file, std::ofstream &complete_file) {
 
 	std::vector<std::pair<double, int>> rewardVector;
 	Gridworld world = Gridworld(GC, NULL);
+
+	this->completed = 0;
 
 	this->doublePopulation();
 	std::random_shuffle(this->nets.begin(), this->nets.end());
@@ -200,10 +206,84 @@ void Simulation::evaluate() {
 
 	std::cout << count << std::endl;
 	this->avg /= (2*K*GC.numAgents);
-	globalAvg += this->avg;
-	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << std::endl;
+	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << "\tCompleted/total: " << this->completed << "/" << this->comp_total << std::endl;
 	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
-	
+	assert(this->nets.size() == K*GC.numAgents);
+	complete_file << this->completed << std::endl;
+	reward_file << (--rewardVector.end())->first << std::endl;
+}
+
+void Simulation::evaluate() {
+
+	std::vector<std::pair<double, int>> rewardVector;
+	Gridworld world = Gridworld(GC, NULL);
+
+	this->completed = 0;
+
+	this->doublePopulation();
+	std::random_shuffle(this->nets.begin(), this->nets.end());
+
+	for (int i = 0; i < 2*K*GC.numAgents; i += GC.numAgents) {
+
+		FANN::neural_net* netTeam[GC.numAgents];
+		for (int j = 0; j < GC.numAgents; j++) {
+			// the jth pointer points to the address of the net at i+j
+			netTeam[j] = this->nets.at(i + j);
+		}
+
+		// run 2k epochs and collect rewards from each agent/net
+		world = Gridworld(GC, netTeam);
+		this->runEpoch(&world);
+		std::vector<double> rewards = world.accumulateRewards();   
+		// rewards 0 thru numagents-1 reward 0 corresponds with net i+k
+
+		for (int track = 0; track < GC.numAgents; track++) {
+			// map associates net reward with net index in vector
+			rewardVector.push_back(std::pair<double, int>(rewards.at(track), i + track));
+		}
+	}
+
+	// sort by reward (smallest in front)
+	std::sort(rewardVector.begin(), rewardVector.end());
+
+	int index;
+	int count = 0;
+	this->avg = 0;
+	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents  << " VS " << rewardVector.size()<< std::endl;
+	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
+		std::cout << "reward " << it->first << std::endl;
+		this->avg += it->first;
+		// free the memory first
+		if (count < rewardVector.size()/2) {
+			index = it->second;
+			delete this->nets[index];
+			this->nets[index] = NULL;
+			++count;
+		}
+	}
+
+	//then loop through and remove the instances in a safe manner, so indexes dont get corrupted
+	std::cout << count << std::endl;
+	count = 0;
+	for (auto it = this->nets.begin(); it != this->nets.end(); )
+	{
+		if (*it == NULL)
+		{
+			++count;
+			it = this->nets.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	std::cout << count << std::endl;
+	this->avg /= (2*K*GC.numAgents);
+	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << "\tCompleted/total: " << this->completed << "/" << this->comp_total << std::endl;
+	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
+	assert(this->nets.size() == K*GC.numAgents);
+
 }
 
 double Simulation::getAvg(int num_epochs) { return this->globalAvg/(double)num_epochs; }
@@ -226,7 +306,9 @@ void Simulation::runEpoch(Gridworld* world) {
 
 		 if (world->worldComplete()) {
 
-		 	world->printWorld();
+		 	++this->completed;
+			++this->comp_total;
+		 	//world->printWorld();
 		 	break;
 
 		 }
