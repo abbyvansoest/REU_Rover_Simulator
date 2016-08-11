@@ -72,7 +72,7 @@ int main(void) {
 	double RANDOM_NET_MAX =  10.0;
 
 	//  number of steps to project into the future
-	int PROJECTION_STEPS = 5;
+	int PROJECTION_STEPS = 1;
 
 	std::string pickupFile = "Pickup.net";
 
@@ -104,15 +104,27 @@ int main(void) {
 
 	Simulation sim = Simulation(GC, NC, MAX_STEPS, K, PROJECTION_STEPS);
 
-	std::ofstream max_reward_out;
-	std::ofstream world_complete_out;
-	std::string reward_type = "data/intent_base/5_proj3";
-	std::string filename = reward_type + "_max_reward.csv";
-	max_reward_out.open(filename);
-	filename = reward_type + "_world_complete.csv";
-	world_complete_out.open(filename);
+	std::ofstream max_reward_gen_out;
+	std::ofstream world_complete_gen_out;
+	std::ofstream max_reward_calls_out;
+	std::ofstream world_complete_calls_out;
 
-	if (max_reward_out.fail() || world_complete_out.fail()) {
+	std::string file_location = "data/intent_computation/1_projection/trial_1";
+
+	std::string filename = file_location + "_max_reward_calls.csv";
+	max_reward_calls_out.open(filename);
+
+	filename = file_location + "_world_complete_calls.csv";
+	world_complete_calls_out.open(filename);
+
+	filename = file_location + "_max_reward_gen.csv";
+	max_reward_gen_out.open(filename);
+
+	filename = file_location + "_world_complete_gen.csv";
+	world_complete_gen_out.open(filename);
+
+	if (max_reward_gen_out.fail() || world_complete_gen_out.fail()
+			|| max_reward_calls_out.fail() || world_complete_calls_out.fail()) {
 		std::cout << "error creating file" << std::endl;
 		exit(0);
 	}
@@ -125,13 +137,15 @@ int main(void) {
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;
 
-		sim.evaluate(max_reward_out, world_complete_out);
+		sim.evaluate(max_reward_gen_out, world_complete_gen_out, max_reward_calls_out, world_complete_calls_out);
 		//sim.evaluate();
 		sim.reset();
 	}
 
-	max_reward_out.close();
-	world_complete_out.close();
+	max_reward_gen_out.close();
+	world_complete_gen_out.close();
+	max_reward_calls_out.close();
+	world_complete_calls_out.close();
 
 	std::cout << "GLOBAL AVERAGE " << sim.getAvg(NUM_EPOCHS) << std::endl;
 

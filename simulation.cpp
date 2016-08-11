@@ -140,7 +140,14 @@ void Simulation::doublePopulation() {
 	}
 }
 
-void Simulation::evaluate(std::ofstream &reward_file, std::ofstream &complete_file) {
+/* Evaluates the simulation, and logs the data to the files.
+ * File parameters in order:
+ * 		maximum reward each generation
+ * 		number complete worlds each generation
+ * 		maximum reward per calls to discoverIntent()
+ * 		number complete worlds per calls discoverIntent()
+ */
+void Simulation::evaluate(std::ofstream &reward_file_gen, std::ofstream &complete_file_gen,std::ofstream &reward_file_calls, std::ofstream &complete_file_calls) {
 
 	std::vector<std::pair<double, int>> rewardVector;
 	Gridworld world = Gridworld(GC, NULL);
@@ -210,8 +217,14 @@ void Simulation::evaluate(std::ofstream &reward_file, std::ofstream &complete_fi
 	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << "\tCompleted/total: " << this->completed << "/" << this->comp_total << std::endl;
 	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
 	assert(this->nets.size() == K*GC.numAgents);
-	complete_file << this->completed << std::endl;
-	reward_file << (--rewardVector.end())->first << std::endl;
+	// Log data for generation and for (virtual) number of calls to discoverIntent() 
+	complete_file_gen << this->completed << std::endl;
+	reward_file_gen << (--rewardVector.end())->first << std::endl;
+	for (int i = 0; i < this->projection; ++i)
+	{
+		complete_file_calls << this->completed << std::endl;
+		reward_file_calls << (--rewardVector.end())->first << std::endl;
+	}
 }
 
 void Simulation::evaluate() {

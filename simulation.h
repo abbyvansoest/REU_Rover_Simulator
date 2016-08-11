@@ -59,7 +59,7 @@ class Simulation
 			// option 1 = no data file generation
 			// option 2 = data file generation
 		void evaluate();
-		void evaluate(std::ofstream&, std::ofstream&);
+		void evaluate(std::ofstream&, std::ofstream&, std::ofstream&, std::ofstream&);
 		//  run the simulation in an epoch with a certain number of timesteps
 		void runEpoch(Gridworld*);
 		//  in place mutation of the simulation's neural net

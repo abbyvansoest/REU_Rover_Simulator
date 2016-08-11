@@ -2,9 +2,14 @@ CC=g++
 CFLAGS=--std=c++11 -lfann
 EXE=grid_sim.out
 
-.PHONY: debug debug-flags default all
+.PHONY: debug debug-flags default all fast fast-flags
 
 default: all
+
+fast: | fast-flags all
+
+fast-flags:
+	$(eval CFLAGS += -O3)
 
 debug-flags: 
 	$(eval CFLAGS += -D DEBUG -Wall -g)
