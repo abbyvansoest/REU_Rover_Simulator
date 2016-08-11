@@ -38,7 +38,7 @@ Simulation::Simulation()
 
 /* This non default constructor uses the information provided by the configuration structs 
  * to call the subsequent non default constructors for the members */
-Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps, int K)
+Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps, int K, int proj)
 {
 
 	this->K = K;
@@ -46,6 +46,7 @@ Simulation::Simulation(struct gridConfig GC, struct netConfig NC, int timesteps,
 	this->globalAvg = 0;
 	this->completed = 0;
 	this->comp_total = 0;
+	this->projection = proj;
 	//std::cout << "Call to non default constructor" << std::endl;
 	//std::cout << "OG nets " << GC.numAgents*K << std::endl;
 	for (int i = 0; i < GC.numAgents*K; i++) {
@@ -301,7 +302,7 @@ void Simulation::runEpoch(Gridworld* world) {
 		//std::cout << "timestep " << steps << std::endl;
 		//  cacluate set of S values (contains info on distance to closest POI)
 			// based on expected locations of agents in next timestep
-		sValues = world->calculateS();
+		sValues = world->calculateS(this->projection);
 		world->stepAgents(this->pickupNet, sValues);
 
 		 if (world->worldComplete()) {

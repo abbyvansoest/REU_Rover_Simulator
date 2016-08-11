@@ -29,20 +29,20 @@ avg_width = 150
 ### calculates the average of the data,         ###
 ### smoothes it, and plots the smoothed avg.    ###
 ###################################################
-for d in data:
+'''for d in data:
     smoothed_d = running_avg(d, avg_width)
     plt.plot(smoothed_d)
 
 # Average
 averaged = np.average(data, axis=0)
 smoothed_d = running_avg(averaged, avg_width)
-'''plt.plot(smoothed_d)'''
+plt.plot(smoothed_d)
 
 # Construct legend (based on the filenames. Will probably require reworking for whatever filename pattern is given.)
 legend = sys.argv[1:]
 legend = ["Trial " + line[2] for line in legend] # Comment out this line if you just want the filenames to be on the legend
 legend.append("Average")
-'''plt.legend(legend)'''
+plt.legend(legend)'''
 
 ###################################################
 ### This plots the averages from different      ###
@@ -51,25 +51,25 @@ legend.append("Average")
 ### sets, then smoothing them with the running  ###
 ### average and plotting.                       ###
 ###################################################
-'''
-average_d = np.average(data[0:5], axis=0)
-average_g = np.average(data[5:10], axis=0)
-average_i = np.average(data[10:15], axis=0)
 
-smoothed_d = running_avg(average_d, avg_width)
-smoothed_g = running_avg(average_g, avg_width)
-smoothed_i = running_avg(average_i, avg_width)
+average_one = np.average(data[0:5], axis=0)
+average_five = np.average(data[5:10], axis=0)
+'''average_five = np.average(data[10:15], axis=0)'''
 
-plt.plot(smoothed_d)
-plt.plot(smoothed_g)
-plt.plot(smoothed_i)
-legend = ["D", "G", "Intent"]
-plt.legend(legend)'''
+'''smoothed_d = running_avg(average_d, avg_width)'''
+smoothed_one = running_avg(average_one, avg_width)
+smoothed_five = running_avg(average_five, avg_width)
+
+'''plt.plot(smoothed_d)'''
+plt.plot(smoothed_one)
+plt.plot(smoothed_five)
+legend = ["One", "Five"]
+'''plt.legend(legend)'''
 
 # Label axis and plot
 plt.xlabel("Generation")
-plt.ylabel("max reward")
-plt.title("max rewards per epoch in intent-controlled systems, five seperate trials")
+plt.ylabel("worlds complete")
+plt.title("worlds complete per epoch in one-step and five-step projected domains")
 
 plt.show()
 

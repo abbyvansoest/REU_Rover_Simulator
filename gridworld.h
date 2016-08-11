@@ -56,7 +56,7 @@ private:
 	bool positionAvailable(Position);
 	//  return the state of the agent in the given position
 	State getState(Position, Agent, std::vector<double>);
-	State getStateWithoutIntent(Position pos, Agent ag);
+	State getStateWithoutIntent(Position pos, Agent ag, std::vector<Agent>*);
 	//  find the distance between two (x, y) locations
 	double getDistance(Position, Position);
 	// is there a poi within one step?
@@ -69,8 +69,8 @@ private:
 	State normalize(State); 
 	// Global reward G
 	double G();
-	//  return vector of next positions of the system
-	std::vector<Position> discoverIntent();
+	//  return vector of next positions of the system in X steps
+	std::vector<Position> discoverIntent(int);
 	// calcualte eucliden norm between 2 positions
 	double eucNorm(Position, Position);
 
@@ -111,7 +111,7 @@ public:
 	std::vector<double> accumulateRewards();
 
 	// calculate set of S values based on intened next steps
-	std::vector<double> calculateS();
+	std::vector<double> calculateS(int);
 
 };
 

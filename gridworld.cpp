@@ -277,13 +277,16 @@ State Gridworld::getState(Position pos, Agent ag, std::vector<double> sValues) {
 
 //  return the 13-dim state representation for ag
 //  scale properly by provided sValues
-State Gridworld::getStateWithoutIntent(Position pos, Agent ag) {
+State Gridworld::getStateWithoutIntent(Position pos, Agent ag, std::vector<Agent>* copyAgents) {
 
 	double agentsA = 0.0, agentsB = 0.0, agentsC = 0.0, agentsD = 0.0;
 	double poiA = 0.0, poiB = 0.0, poiC = 0.0, poiD = 0.0;
 
+	std::vector<Agent> tempAgents = *copyAgents;
+
 	// for the given agent, get count of agents in each quadrant
-	for (auto it = agents.begin(); it != agents.end(); ++it) {  
+	for (auto it = tempAgents.begin(); it != tempAgents.end(); ++it) { 
+		 
 		//  values for the comparing agent
 		Position p = Position(it->getP());
 
@@ -500,67 +503,72 @@ void Gridworld::stepAgents(FANN::neural_net* pickupNet, std::vector<double> sVal
 }
 
 //  step all agents in the world. Reward is not provided here
-std::vector<Position> Gridworld::discoverIntent() {
+std::vector<Position> Gridworld::discoverIntent(int projection) {
 
 	State state;
 	Position oldPos, nextPos;
 	int index = 0;
 	int action;
 	std::vector<Position> intentions;
+	std::vector<Agent> copyAgents = this->agents;
 
 	//if (this->numSteps == 0) std::cout << "stepping agents" << std::endl;
+	int i = 0;
+	while (i < projection) {
 
-	//  iterate through all agents
-	for (auto it = agents.begin(); it != agents.end(); ++it) {
+		//  iterate through all agents
+		for (auto it = copyAgents.begin(); it != copyAgents.end(); ++it) {
 
-		if (this->numSteps == 0) {
-			//std::cout << "Agent " << &(*it) << std::endl;
-			//std::cout << "position: " << it->getP().toString() << "\tcarried: " << it->numberCarried() << std::endl;
+			oldPos = Position(it->getP());
+			state = getStateWithoutIntent(oldPos, *it, &copyAgents);
+
+			//float* output = pickupNet->run( (fann_type*) state.array);
+			//if (*output > .95) {
+			if (findNearbyPOI(oldPos)) {
+				action = PICKUP;
+			}
+			else {
+				action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
+			}
+
+			//  set down the POI a group of agents is holding
+			if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
+				nextPos = oldPos;
+			}
+
+			//  set next position for all cases
+			else if (action == MOVE_RIGHT) {
+				nextPos = Position(oldPos.getX() + 1, oldPos.getY());
+			}
+			else if (action == MOVE_DOWN) {
+				nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
+			}
+			else if (action == MOVE_LEFT) {
+				nextPos = Position(oldPos.getX() - 1, oldPos.getY());
+			}
+			else if (action == MOVE_UP) {
+				nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
+			}
+
+			if (action == PICKUP) {
+				nextPos = oldPos;
+			}
+
+			//  check for collisions in new map -- change agent's position if unoccupied
+			//  insert agent to newAgents vector 
+			if (!positionAvailable(nextPos)) {
+				nextPos = oldPos;
+			}
+
+			it->setP(nextPos);
+
+			//std::cout << "projected step " << i << " is " << nextPos.toString() << std::endl;
+
+			//  if on last projected step, add to intentions vector
+			if (i == projection - 1) intentions.push_back(nextPos);
 		}
 
-		oldPos = Position(it->getP());
-		state = getStateWithoutIntent(oldPos, *it);
-
-		//float* output = pickupNet->run( (fann_type*) state.array);
-		//if (*output > .95) {
-		if (findNearbyPOI(oldPos)) {
-			action = PICKUP;
-		}
-		else {
-			action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
-		}
-
-		//  set down the POI a group of agents is holding
-		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
-			nextPos = oldPos;
-		}
-
-		//  set next position for all cases
-		else if (action == MOVE_RIGHT) {
-			nextPos = Position(oldPos.getX() + 1, oldPos.getY());
-		}
-		else if (action == MOVE_DOWN) {
-			nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
-		}
-		else if (action == MOVE_LEFT) {
-			nextPos = Position(oldPos.getX() - 1, oldPos.getY());
-		}
-		else if (action == MOVE_UP) {
-			nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
-		}
-
-		if (action == PICKUP) {
-			nextPos = oldPos;
-		}
-
-		//  check for collisions in new map -- change agent's position if unoccupied
-		//  insert agent to newAgents vector 
-		if (!positionAvailable(nextPos)) {
-			nextPos = oldPos;
-		}
-
-		intentions.push_back(nextPos);
-		//std::cout << "next pos: " << nextPos.toString() << std::endl;
+		i++;
 	}
 
 	return intentions;
@@ -568,9 +576,9 @@ std::vector<Position> Gridworld::discoverIntent() {
 }
 
 //  calculate the set of S values in the system
-std::vector<double> Gridworld::calculateS() {
+std::vector<double> Gridworld::calculateS(int projection) {
 
-	std::vector<Position> intentions = this->discoverIntent();
+	std::vector<Position> intentions = this->discoverIntent(projection);
 	std::vector<double> sValues;
 	POI* poiAim = NULL;
 	int index = 0;
@@ -682,7 +690,7 @@ bool Gridworld::worldComplete()
 	if (this->home.currentAmount() == this->numPOI)
 	{
 		std::cout << "worldComplete: " << this->home.currentAmount() << std::endl;
-		this->printWorld();
+		//this->printWorld();
 		return true;
 	}
 

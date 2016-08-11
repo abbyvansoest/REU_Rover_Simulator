@@ -43,17 +43,21 @@ class Simulation
 		double globalAvg;
 		int completed;
 		int comp_total;
+		int projection;
 
 	public:
 		//  constructors, destructor, copy constructor
 		Simulation();
-		Simulation(struct gridConfig, struct netConfig, int, int);
+		Simulation(struct gridConfig, struct netConfig, int, int, int);
 		~Simulation();
 		Simulation(const Simulation&);
 
 		// copy assignment operator
 		Simulation& operator=(const Simulation&);
 
+		//  evaluate the neural nets in a simulation
+			// option 1 = no data file generation
+			// option 2 = data file generation
 		void evaluate();
 		void evaluate(std::ofstream&, std::ofstream&);
 		//  run the simulation in an epoch with a certain number of timesteps

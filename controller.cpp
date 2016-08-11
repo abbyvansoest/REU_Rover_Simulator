@@ -71,6 +71,9 @@ int main(void) {
 	double RANDOM_NET_MIN = -10.0;
 	double RANDOM_NET_MAX =  10.0;
 
+	//  number of steps to project into the future
+	int PROJECTION_STEPS = 5;
+
 	std::string pickupFile = "Pickup.net";
 
 
@@ -99,11 +102,11 @@ int main(void) {
 
 	int K = 10;
 
-	Simulation sim = Simulation(GC, NC, MAX_STEPS, K);
+	Simulation sim = Simulation(GC, NC, MAX_STEPS, K, PROJECTION_STEPS);
 
 	std::ofstream max_reward_out;
 	std::ofstream world_complete_out;
-	std::string reward_type = "data/intent_base/5";
+	std::string reward_type = "data/intent_base/5_proj3";
 	std::string filename = reward_type + "_max_reward.csv";
 	max_reward_out.open(filename);
 	filename = reward_type + "_world_complete.csv";
@@ -122,8 +125,8 @@ int main(void) {
 		std::cout << "**********************************" << std::endl;
 		std::cout << "EPOCH " << i << std::endl;
 
-		//sim.evaluate(max_reward_out, world_complete_out);
-		sim.evaluate();
+		sim.evaluate(max_reward_out, world_complete_out);
+		//sim.evaluate();
 		sim.reset();
 	}
 
