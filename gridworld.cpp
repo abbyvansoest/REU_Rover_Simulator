@@ -663,6 +663,7 @@ POI* Gridworld::nearbyPOI(Position pos) {
 			return &(*it);
 		}
 	}
+	return NULL;
 }
 
 //  entirely clear the gridworld of agents and POIs
@@ -769,7 +770,7 @@ void Gridworld::clearPOI()
 std::vector<double> Gridworld::accumulateRewards()
 {
 	std::vector<double> rewards;
-	double G_value = this->G();
+	// double G_value = this->G(); // Currently unused
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
 		rewards.push_back(it->getReward());
