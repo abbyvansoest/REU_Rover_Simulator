@@ -513,62 +513,92 @@ std::vector<Position> Gridworld::discoverIntent(int projection) {
 	std::vector<Agent> copyAgents = this->agents;
 
 	//if (this->numSteps == 0) std::cout << "stepping agents" << std::endl;
-	int i = 0;
-	while (i < projection) {
+	//int i = 0;
 
-		//  iterate through all agents
-		for (auto it = copyAgents.begin(); it != copyAgents.end(); ++it) {
+	//  iterate through all agents
+	for (auto it = copyAgents.begin(); it != copyAgents.end(); ++it) {
 
-			oldPos = Position(it->getP());
-			state = getStateWithoutIntent(oldPos, *it, &copyAgents);
+		oldPos = Position(it->getP());
+		state = getStateWithoutIntent(oldPos, *it, &copyAgents);
 
-			//float* output = pickupNet->run( (fann_type*) state.array);
-			//if (*output > .95) {
-			if (findNearbyPOI(oldPos)) {
-				action = PICKUP;
-			}
-			else {
-				action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
-			}
+		//float* output = pickupNet->run( (fann_type*) state.array);
+		//if (*output > .95) {
+		if (findNearbyPOI(oldPos)) {
+			action = PICKUP;
+		}
+		else {
+			action = it->nextAction(state, oldPos, this->home, this->netTeam[index]); 
+		}
+#ifdef DEBUG
+		std::cout << "Action (uldr): " << action << std::endl;
+		std::cout << "  OLD: " << oldPos.toString() << std::endl;
+#endif
 
-			//  set down the POI a group of agents is holding
-			if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
-				nextPos = oldPos;
-			}
-
-			//  set next position for all cases
-			else if (action == MOVE_RIGHT) {
-				nextPos = Position(oldPos.getX() + 1, oldPos.getY());
-			}
-			else if (action == MOVE_DOWN) {
-				nextPos = Position(oldPos.getX(), oldPos.getY() + 1);
-			}
-			else if (action == MOVE_LEFT) {
-				nextPos = Position(oldPos.getX() - 1, oldPos.getY());
-			}
-			else if (action == MOVE_UP) {
-				nextPos = Position(oldPos.getX(), oldPos.getY() - 1);
-			}
-
-			if (action == PICKUP) {
-				nextPos = oldPos;
-			}
-
-			//  check for collisions in new map -- change agent's position if unoccupied
-			//  insert agent to newAgents vector 
-			if (!positionAvailable(nextPos)) {
-				nextPos = oldPos;
-			}
-
-			it->setP(nextPos);
-
-			//std::cout << "projected step " << i << " is " << nextPos.toString() << std::endl;
-
-			//  if on last projected step, add to intentions vector
-			if (i == projection - 1) intentions.push_back(nextPos);
+		//  set down the POI a group of agents is holding
+		if (action == SET_DOWN && it->getP() == this->home.getPosition()) {
+			nextPos = oldPos;
 		}
 
-		i++;
+		//  set next position for all cases
+		//  Project the agent's movement as a high speed movement, eg moving 'projection' number 
+		//  of steps straigt forward. If the agent cannot move 'projection' steps in a direction, 
+		//  then they will move as far as they can
+		//
+		//  The agent is moved 1 unit in the chosen direction untill they cannot move anymore
+		//  or they reach the projection 'speed'. There is an exception in the boolean expression
+		//  to see allow for the positionAvailable to be false when the old position == new position
+		//  (eg, when they start moving) since that position is not technically available, but
+		//  still ok for the agent to occupy.
+		else if (action == MOVE_RIGHT) {
+			int decrement = projection;
+			do{
+				nextPos = Position(oldPos.getX() + projection - decrement, oldPos.getY());
+				--decrement;
+			} while(decrement >= 0 && (nextPos == oldPos || positionAvailable(nextPos)));
+		}
+		else if (action == MOVE_DOWN) {
+			int decrement = projection;
+			do{
+				nextPos = Position(oldPos.getX(), oldPos.getY() + projection - decrement);
+				--decrement;
+			} while(decrement >= 0 && (nextPos == oldPos || positionAvailable(nextPos)));
+		}
+		else if (action == MOVE_LEFT) {
+			int decrement = projection;
+			do{
+				nextPos = Position(oldPos.getX() - projection + decrement, oldPos.getY());
+				--decrement;
+			} while(decrement >= 0 && (nextPos == oldPos || positionAvailable(nextPos)));
+		}
+		else if (action == MOVE_UP) {
+			int decrement = projection;
+			do{
+				nextPos = Position(oldPos.getX(), oldPos.getY() - projection + decrement);
+				--decrement;
+			} while(decrement >= 0 && (nextPos == oldPos || positionAvailable(nextPos)));
+		}
+
+		if (action == PICKUP) {
+			nextPos = oldPos;
+		}
+
+#ifdef DEBUG
+		std::cout << oldPos.toString() << " vs " << nextPos.toString() << std::endl;
+#endif
+
+		//  check for collisions in new map -- change agent's position if unoccupied
+		//  insert agent to newAgents vector 
+		if (!positionAvailable(nextPos)) {
+			nextPos = oldPos;
+		}
+
+		it->setP(nextPos);
+
+		//std::cout << "projected step " << i << " is " << nextPos.toString() << std::endl;
+
+		//  if on last projected step, add to intentions vector
+		//if (i == projection - 1) intentions.push_back(nextPos);
+		intentions.push_back(nextPos);
 	}
 
 	return intentions;
@@ -605,7 +635,7 @@ std::vector<double> Gridworld::calculateS(int projection) {
 	//	this->printWorld();
 		sValues.push_back(result);
 
-		index++;
+		++index;
 	}
 
 	return sValues;
