@@ -24,33 +24,33 @@
 #include "controller.h"
 #include <cassert>
 
-
-// struct gridConfig
-// {
-// 	int numAgents;
-// 	int numPOI;
-// 	int width;
-// 	int height;
-// 	int poiWeight;
-// };
-
-// // struct representation of the neural net configuration 
-// struct netConfig
-// {
-// 	FANN::network_type_enum net_type;
-// 	unsigned int num_layers;
-// 	unsigned int *layers;
-// 	bool randWeights;
-// 	float randMin;
-// 	float randMax;
-// };
-
+/* A simple function to open new files based on filename.
+ * If the file already exists, it exits the program.
+ * NOT THE BEST WAY TO EXIT, but this is a single-threaded simulation */
+std::ofstream new_file(std::string filename)
+{
+	std::ofstream file;
+	struct stat buffer;
+	/* Test if files already exist. If so, abort program*/
+	if ( stat(filename.c_str(), &buffer) == 0)
+	{
+		std::cout << "File <" << filename << "> already exists. Aborting Simulation." << std::endl;
+		exit(1);
+	}
+	file.open(filename);
+	if (file.fail())
+	{
+		std::cout << "FILE <" << filename << "> Failed in creation. Aborting Simulation." << std::endl;
+		exit(1);
+	}
+	return file;
+}
 
 /* run simulations for the full number of epochs, performing neuro-evolutionary
    techniques between each epoch */ 
 int main(void) {
 
-	int MAX_STEPS = 250;
+	int MAX_STEPS = 100;
 //	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 10000;
 //	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
@@ -58,10 +58,10 @@ int main(void) {
 
 	//  control gridworld
 	int NUMBER_OF_AGENTS = 6;
-	int NUMBER_OF_POI = 4;
+	int NUMBER_OF_POI = 20;
 
-	int WORLD_WIDTH = 15;
-	int WORLD_HEIGHT = 15;
+	int WORLD_WIDTH = 50;
+	int WORLD_HEIGHT = 50;
 
 	int POI_WEIGHT = 2;
 
@@ -109,25 +109,19 @@ int main(void) {
 	std::ofstream max_reward_calls_out;
 	std::ofstream world_complete_calls_out;
 
-	std::string file_location = "data/intent_computation/1_projection/trial_1";
+	std::string file_location = "data/test";
 
 	std::string filename = file_location + "_max_reward_calls.csv";
-	max_reward_calls_out.open(filename);
+	max_reward_calls_out = new_file(filename);
 
 	filename = file_location + "_world_complete_calls.csv";
-	world_complete_calls_out.open(filename);
+	world_complete_calls_out = new_file(filename);
 
 	filename = file_location + "_max_reward_gen.csv";
-	max_reward_gen_out.open(filename);
+	max_reward_gen_out = new_file(filename);
 
 	filename = file_location + "_world_complete_gen.csv";
-	world_complete_gen_out.open(filename);
-
-	if (max_reward_gen_out.fail() || world_complete_gen_out.fail()
-			|| max_reward_calls_out.fail() || world_complete_calls_out.fail()) {
-		std::cout << "error creating file" << std::endl;
-		exit(0);
-	}
+	world_complete_gen_out = new_file(filename);
 
 	//  for each learning epoch, we run around 10% of the set of simulations and 
 	//  then evolve the population 

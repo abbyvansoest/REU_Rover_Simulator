@@ -183,9 +183,9 @@ void Simulation::evaluate(std::ofstream &reward_file_gen, std::ofstream &complet
 	int index;
 	int count = 0;
 	this->avg = 0;
-	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents  << " VS " << rewardVector.size()<< std::endl;
+	//std::cout << this->nets.size() <<  " VS " << K*GC.numAgents  << " VS " << rewardVector.size()<< std::endl;
 	for (auto it = rewardVector.begin(); it != rewardVector.end(); ++it) {
-		std::cout << "reward " << it->first << std::endl;
+		//std::cout << "reward " << it->first << std::endl;
 		this->avg += it->first;
 		// free the memory first
 		if (count < rewardVector.size()/2) {
@@ -197,7 +197,7 @@ void Simulation::evaluate(std::ofstream &reward_file_gen, std::ofstream &complet
 	}
 
 	//then loop through and remove the instances in a safe manner, so indexes dont get corrupted
-	std::cout << count << std::endl;
+	//std::cout << count << std::endl;
 	count = 0;
 	for (auto it = this->nets.begin(); it != this->nets.end(); )
 	{
@@ -212,10 +212,10 @@ void Simulation::evaluate(std::ofstream &reward_file_gen, std::ofstream &complet
 		}
 	}
 
-	std::cout << count << std::endl;
+	//std::cout << count << std::endl;
 	this->avg /= (2*K*GC.numAgents);
 	std::cout << "Avg: " << this->avg << "\t" << " Max: " << (--rewardVector.end())->first << "\tCompleted/total: " << this->completed << "/" << this->comp_total << std::endl;
-	std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
+	//std::cout << this->nets.size() <<  " VS " << K*GC.numAgents << std::endl;
 	assert(this->nets.size() == K*GC.numAgents);
 	// Log data for generation and for (virtual) number of calls to discoverIntent() 
 	complete_file_gen << this->completed << std::endl;
