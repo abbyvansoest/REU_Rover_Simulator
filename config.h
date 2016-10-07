@@ -1,3 +1,5 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H
 /* FANN */
 #include <fann.h>
 #include <fann_cpp.h>
@@ -26,3 +28,6 @@ struct netConfig
 };
 
 
+#define LEARNING_TYPE 'D'
+#define ENABLE_INTENT true
+#endif

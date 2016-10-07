@@ -157,6 +157,7 @@ void Simulation::evaluate(std::ofstream &reward_file_gen, std::ofstream &complet
 	this->doublePopulation();
 	std::random_shuffle(this->nets.begin(), this->nets.end());
 
+	/* Make teams and run them in a world */
 	for (int i = 0; i < 2*K*GC.numAgents; i += GC.numAgents) {
 
 		FANN::neural_net* netTeam[GC.numAgents];

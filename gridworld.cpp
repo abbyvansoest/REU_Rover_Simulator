@@ -231,19 +231,31 @@ State Gridworld::getState(Position pos, Agent ag, std::vector<double> sValues) {
 
 		Position p = Position(it->getP());
 
-		if (it->isClosest()) I = 1.0;	
-		else I = sValues.at(index);		
+		if (it->isClosest())
+		{
+			I = 1.0;	
+		}
+		else
+		{
+			I = sValues.at(index);		
+		}
+
+		/* If not using the intent state modification,
+		 * an easy way to enforce this is this next line. */
+#if (ENABLE_INTENT == false)
+		I = 1.0;
+#endif
 
 		if (p.getX() <  pos.getX() && p.getY() >= pos.getY()) { 
 			poiA += I/getDistance(p, pos);
 		}
-		if (p.getX() >= pos.getX() && p.getY() >  pos.getY()) { 
+		else if (p.getX() >= pos.getX() && p.getY() >  pos.getY()) { 
 			poiB += I/getDistance(p, pos);
 		}
-		if (p.getX() <= pos.getX() && p.getY() <  pos.getY()) { 
+		else if (p.getX() <= pos.getX() && p.getY() <  pos.getY()) { 
 			poiC += I/getDistance(p, pos);
 		}
-		if (p.getX() >  pos.getX() && p.getY() <= pos.getY()) {
+		else if (p.getX() >  pos.getX() && p.getY() <= pos.getY()) {
 			poiD += I/getDistance(p, pos);
 		}
 		if (it->isClosest()) it->setAsClosest(false);
@@ -665,8 +677,11 @@ bool Gridworld::findNearbyPOI(Position pos) {
 		//  ignore if poi has been marked as complete or removed
 		if (it->isComplete() || it->isRemoved()) continue;
 		Position p = it->getP();
-		if (p == checkUp || p == checkDown || p == checkRight || p == checkLeft
-			|| p == checkUpLeft || p == checkDownLeft || p == checkUpRight || p == checkDownRight) {
+		if ( p == checkUp || p == checkDown
+				|| p == checkRight || p == checkLeft
+				|| p == checkUpLeft || p == checkDownLeft
+				|| p == checkUpRight || p == checkDownRight)
+		{
 			return true;
 		}
 	}
@@ -800,10 +815,16 @@ void Gridworld::clearPOI()
 std::vector<double> Gridworld::accumulateRewards()
 {
 	std::vector<double> rewards;
-	// double G_value = this->G(); // Currently unused
+	double G_value = this->G();
 	for (auto it = this->agents.begin(); it != this->agents.end(); ++it)
 	{
+		/* For D: */
+#if (LEARNING_TYPE == 'D')
 		rewards.push_back(it->getReward());
+#else
+		/* For G: */
+		rewards.push_back(G_value);
+#endif
 	}
 	return rewards;
 }

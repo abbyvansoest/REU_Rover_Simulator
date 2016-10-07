@@ -29,6 +29,8 @@
 #include <fann_cpp.h>
 #include <algorithm>
 
+#include "config.h"
+
 using std::unordered_map;
 using std::string;
 

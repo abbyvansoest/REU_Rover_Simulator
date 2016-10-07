@@ -50,7 +50,7 @@ std::ofstream new_file(std::string filename)
    techniques between each epoch */ 
 int main(void) {
 
-	int MAX_STEPS = 100;
+	int MAX_STEPS = 75;
 //	int NUM_SIMULATIONS = 50;
 	int NUM_EPOCHS = 10000;
 //	double MUTATION_RATE = .1;  //  number of connections to mutate within a net
@@ -60,10 +60,10 @@ int main(void) {
 	int NUMBER_OF_AGENTS = 6;
 	int NUMBER_OF_POI = 20;
 
-	int WORLD_WIDTH = 50;
-	int WORLD_HEIGHT = 50;
+	int WORLD_WIDTH = 75;
+	int WORLD_HEIGHT = 75;
 
-	int POI_WEIGHT = 2;
+	int POI_WEIGHT = 3;
 
 	//  control neural nets
 	int NUMBER_OF_LAYERS = 4;
@@ -109,18 +109,18 @@ int main(void) {
 	std::ofstream max_reward_calls_out;
 	std::ofstream world_complete_calls_out;
 
-	std::string file_location = "data/test";
+	std::string file_location = "data/impossible_runs/trial_5/";
 
-	std::string filename = file_location + "_max_reward_calls.csv";
+	std::string filename = file_location + "max_reward_calls.csv";
 	max_reward_calls_out = new_file(filename);
 
-	filename = file_location + "_world_complete_calls.csv";
+	filename = file_location + "world_complete_calls.csv";
 	world_complete_calls_out = new_file(filename);
 
-	filename = file_location + "_max_reward_gen.csv";
+	filename = file_location + "max_reward_gen.csv";
 	max_reward_gen_out = new_file(filename);
 
-	filename = file_location + "_world_complete_gen.csv";
+	filename = file_location + "world_complete_gen.csv";
 	world_complete_gen_out = new_file(filename);
 
 	//  for each learning epoch, we run around 10% of the set of simulations and 
@@ -148,7 +148,3 @@ int main(void) {
 
 	return 0;
 }
-
-
-
-
